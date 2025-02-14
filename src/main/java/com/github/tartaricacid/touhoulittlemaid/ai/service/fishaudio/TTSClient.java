@@ -3,21 +3,27 @@ package com.github.tartaricacid.touhoulittlemaid.ai.service.fishaudio;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.Service;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.fishaudio.request.TTSRequest;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.fishaudio.response.TTSCallback;
-import com.squareup.okhttp.*;
+import com.google.common.net.HttpHeaders;
+import com.google.common.net.MediaType;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.function.Consumer;
 
 public class TTSClient {
-    private final OkHttpClient httpClient;
+    private final HttpClient httpClient;
     private String baseUrl = "";
     private String apiKey = "";
     private TTSRequest request;
 
-    public static TTSClient create(final OkHttpClient httpClient) {
+    public static TTSClient create(final HttpClient httpClient) {
         return new TTSClient(httpClient);
     }
 
-    private TTSClient(OkHttpClient httpClient) {
+    private TTSClient(HttpClient httpClient) {
         this.httpClient = httpClient;
     }
 
@@ -41,15 +47,21 @@ public class TTSClient {
     }
 
     public void handle(Consumer<byte[]> consumer) {
-        MediaType mediaType = MediaType.parse("application/json; charset=UTF-8");
-        RequestBody requestBody = RequestBody.create(mediaType, Service.GSON.toJson(request));
-        Request request = new Request.Builder()
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Authorization", "Bearer " + this.apiKey)
-                .post(requestBody)
-                .url(this.baseUrl + TTSRequest.getUrl())
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.JSON_UTF_8.toString())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.apiKey)
+                .POST(HttpRequest.BodyPublishers.ofString(Service.GSON.toJson(request)))
+                .timeout(Duration.ofSeconds(20))
+                .uri(URI.create(baseUrl + TTSRequest.getUrl()))
                 .build();
-        Call call = httpClient.newCall(request);
-        call.enqueue(new TTSCallback(consumer));
+        httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofByteArray())
+                .whenComplete((response, throwable) -> {
+                    TTSCallback callback = new TTSCallback(consumer);
+                    if (throwable != null) {
+                        callback.onFailure(httpRequest, throwable);
+                    } else {
+                        callback.onResponse(response);
+                    }
+                });
     }
 }

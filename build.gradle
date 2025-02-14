@@ -131,14 +131,6 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${forge_version}"
 
-    // 稍老版本的 okhttp 库，总大小 300KB，用于 AI 相关的网络调用
-    // 不能用 apache httpclient，这个库只有客户端有，服务端没有
-    minecraftLibrary(jarJar("com.squareup.okhttp:okhttp:2.7.5") {
-        jarJar.ranged(it, "[2.7.5,)")
-    })
-    minecraftLibrary(jarJar("com.squareup.okio:okio:1.6.0") {
-        jarJar.ranged(it, "[1.6.0,)")
-    })
     // MP3 音频解码库
     minecraftLibrary(jarJar("com.googlecode.soundlibs:mp3spi:1.9.5.4") {
         // mp3spi 居然会把 junit 打包进去……

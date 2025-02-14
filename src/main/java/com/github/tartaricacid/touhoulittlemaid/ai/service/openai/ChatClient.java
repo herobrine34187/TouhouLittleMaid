@@ -4,21 +4,27 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.Service;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.openai.request.ChatCompletion;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.openai.response.ChatCallback;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.openai.response.ChatCompletionResponse;
-import com.squareup.okhttp.*;
+import com.google.common.net.HttpHeaders;
+import com.google.common.net.MediaType;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.function.Consumer;
 
 public final class ChatClient {
-    private final OkHttpClient httpClient;
+    private final HttpClient httpClient;
     private String baseUrl = "";
     private String apiKey = "";
     private ChatCompletion chatCompletion;
 
-    public static ChatClient create(final OkHttpClient httpClient) {
+    public static ChatClient create(final HttpClient httpClient) {
         return new ChatClient(httpClient);
     }
 
-    private ChatClient(OkHttpClient httpClient) {
+    private ChatClient(HttpClient httpClient) {
         this.httpClient = httpClient;
     }
 
@@ -42,15 +48,21 @@ public final class ChatClient {
     }
 
     public void handle(Consumer<ChatCompletionResponse> consumer) {
-        MediaType mediaType = MediaType.parse("application/json; charset=UTF-8");
-        RequestBody requestBody = RequestBody.create(mediaType, Service.GSON.toJson(chatCompletion));
-        Request request = new Request.Builder()
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Authorization", "Bearer " + this.apiKey)
-                .post(requestBody)
-                .url(this.baseUrl + ChatCompletion.getUrl())
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.JSON_UTF_8.toString())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.apiKey)
+                .POST(HttpRequest.BodyPublishers.ofString(Service.GSON.toJson(chatCompletion)))
+                .timeout(Duration.ofSeconds(20))
+                .uri(URI.create(baseUrl + ChatCompletion.getUrl()))
                 .build();
-        Call call = httpClient.newCall(request);
-        call.enqueue(new ChatCallback(consumer));
+        httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString())
+                .whenComplete((response, throwable) -> {
+                    ChatCallback callback = new ChatCallback(consumer);
+                    if (throwable != null) {
+                        callback.onFailure(httpRequest, throwable);
+                    } else {
+                        callback.onResponse(response);
+                    }
+                });
     }
 }

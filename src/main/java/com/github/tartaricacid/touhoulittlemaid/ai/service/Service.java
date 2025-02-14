@@ -14,12 +14,14 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.openai.request.Role;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.util.CappedQueue;
 import com.google.gson.Gson;
-import com.squareup.okhttp.OkHttpClient;
+
+import java.net.http.HttpClient;
+import java.time.Duration;
 
 public final class Service {
     public static final Gson GSON = new Gson();
-
-    private static final OkHttpClient HTTP_CLIENT = new OkHttpClient();
+    // TODO: 增加代理功能？
+    private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
     // TODO: 未来需要改成可配置选项
     private static final double TEMPERATURE = 0.5;
     private static final int SAMPLE_RATE = 32000;
