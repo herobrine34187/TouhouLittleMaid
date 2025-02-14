@@ -23,7 +23,9 @@ public class PapiReplacer {
                 .replace("${mainhand_item}", getSlotItemName(EquipmentSlot.MAINHAND, maid))
                 .replace("${offhand_item}", getSlotItemName(EquipmentSlot.OFFHAND, maid))
                 .replace("${inventory_items}", getInventoryItems(maid))
-                .replace("${output_json_format}", getOutputJsonFormat());
+                .replace("${output_json_format}", getOutputJsonFormat())
+                .replace("${chat_language}", AIConfig.CHAT_LANGUAGE.get())
+                .replace("${tts_language}", AIConfig.TTS_LANGUAGE.get());
     }
 
     private static String getWeather(Level level) {

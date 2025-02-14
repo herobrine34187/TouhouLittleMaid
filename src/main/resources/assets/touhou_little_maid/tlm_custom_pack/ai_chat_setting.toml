@@ -50,5 +50,5 @@ format = """
 
 # 回复语言类型
 language = """
-    文字（chat_text）字段为中文回复，语音（tss_text）字段为中文回复翻译过来的英文回复
+    文字（chat_text）字段为${chat_language}回复，语音（tts_text）字段为${chat_language}回复翻译过来的${tts_language}回复
     """

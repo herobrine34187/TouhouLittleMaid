@@ -32,7 +32,7 @@ public class AIChatConfigScreen extends Screen {
     @Override
     protected void init() {
         int posX = this.width / 2;
-        int posY = this.height / 2;
+        int posY = this.height / 2 - 5;
 
         this.configEditBoxes.clear();
         this.configOnSave.clear();
@@ -49,6 +49,8 @@ public class AIChatConfigScreen extends Screen {
                 Component.translatable("ai.touhou_little_maid.chat.config.base_url"), v -> AIConfig.CHAT_BASE_URL.set(v));
         createInputEditBox(posX - 203, posY + 20, AIConfig.CHAT_MODEL.get(),
                 Component.translatable("ai.touhou_little_maid.chat.config.model"), v -> AIConfig.CHAT_MODEL.set(v));
+        createInputEditBox(posX - 203, posY + 60, AIConfig.CHAT_LANGUAGE.get(),
+                Component.translatable("ai.touhou_little_maid.chat.config.language"), v -> AIConfig.CHAT_LANGUAGE.set(v));
 
         createInputEditBox(posX + 3, posY - 60, ApiKeyManager.getTtsApiKey(), true,
                 Component.translatable("ai.touhou_little_maid.tts.config.api_key"), ApiKeyManager::setTtsApiKey);
@@ -56,6 +58,8 @@ public class AIChatConfigScreen extends Screen {
                 Component.translatable("ai.touhou_little_maid.tts.config.base_url"), v -> AIConfig.TTS_BASE_URL.set(v));
         createInputEditBox(posX + 3, posY + 20, AIConfig.TTS_MODEL.get(),
                 Component.translatable("ai.touhou_little_maid.tts.config.model"), v -> AIConfig.TTS_MODEL.set(v));
+        createInputEditBox(posX + 3, posY + 60, AIConfig.TTS_LANGUAGE.get(),
+                Component.translatable("ai.touhou_little_maid.tts.config.language"), v -> AIConfig.TTS_LANGUAGE.set(v));
     }
 
     private void createCheckbox(int posX, int posY) {
@@ -80,14 +84,14 @@ public class AIChatConfigScreen extends Screen {
 
     private void createSaveExitButton(int posX, int posY) {
         this.addRenderableWidget(Button.builder(Component.translatable("button.touhou_little_maid.maid.return"), b -> this.getMinecraft().setScreen(parent))
-                .pos(posX - 205, posY + 50).size(204, 20).build());
+                .pos(posX - 205, posY + 90).size(204, 20).build());
         this.addRenderableWidget(Button.builder(Component.translatable("selectWorld.edit.save"), b -> {
             for (int i = 0; i < this.configOnSave.size(); i++) {
                 EditBox editBox = this.configEditBoxes.get(i);
                 this.configOnSave.get(i).accept(editBox.getValue());
             }
             this.getMinecraft().setScreen(parent);
-        }).pos(posX + 1, posY + 50).size(204, 20).build());
+        }).pos(posX + 1, posY + 90).size(204, 20).build());
     }
 
     @Override

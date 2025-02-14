@@ -6,10 +6,12 @@ public class AIConfig {
     public static ForgeConfigSpec.BooleanValue CHAT_ENABLED;
     public static ForgeConfigSpec.ConfigValue<String> CHAT_BASE_URL;
     public static ForgeConfigSpec.ConfigValue<String> CHAT_MODEL;
+    public static ForgeConfigSpec.ConfigValue<String> CHAT_LANGUAGE;
 
     public static ForgeConfigSpec.BooleanValue TTS_ENABLED;
     public static ForgeConfigSpec.ConfigValue<String> TTS_BASE_URL;
     public static ForgeConfigSpec.ConfigValue<String> TTS_MODEL;
+    public static ForgeConfigSpec.ConfigValue<String> TTS_LANGUAGE;
 
     public static ForgeConfigSpec.IntValue MAID_MAX_HISTORY_CHAT_SIZE;
 
@@ -29,6 +31,9 @@ public class AIConfig {
         builder.comment("The chat AI model you intend to use");
         CHAT_MODEL = builder.define("ChatModel", "deepseek-chat");
 
+        builder.comment("The chat language you intend to use");
+        CHAT_LANGUAGE = builder.define("ChatLanguage", "中文");
+
         builder.comment("Whether or not to enable the TTS feature");
         TTS_ENABLED = builder.define("TTSEnabled", true);
 
@@ -37,6 +42,9 @@ public class AIConfig {
 
         builder.comment("The TTS model you intend to use");
         TTS_MODEL = builder.define("TTSModel", "4858e0be678c4449bf3a7646186edd42");
+
+        builder.comment("The TTS language you intend to use");
+        TTS_LANGUAGE = builder.define("TTSLanguage", "英文");
 
         builder.comment("The maximum historical conversation length cached by the maid");
         MAID_MAX_HISTORY_CHAT_SIZE = builder.defineInRange("MaidMaxHistoryChatSize", 16, 1, Integer.MAX_VALUE);
