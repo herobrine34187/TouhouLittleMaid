@@ -2,7 +2,6 @@ package com.github.tartaricacid.touhoulittlemaid.network.message;
 
 import com.github.tartaricacid.touhoulittlemaid.client.sound.data.MaidAISoundInstance;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
-import com.github.tartaricacid.touhoulittlemaid.util.CompressionUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
@@ -23,11 +22,11 @@ public class TTSAudioToClientMessage {
 
     public static void encode(TTSAudioToClientMessage message, FriendlyByteBuf buf) {
         buf.writeVarInt(message.maidId);
-        buf.writeByteArray(CompressionUtils.compress(message.data));
+        buf.writeByteArray(message.data);
     }
 
     public static TTSAudioToClientMessage decode(FriendlyByteBuf buf) {
-        return new TTSAudioToClientMessage(buf.readVarInt(), CompressionUtils.decompress(buf.readByteArray()));
+        return new TTSAudioToClientMessage(buf.readVarInt(), buf.readByteArray());
     }
 
     public static void handle(TTSAudioToClientMessage message, Supplier<NetworkEvent.Context> contextSupplier) {

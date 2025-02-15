@@ -6,6 +6,7 @@ import com.github.tartaricacid.touhoulittlemaid.ai.manager.config.CharacterSetti
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.entity.HistoryChat;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.fishaudio.TTSClient;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.fishaudio.request.Format;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.fishaudio.request.OpusBitRate;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.fishaudio.request.TTSRequest;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.openai.ChatClient;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.openai.request.ChatCompletion;
@@ -70,8 +71,9 @@ public final class Service {
     public static TTSRequest getTtsRequest(String model, String text) {
         return TTSRequest.create()
                 .setReferenceId(model)
-                .setSampleRate(SAMPLE_RATE)
-                .setFormat(Format.MP3)
+                .setFormat(Format.OPUS)
+                // OPUS 极低比特率情况下，音质效果也还不错
+                .setOpusBitrate(OpusBitRate.LOWEST)
                 .setText(text);
     }
 }

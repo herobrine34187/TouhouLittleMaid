@@ -10,8 +10,6 @@ import net.minecraft.client.sounds.AudioStream;
 import net.minecraft.client.sounds.SoundBufferLibrary;
 import net.minecraft.sounds.SoundSource;
 
-import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
 public class MaidAISoundInstance extends EntityBoundSoundInstance {
@@ -26,8 +24,8 @@ public class MaidAISoundInstance extends EntityBoundSoundInstance {
     public CompletableFuture<AudioStream> getStream(SoundBufferLibrary library, Sound sound, boolean looping) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                return new Mp3AudioStream(this.data);
-            } catch (IOException | UnsupportedAudioFileException e) {
+                return new OpusAudioStream(this.data);
+            } catch (Exception e) {
                 TouhouLittleMaid.LOGGER.error(e);
             }
             return null;
