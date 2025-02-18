@@ -2,6 +2,7 @@
   "ai.touhou_little_maid.chat.api_key.empty": "You don't have an API Key for AI Chat",
   "ai.touhou_little_maid.chat.disable": "The AI chat feature has been disabled",
   "ai.touhou_little_maid.chat.input.tip": "Enter the content and press the Enter key to send",
+  "ai.touhou_little_maid.chat.config.tip": "Click to open the AI chat config",
   "advancements.touhou_little_maid.base.craft_gohei.description": "Craft a gohei",
   "advancements.touhou_little_maid.base.craft_gohei.title": "The Key to Gensou?",
   "advancements.touhou_little_maid.base.build_altar.description": "Build an altar, and let the fun begin",

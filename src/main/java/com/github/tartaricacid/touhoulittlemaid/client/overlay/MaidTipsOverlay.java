@@ -48,7 +48,6 @@ public class MaidTipsOverlay implements IGuiOverlay {
 
         overlay.addSpecialTips("overlay.touhou_little_maid.ntr_item.tips", (item, maid, player) -> !maid.isOwnedBy(player) && EntityMaid.getNtrItem().test(item));
         overlay.addSpecialTips("overlay.touhou_little_maid.remove_backpack.tips", (item, maid, player) -> maid.isOwnedBy(player) && maid.hasBackpack() && item.is(Tags.Items.SHEARS));
-        // FIXME: 应该要能自定义，而不是指定特定的女仆才能对话
         overlay.addSpecialTips("overlay.touhou_little_maid.can_ai_chat.tips", MaidTipsOverlay::checkAiChatCondition);
 
         for (ILittleMaid littleMaid : TouhouLittleMaid.EXTENSIONS) {
@@ -67,7 +66,7 @@ public class MaidTipsOverlay implements IGuiOverlay {
         if (!item.isEmpty()) {
             return false;
         }
-        return maid.isOwnedBy(player) && maid.getModelId().contains(PressAIChatKeyEvent.CAN_CHAT_MAID_ID);
+        return maid.isOwnedBy(player) && PressAIChatKeyEvent.CAN_CHAT_MAID_IDS.contains(maid.getModelId());
     }
 
     private static MutableComponent checkSpecialTips(ItemStack mainhandItem, EntityMaid maid, LocalPlayer player) {
@@ -113,14 +112,13 @@ public class MaidTipsOverlay implements IGuiOverlay {
         }
         if (tip != null) {
             gui.setupOverlayRenderState(true, false);
-            List<FormattedCharSequence> split = minecraft.font.split(tip, 150);
+            List<FormattedCharSequence> split = minecraft.font.split(tip, 120);
             int offset = (screenHeight / 2 - 5) - split.size() * 10;
-            guiGraphics.renderItem(player.getMainHandItem(), screenWidth / 2 - 8, offset);
-            guiGraphics.blit(ICON, screenWidth / 2 + 2, offset - 4, 16, 16, 16, 16, 16, 16);
+            guiGraphics.renderItem(player.getMainHandItem(), screenWidth / 2 + 32, offset);
+            guiGraphics.blit(ICON, screenWidth / 2 + 42, offset - 4, 16, 16, 16, 16, 16, 16);
             offset += 18;
             for (FormattedCharSequence sequence : split) {
-                int width = minecraft.font.width(sequence);
-                guiGraphics.drawString(minecraft.font, sequence, (screenWidth - width) / 2, offset, 0xFFFFFF);
+                guiGraphics.drawString(minecraft.font, sequence, screenWidth / 2 + 32, offset, 0xFFFFFF);
                 offset += 10;
             }
         }

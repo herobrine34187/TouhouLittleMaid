@@ -102,6 +102,8 @@ public final class NetworkHandler {
                 Optional.of(NetworkDirection.PLAY_TO_SERVER));
         CHANNEL.registerMessage(38, TTSAudioToClientMessage.class, TTSAudioToClientMessage::encode, TTSAudioToClientMessage::decode, TTSAudioToClientMessage::handle,
                 Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+        CHANNEL.registerMessage(39, SyncAiSettingMessage.class, SyncAiSettingMessage::encode, SyncAiSettingMessage::decode, SyncAiSettingMessage::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT));
     }
 
     public static void sendToClientPlayer(Object message, Player player) {

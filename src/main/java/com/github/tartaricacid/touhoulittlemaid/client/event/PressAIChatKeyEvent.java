@@ -2,6 +2,7 @@ package com.github.tartaricacid.touhoulittlemaid.client.event;
 
 import com.github.tartaricacid.touhoulittlemaid.client.gui.entity.maid.ai.AIChatScreen;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
+import com.google.common.collect.Sets;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -16,11 +17,12 @@ import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.Set;
+
 @OnlyIn(Dist.CLIENT)
 @Mod.EventBusSubscriber(value = Dist.CLIENT)
 public class PressAIChatKeyEvent {
-    // TODO：可以自定义能够进行 Chat 的女仆
-    public static final String CAN_CHAT_MAID_ID = "winefox";
+    public static final Set<String> CAN_CHAT_MAID_IDS = Sets.newHashSet();
 
     @SubscribeEvent
     public static void onOpenConfig(InputEvent.Key event) {
@@ -60,9 +62,8 @@ public class PressAIChatKeyEvent {
         if (!maid.isOwnedBy(player)) {
             return null;
         }
-        // TODO：暂定只有酒狐可以进行 Chat
         String modelId = maid.getModelId();
-        if (modelId.contains(CAN_CHAT_MAID_ID)) {
+        if (CAN_CHAT_MAID_IDS.contains(modelId)) {
             return maid;
         }
         return null;

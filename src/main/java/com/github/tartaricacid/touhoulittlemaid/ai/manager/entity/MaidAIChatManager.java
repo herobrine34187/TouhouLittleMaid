@@ -2,6 +2,8 @@ package com.github.tartaricacid.touhoulittlemaid.ai.manager.entity;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.response.ResponseChat;
+import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.CharacterSetting;
+import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.SettingReader;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.Service;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.fishaudio.TTSClient;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.fishaudio.request.TTSRequest;
@@ -19,6 +21,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Optional;
+
 public final class MaidAIChatManager {
     private final EntityMaid maid;
     private final CappedQueue<HistoryChat> history;
@@ -34,19 +38,44 @@ public final class MaidAIChatManager {
                 ChatBubbleManger.addInnerChatText(maid, "ai.touhou_little_maid.chat.api_key.empty");
             } else {
                 ChatClient chatClient = Service.getChatClient();
-                ChatCompletion chatCompletion = Service.getChatCompletion(this.maid, AIConfig.CHAT_MODEL.get(), language, this.history);
-                chatCompletion.userChat(message);
-                chatClient.chat(chatCompletion).handle(this::onShowChatSync);
-                this.addUserHistory(message);
+                ChatCompletion chatCompletion = Service.getChatCompletion(this, language);
+                if (chatCompletion != null) {
+                    chatCompletion.userChat(message);
+                    chatClient.chat(chatCompletion).handle(this::onShowChatSync);
+                    this.addUserHistory(message);
+                } else {
+                    ChatBubbleManger.addInnerChatText(maid, "ai.touhou_little_maid.chat.no_setting");
+                }
             }
         } else {
             ChatBubbleManger.addInnerChatText(maid, "ai.touhou_little_maid.chat.disable");
         }
     }
 
+    public String getChatModel() {
+        return AIConfig.CHAT_MODEL.get();
+    }
+
+    public String getTtsModel() {
+        return AIConfig.TTS_MODEL.get();
+    }
+
+    public CappedQueue<HistoryChat> getHistory() {
+        return history;
+    }
+
+    public EntityMaid getMaid() {
+        return maid;
+    }
+
+    public Optional<CharacterSetting> getSetting() {
+        String modelId = this.maid.getModelId();
+        return SettingReader.getSetting(modelId);
+    }
+
     private void tts(String chatText, String ttsText) {
         TTSClient ttsClient = Service.getTtsClient();
-        TTSRequest ttsRequest = Service.getTtsRequest(AIConfig.TTS_MODEL.get(), ttsText);
+        TTSRequest ttsRequest = Service.getTtsRequest(this.getTtsModel(), ttsText);
         ttsClient.request(ttsRequest).handle(data -> onPlaySoundSync(chatText, data));
     }
 

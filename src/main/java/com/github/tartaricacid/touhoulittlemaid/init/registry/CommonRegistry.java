@@ -23,7 +23,6 @@ public final class CommonRegistry {
     @SubscribeEvent
     public static void onSetupEvent(FMLCommonSetupEvent event) {
         event.enqueueWork(ServerCustomPackLoader::reloadPacks);
-        event.enqueueWork(CharacterSetting::readPresetFile);
         event.enqueueWork(NetworkHandler::init);
         event.enqueueWork(CommonRegistry::modApiInit);
     }
