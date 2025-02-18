@@ -12,7 +12,9 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -206,9 +208,9 @@ public class ChatBubbleManger {
 
         // 给主人发送聊天栏信息
         if (maid.getOwner() instanceof ServerPlayer player) {
-            String name = maid.getName().getString();
-            String format = String.format("<%s> %s", name, message);
-            player.sendSystemMessage(Component.literal(format).withStyle(ChatFormatting.GRAY));
+            Component name = maid.getName();
+            MutableComponent msg = Component.literal("<").append(name).append(">").append(CommonComponents.SPACE).append(message);
+            player.sendSystemMessage(msg.withStyle(ChatFormatting.GRAY));
         }
     }
 

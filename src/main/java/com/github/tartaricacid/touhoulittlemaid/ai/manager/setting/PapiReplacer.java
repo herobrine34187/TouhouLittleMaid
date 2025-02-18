@@ -57,7 +57,7 @@ public class PapiReplacer {
 
     private static String getTime(Level level) {
         long time = level.getDayTime();
-        long hours = time / 1000 + 6;
+        long hours = (time / 1000 + 6) % 24;
         long minutes = (time % 1000) / (50 / 3);
         return String.format("%02d:%02d", hours, minutes);
     }
