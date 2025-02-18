@@ -1,9 +1,7 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.service;
 
-import com.github.tartaricacid.touhoulittlemaid.ai.manager.config.AIConfig;
-import com.github.tartaricacid.touhoulittlemaid.ai.manager.config.ApiKeyManager;
-import com.github.tartaricacid.touhoulittlemaid.ai.manager.config.CharacterSetting;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.entity.HistoryChat;
+import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.CharacterSetting;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.fishaudio.TTSClient;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.fishaudio.request.Format;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.fishaudio.request.OpusBitRate;
@@ -12,6 +10,8 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.openai.ChatClient;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.openai.request.ChatCompletion;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.openai.request.ResponseFormat;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.openai.request.Role;
+import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
+import com.github.tartaricacid.touhoulittlemaid.config.subconfig.ApiKeyManager;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.util.CappedQueue;
 import com.google.gson.Gson;
@@ -23,9 +23,6 @@ public final class Service {
     public static final Gson GSON = new Gson();
     // TODO: 增加代理功能？
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
-    // TODO: 未来需要改成可配置选项
-    private static final double TEMPERATURE = 0.5;
-    private static final int SAMPLE_RATE = 32000;
 
     public static ChatClient getChatClient() {
         String chatApiKey = ApiKeyManager.getChatApiKey();
@@ -35,14 +32,15 @@ public final class Service {
                 .baseUrl(chatBaseUrl);
     }
 
-    public static ChatCompletion getChatCompletion(EntityMaid maid, String model, CappedQueue<HistoryChat> history) {
+    public static ChatCompletion getChatCompletion(EntityMaid maid, String model, String language, CappedQueue<HistoryChat> history) {
         // 获取设定文件
-        String setting = CharacterSetting.getSetting(maid);
+        String setting = CharacterSetting.getSetting(maid, language);
 
         // 构建对话
         ChatCompletion chatCompletion = ChatCompletion.create()
                 .model(model)
-                .temperature(TEMPERATURE)
+                // 温度的范围是 [0,2)
+                .temperature(Math.min(AIConfig.CHAT_TEMPERATURE.get(), 1.99))
                 .setResponseFormat(ResponseFormat.json())
                 .systemChat(setting);
 

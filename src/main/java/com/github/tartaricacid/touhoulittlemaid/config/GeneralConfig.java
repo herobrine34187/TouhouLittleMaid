@@ -1,6 +1,6 @@
 package com.github.tartaricacid.touhoulittlemaid.config;
 
-import com.github.tartaricacid.touhoulittlemaid.ai.manager.config.AIConfig;
+import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.*;
 import net.minecraftforge.common.ForgeConfigSpec;
 

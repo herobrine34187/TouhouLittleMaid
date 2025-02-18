@@ -150,6 +150,9 @@ dependencies {
     mcLib "org.gagravarr:vorbis-java-core:0.8"
     mcLib "io.github.jaredmdobson:concentus:1.0.2"
 
+    // 单元测试
+    testImplementation 'junit:junit:4.13.2'
+
     // compile against the JEI API but do not include it at runtime
     compileOnly(fg.deobf("mezz.jei:jei-1.20.1-common-api:${jei_version}"))
     compileOnly(fg.deobf("mezz.jei:jei-1.20.1-forge-api:${jei_version}"))
@@ -225,11 +228,17 @@ shadowJar {
         exclude(dependency('junit:junit'))
     }
 
+    // 包重定向
     relocate 'javazoom.jl', 'com.github.tartaricacid.touhoulittlemaid.libs.jl'
     relocate 'javazoom.spi', 'com.github.tartaricacid.touhoulittlemaid.libs.spi'
     relocate 'org.tritonus', 'com.github.tartaricacid.touhoulittlemaid.libs.tritonus'
     relocate 'io.github.jaredmdobson.concentus', 'com.github.tartaricacid.touhoulittlemaid.libs.concentus'
     relocate 'org.gagravarr', 'com.github.tartaricacid.touhoulittlemaid.libs.gagravarr'
+
+    // 排除不需要的依赖项和资源
+    exclude 'META-INF/maven/**/*'
+    // 这个版权许可都已经手动添加进 licenses 里了
+    exclude 'META-INF/LICENSE'
 
     mergeServiceFiles()
     minimize()

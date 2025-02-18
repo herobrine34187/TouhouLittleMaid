@@ -1,4 +1,4 @@
-package com.github.tartaricacid.touhoulittlemaid.ai.manager.config;
+package com.github.tartaricacid.touhoulittlemaid.ai.manager.setting;
 
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.file.FileConfig;
@@ -44,8 +44,8 @@ public class CharacterSetting {
         }
     }
 
-    public static String getSetting(EntityMaid maid) {
-        return PapiReplacer.replace(RAW_SETTING, maid);
+    public static String getSetting(EntityMaid maid, String language) {
+        return PapiReplacer.replace(RAW_SETTING, maid, language);
     }
 
     private static File getJarPersetFile(File configFile) {

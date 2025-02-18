@@ -1,7 +1,8 @@
-package com.github.tartaricacid.touhoulittlemaid.ai.manager.config;
+package com.github.tartaricacid.touhoulittlemaid.ai.manager.setting;
 
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.response.ResponseChat;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.Service;
+import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -12,11 +13,13 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
-// FIXME: 支持多语言版本
+// TODO: 有必要支持多语言版本么？现在的大语言模型都自带翻译功能？
 public class PapiReplacer {
-    static String replace(String input, EntityMaid maid) {
+    static String replace(String input, EntityMaid maid, String language) {
         Level level = maid.level;
+        Locale locale = Locale.forLanguageTag(language);
         return input.replace("${game_time}", getTime(level))
                 .replace("${weather}", getWeather(level))
                 .replace("${dimension}", getDimension(level))
@@ -24,8 +27,22 @@ public class PapiReplacer {
                 .replace("${offhand_item}", getSlotItemName(EquipmentSlot.OFFHAND, maid))
                 .replace("${inventory_items}", getInventoryItems(maid))
                 .replace("${output_json_format}", getOutputJsonFormat())
-                .replace("${chat_language}", AIConfig.CHAT_LANGUAGE.get())
-                .replace("${tts_language}", AIConfig.TTS_LANGUAGE.get());
+                .replace("${chat_language}", language)
+                .replace("${tts_language}", ttsLanguage());
+    }
+
+    /**
+     * 不能调用 LanguageManager，那个是客户端方法
+     */
+    private static String ttsLanguage() {
+        // 将语言代码转换为 Locale 所需的格式，例如 zh_cn -> zh-CN
+        String languageTag = AIConfig.TTS_LANGUAGE.get();
+        String[] parts = languageTag.split("_");
+        if (parts.length == 2) {
+            languageTag = parts[0] + "-" + parts[1].toUpperCase(Locale.ENGLISH);
+        }
+        Locale locale = Locale.forLanguageTag(languageTag);
+        return locale.getDisplayLanguage() + " (" + locale.getDisplayCountry() + ")";
     }
 
     private static String getWeather(Level level) {

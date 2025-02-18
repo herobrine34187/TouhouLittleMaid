@@ -1,8 +1,6 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.manager.entity;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
-import com.github.tartaricacid.touhoulittlemaid.ai.manager.config.AIConfig;
-import com.github.tartaricacid.touhoulittlemaid.ai.manager.config.ApiKeyManager;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.response.ResponseChat;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.Service;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.fishaudio.TTSClient;
@@ -10,6 +8,8 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.fishaudio.request.TTS
 import com.github.tartaricacid.touhoulittlemaid.ai.service.openai.ChatClient;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.openai.request.ChatCompletion;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.openai.response.ChatCompletionResponse;
+import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
+import com.github.tartaricacid.touhoulittlemaid.config.subconfig.ApiKeyManager;
 import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleManger;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
@@ -28,13 +28,13 @@ public final class MaidAIChatManager {
         this.history = new CappedQueue<>(AIConfig.MAID_MAX_HISTORY_CHAT_SIZE.get());
     }
 
-    public void chat(String message) {
+    public void chat(String message, String language) {
         if (AIConfig.CHAT_ENABLED.get()) {
             if (StringUtils.isBlank(ApiKeyManager.getChatApiKey())) {
                 ChatBubbleManger.addInnerChatText(maid, "ai.touhou_little_maid.chat.api_key.empty");
             } else {
                 ChatClient chatClient = Service.getChatClient();
-                ChatCompletion chatCompletion = Service.getChatCompletion(this.maid, AIConfig.CHAT_MODEL.get(), this.history);
+                ChatCompletion chatCompletion = Service.getChatCompletion(this.maid, AIConfig.CHAT_MODEL.get(), language, this.history);
                 chatCompletion.userChat(message);
                 chatClient.chat(chatCompletion).handle(this::onShowChatSync);
                 this.addUserHistory(message);

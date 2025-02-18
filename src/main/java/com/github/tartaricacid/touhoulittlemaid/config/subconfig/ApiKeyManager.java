@@ -1,4 +1,4 @@
-package com.github.tartaricacid.touhoulittlemaid.ai.manager.config;
+package com.github.tartaricacid.touhoulittlemaid.config.subconfig;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.util.SystemAppDataUtil;

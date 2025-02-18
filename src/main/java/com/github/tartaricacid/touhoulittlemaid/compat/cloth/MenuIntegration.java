@@ -34,6 +34,7 @@ public class MenuIntegration {
         chairConfig(root, entryBuilder);
         miscConfig(root, entryBuilder);
         vanillaConfig(root, entryBuilder);
+        AIChatIntegration.init(root, entryBuilder);
         MinecraftForge.EVENT_BUS.post(new AddClothConfigEvent(root, entryBuilder));
         return root;
     }

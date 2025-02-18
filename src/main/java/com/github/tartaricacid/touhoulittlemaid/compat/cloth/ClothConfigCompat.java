@@ -9,4 +9,10 @@ public final class ClothConfigCompat {
         configBuilder.setGlobalizedExpanded(true);
         Minecraft.getInstance().setScreen(configBuilder.build());
     }
+
+    public static void openAiChatScreen() {
+        ConfigBuilder configBuilder = AIChatIntegration.getConfigBuilder();
+        configBuilder.setGlobalizedExpanded(true);
+        Minecraft.getInstance().setScreen(configBuilder.build());
+    }
 }
