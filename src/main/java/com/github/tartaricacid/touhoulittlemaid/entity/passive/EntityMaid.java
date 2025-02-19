@@ -1396,8 +1396,9 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
 
     private void swapHandItem(InteractionHand hand, ItemStack itemInHand, ItemStack backpackItem) {
         ItemStack handItemCopy = itemInHand.copy();
-        this.setItemInHand(hand, backpackItem.split(backpackItem.getCount()));
-        ItemHandlerHelper.insertItemStacked(this.getMaidInv(), handItemCopy, false);
+        this.setItemInHand(hand, backpackItem.copy());
+        backpackItem.setCount(0);
+        ItemHandlerHelper.insertItemStacked(this.getAvailableBackpackInv(), handItemCopy, false);
     }
 
     @Override

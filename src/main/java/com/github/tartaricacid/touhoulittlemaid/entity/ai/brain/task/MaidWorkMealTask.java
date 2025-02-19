@@ -6,12 +6,10 @@ import com.github.tartaricacid.touhoulittlemaid.entity.favorability.Favorability
 import com.github.tartaricacid.touhoulittlemaid.entity.favorability.Type;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.entity.task.meal.MaidMealManager;
-import com.github.tartaricacid.touhoulittlemaid.init.InitEntities;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.RangedWrapper;
 
 import java.util.List;
@@ -78,8 +76,7 @@ public class MaidWorkMealTask extends MaidCheckRateTask {
                     ItemStack foodStack = stack.copy();
                     ItemStack handStack = itemInHand.copy();
                     maid.setItemInHand(eanHand, foodStack);
-                    backpackInv.setStackInSlot(i, ItemStack.EMPTY);
-                    ItemHandlerHelper.insertItemStacked(backpackInv, handStack, false);
+                    backpackInv.setStackInSlot(i, handStack);
                     maid.memoryHandItemStack(handStack);
                     itemInHand = maid.getItemInHand(eanHand);
                     hasFood = true;

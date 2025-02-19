@@ -8,7 +8,6 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.RangedWrapper;
 
 import java.util.List;
@@ -76,8 +75,7 @@ public class MaidHealSelfTask extends MaidCheckRateTask {
                     ItemStack foodStack = stack.copy();
                     ItemStack handStack = itemInHand.copy();
                     maid.setItemInHand(eanHand, foodStack);
-                    backpackInv.setStackInSlot(i, ItemStack.EMPTY);
-                    ItemHandlerHelper.insertItemStacked(backpackInv, handStack, false);
+                    backpackInv.setStackInSlot(i, handStack);
                     itemInHand = maid.getItemInHand(eanHand);
                     maid.memoryHandItemStack(handStack);
                     hasFood = true;
