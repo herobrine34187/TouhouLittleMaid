@@ -150,6 +150,9 @@ dependencies {
     mcLib "org.gagravarr:vorbis-java-core:0.8"
     mcLib "io.github.jaredmdobson:concentus:1.0.2"
 
+    // YAML 库
+    mcLib "org.yaml:snakeyaml:2.4"
+
     // 单元测试
     testImplementation 'junit:junit:4.13.2'
 
@@ -234,9 +237,11 @@ shadowJar {
     relocate 'org.tritonus', 'com.github.tartaricacid.touhoulittlemaid.libs.tritonus'
     relocate 'io.github.jaredmdobson.concentus', 'com.github.tartaricacid.touhoulittlemaid.libs.concentus'
     relocate 'org.gagravarr', 'com.github.tartaricacid.touhoulittlemaid.libs.gagravarr'
+    relocate 'org.yaml.snakeyaml', 'com.github.tartaricacid.touhoulittlemaid.libs.snakeyaml'
 
     // 排除不需要的依赖项和资源
     exclude 'META-INF/maven/**/*'
+    exclude 'META-INF/versions/**/*'
     // 这个版权许可都已经手动添加进 licenses 里了
     exclude 'META-INF/LICENSE'
 

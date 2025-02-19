@@ -2,8 +2,10 @@ package com.github.tartaricacid.touhoulittlemaid.ai.manager.entity;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.response.ResponseChat;
+import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.AvailableSites;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.CharacterSetting;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.SettingReader;
+import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.Site;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.Service;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.fishaudio.TTSClient;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.fishaudio.request.TTSRequest;
@@ -11,7 +13,6 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.openai.ChatClient;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.openai.request.ChatCompletion;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.openai.response.ChatCompletionResponse;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
-import com.github.tartaricacid.touhoulittlemaid.config.subconfig.ApiKeyManager;
 import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleManger;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
@@ -20,12 +21,18 @@ import com.github.tartaricacid.touhoulittlemaid.util.CappedQueue;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
 public final class MaidAIChatManager {
     private final EntityMaid maid;
     private final CappedQueue<HistoryChat> history;
+
+    private String chatSite = "";
+    private String chatModel = "";
+    private String ttsSite = "";
+    private String ttsModel = "";
 
     public MaidAIChatManager(EntityMaid maid) {
         this.maid = maid;
@@ -34,10 +41,11 @@ public final class MaidAIChatManager {
 
     public void chat(String message, String language) {
         if (AIConfig.CHAT_ENABLED.get()) {
-            if (StringUtils.isBlank(ApiKeyManager.getChatApiKey())) {
+            @Nullable Site site = this.getChatSite();
+            if (site == null || StringUtils.isBlank(site.getApiKey())) {
                 ChatBubbleManger.addInnerChatText(maid, "ai.touhou_little_maid.chat.api_key.empty");
             } else {
-                ChatClient chatClient = Service.getChatClient();
+                ChatClient chatClient = Service.getChatClient(site);
                 ChatCompletion chatCompletion = Service.getChatCompletion(this, language);
                 if (chatCompletion != null) {
                     chatCompletion.userChat(message);
@@ -53,11 +61,29 @@ public final class MaidAIChatManager {
     }
 
     public String getChatModel() {
-        return AIConfig.CHAT_MODEL.get();
+        Site site = getChatSite();
+        String model = StringUtils.EMPTY;
+        if (site != null && !site.getModels().isEmpty()) {
+            if (StringUtils.isBlank(chatModel)) {
+                model = site.getModels().get(0);
+            } else {
+                model = chatModel;
+            }
+        }
+        return model;
     }
 
     public String getTtsModel() {
-        return AIConfig.TTS_MODEL.get();
+        Site site = getTtsSite();
+        String model = StringUtils.EMPTY;
+        if (site != null && !site.getModels().isEmpty()) {
+            if (StringUtils.isBlank(ttsModel)) {
+                model = site.getModels().get(0);
+            } else {
+                model = ttsModel;
+            }
+        }
+        return model;
     }
 
     public CappedQueue<HistoryChat> getHistory() {
@@ -73,8 +99,52 @@ public final class MaidAIChatManager {
         return SettingReader.getSetting(modelId);
     }
 
-    private void tts(String chatText, String ttsText) {
-        TTSClient ttsClient = Service.getTtsClient();
+    public void setChatSite(String chatSite) {
+        this.chatSite = chatSite;
+    }
+
+    public void setChatModel(String chatModel) {
+        this.chatModel = chatModel;
+    }
+
+    public void setTtsSite(String ttsSite) {
+        this.ttsSite = ttsSite;
+    }
+
+    public void setTtsModel(String ttsModel) {
+        this.ttsModel = ttsModel;
+    }
+
+    @Nullable
+    private Site getChatSite() {
+        Site site;
+        if (StringUtils.isBlank(chatSite)) {
+            site = AvailableSites.getFirstAvailableChatSite();
+        } else {
+            site = AvailableSites.getChatSite(chatSite);
+            if (site == null) {
+                site = AvailableSites.getFirstAvailableChatSite();
+            }
+        }
+        return site;
+    }
+
+    @Nullable
+    private Site getTtsSite() {
+        Site site;
+        if (StringUtils.isBlank(ttsSite)) {
+            site = AvailableSites.getFirstAvailableTtsSite();
+        } else {
+            site = AvailableSites.getTtsSite(ttsSite);
+            if (site == null) {
+                site = AvailableSites.getFirstAvailableTtsSite();
+            }
+        }
+        return site;
+    }
+
+    private void tts(Site site, String chatText, String ttsText) {
+        TTSClient ttsClient = Service.getTtsClient(site);
         TTSRequest ttsRequest = Service.getTtsRequest(this.getTtsModel(), ttsText);
         ttsClient.request(ttsRequest).handle(data -> onPlaySoundSync(chatText, data));
     }
@@ -94,8 +164,9 @@ public final class MaidAIChatManager {
                 return;
             }
             this.addAssistantHistory(rawMessage);
-            if (AIConfig.TTS_ENABLED.get() && StringUtils.isNotBlank(ApiKeyManager.getTtsApiKey())) {
-                this.tts(chatText, ttsText);
+            Site site = this.getTtsSite();
+            if (AIConfig.TTS_ENABLED.get() && site != null && StringUtils.isNotBlank(site.getApiKey())) {
+                this.tts(site, chatText, ttsText);
             } else {
                 ChatBubbleManger.addAiChatTextSync(maid, chatText);
             }

@@ -2,6 +2,7 @@ package com.github.tartaricacid.touhoulittlemaid.ai.service;
 
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.entity.HistoryChat;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.entity.MaidAIChatManager;
+import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.Site;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.fishaudio.TTSClient;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.fishaudio.request.Format;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.fishaudio.request.OpusBitRate;
@@ -11,7 +12,6 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.openai.request.ChatCo
 import com.github.tartaricacid.touhoulittlemaid.ai.service.openai.request.ResponseFormat;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.openai.request.Role;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
-import com.github.tartaricacid.touhoulittlemaid.config.subconfig.ApiKeyManager;
 import com.github.tartaricacid.touhoulittlemaid.util.CappedQueue;
 import com.google.gson.Gson;
 import org.jetbrains.annotations.Nullable;
@@ -24,9 +24,9 @@ public final class Service {
     // TODO: 增加代理功能？
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
 
-    public static ChatClient getChatClient() {
-        String chatApiKey = ApiKeyManager.getChatApiKey();
-        String chatBaseUrl = AIConfig.CHAT_BASE_URL.get();
+    public static ChatClient getChatClient(Site site) {
+        String chatApiKey = site.getApiKey();
+        String chatBaseUrl = site.getUrl();
         return ChatClient.create(HTTP_CLIENT)
                 .apiKey(chatApiKey)
                 .baseUrl(chatBaseUrl);
@@ -63,9 +63,9 @@ public final class Service {
         }).orElse(null);
     }
 
-    public static TTSClient getTtsClient() {
-        String ttsApiKey = ApiKeyManager.getTtsApiKey();
-        String ttsBaseUrl = AIConfig.TTS_BASE_URL.get();
+    public static TTSClient getTtsClient(Site site) {
+        String ttsApiKey = site.getApiKey();
+        String ttsBaseUrl = site.getUrl();
         return TTSClient.create(HTTP_CLIENT)
                 .apiKey(ttsApiKey)
                 .baseUrl(ttsBaseUrl);
