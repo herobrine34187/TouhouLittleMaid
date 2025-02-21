@@ -141,10 +141,10 @@ configurations {
 dependencies {
     minecraft "net.minecraftforge:forge:${forge_version}"
 
-    // MP3 音频解码库
-    mcLib "com.googlecode.soundlibs:mp3spi:1.9.5.4"
-    mcLib "com.googlecode.soundlibs:jlayer:1.0.1.4"
-    mcLib "com.googlecode.soundlibs:tritonus-share:0.3.7.4"
+    // MP3 音频解码库，暂时不需要
+    // mcLib "com.googlecode.soundlibs:mp3spi:1.9.5.4"
+    // mcLib "com.googlecode.soundlibs:jlayer:1.0.1.4"
+    // mcLib "com.googlecode.soundlibs:tritonus-share:0.3.7.4"
 
     // Opus 音频解码库
     mcLib "org.gagravarr:vorbis-java-core:0.8"
@@ -232,9 +232,9 @@ shadowJar {
     }
 
     // 包重定向
-    relocate 'javazoom.jl', 'com.github.tartaricacid.touhoulittlemaid.libs.jl'
-    relocate 'javazoom.spi', 'com.github.tartaricacid.touhoulittlemaid.libs.spi'
-    relocate 'org.tritonus', 'com.github.tartaricacid.touhoulittlemaid.libs.tritonus'
+    // relocate 'javazoom.jl', 'com.github.tartaricacid.touhoulittlemaid.libs.jl'
+    // relocate 'javazoom.spi', 'com.github.tartaricacid.touhoulittlemaid.libs.spi'
+    // relocate 'org.tritonus', 'com.github.tartaricacid.touhoulittlemaid.libs.tritonus'
     relocate 'io.github.jaredmdobson.concentus', 'com.github.tartaricacid.touhoulittlemaid.libs.concentus'
     relocate 'org.gagravarr', 'com.github.tartaricacid.touhoulittlemaid.libs.gagravarr'
     relocate 'org.yaml.snakeyaml', 'com.github.tartaricacid.touhoulittlemaid.libs.snakeyaml'
