@@ -251,7 +251,7 @@ public abstract class AbstractMaidContainerGui<T extends AbstractMaidContainer> 
 
         if (YsmCompat.isInstalled()) {
             this.ysmSkin = new ImageButton(leftPos + 52, topPos + 14, 9, 9,
-                    72, 43, 10, BUTTON,
+                    144, 65, 10, BUTTON,
                     (b) -> MinecraftForge.EVENT_BUS.post(new OpenYsmMaidScreenEvent(maid)));
             this.sound = new ImageButton(leftPos + 42, topPos + 14, 9, 9,
                     144, 43, 10, BUTTON,

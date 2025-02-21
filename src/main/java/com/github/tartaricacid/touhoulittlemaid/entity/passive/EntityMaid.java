@@ -18,6 +18,7 @@ import com.github.tartaricacid.touhoulittlemaid.client.resource.CustomPackLoader
 import com.github.tartaricacid.touhoulittlemaid.client.resource.pojo.MaidModelInfo;
 import com.github.tartaricacid.touhoulittlemaid.compat.domesticationinnovation.PetBedDrop;
 import com.github.tartaricacid.touhoulittlemaid.compat.slashblade.SlashBladeCompat;
+import com.github.tartaricacid.touhoulittlemaid.compat.ysm.YsmCompat;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.MaidConfig;
 import com.github.tartaricacid.touhoulittlemaid.datagen.tag.TagItem;
 import com.github.tartaricacid.touhoulittlemaid.entity.ai.brain.MaidBrain;
@@ -157,6 +158,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
     public static final String IS_YSM_MODEL_TAG = "IsYsmModel";
     public static final String YSM_MODEL_ID_TAG = "YsmModelId";
     public static final String YSM_MODEL_TEXTURE_TAG = "YsmModelTexture";
+    public static final String YSM_MODEL_NAME_TAG = "YsmModelName";
     public static final String SOUND_PACK_ID_TAG = "SoundPackId";
     public static final String MAID_BACKPACK_TYPE = "MaidBackpackType";
     public static final String MAID_INVENTORY_TAG = "MaidInventory";
@@ -166,6 +168,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
     private static final EntityDataAccessor<Boolean> DATA_IS_YSM_MODEL = SynchedEntityData.defineId(EntityMaid.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<String> DATA_YSM_MODEL_ID = SynchedEntityData.defineId(EntityMaid.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<String> DATA_YSM_MODEL_TEXTURE = SynchedEntityData.defineId(EntityMaid.class, EntityDataSerializers.STRING);
+    private static final EntityDataAccessor<Component> DATA_YSM_MODEL_NAME = SynchedEntityData.defineId(EntityMaid.class, EntityDataSerializers.COMPONENT);
     private static final EntityDataAccessor<String> DATA_SOUND_PACK_ID = SynchedEntityData.defineId(EntityMaid.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<String> DATA_TASK = SynchedEntityData.defineId(EntityMaid.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Boolean> DATA_BEGGING = SynchedEntityData.defineId(EntityMaid.class, EntityDataSerializers.BOOLEAN);
@@ -303,6 +306,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
         this.entityData.define(DATA_IS_YSM_MODEL, false);
         this.entityData.define(DATA_YSM_MODEL_ID, StringUtils.EMPTY);
         this.entityData.define(DATA_YSM_MODEL_TEXTURE, StringUtils.EMPTY);
+        this.entityData.define(DATA_YSM_MODEL_NAME, Component.empty());
         this.entityData.define(DATA_SOUND_PACK_ID, DefaultMaidSoundPack.getInitSoundPackId());
         this.entityData.define(DATA_TASK, TaskIdle.UID.toString());
         this.entityData.define(DATA_BEGGING, false);
@@ -1153,6 +1157,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
         compound.putBoolean(IS_YSM_MODEL_TAG, isYsmModel());
         compound.putString(YSM_MODEL_ID_TAG, getYsmModelId());
         compound.putString(YSM_MODEL_TEXTURE_TAG, getYsmModelTexture());
+        compound.putString(YSM_MODEL_NAME_TAG, Component.Serializer.toJson(getYsmModelName()));
         compound.putString(SOUND_PACK_ID_TAG, getSoundPackId());
         compound.putString(TASK_TAG, getTask().getUid().toString());
         compound.put(MAID_INVENTORY_TAG, maidInv.serializeNBT());
@@ -1197,6 +1202,10 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
         }
         if (compound.contains(YSM_MODEL_TEXTURE_TAG, Tag.TAG_STRING)) {
             setYsmModelTexture(compound.getString(YSM_MODEL_TEXTURE_TAG));
+        }
+        if (compound.contains(YSM_MODEL_NAME_TAG, Tag.TAG_STRING)) {
+            MutableComponent component = Component.Serializer.fromJson(compound.getString(YSM_MODEL_NAME_TAG));
+            setYsmModelName(Objects.requireNonNullElse(component, Component.empty()));
         }
         if (compound.contains(SOUND_PACK_ID_TAG, Tag.TAG_STRING)) {
             setSoundPackId(compound.getString(SOUND_PACK_ID_TAG));
@@ -1410,6 +1419,15 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
 
     @Override
     protected Component getTypeName() {
+        // 优先使用 YSM 模型名称
+        if (YsmCompat.isInstalled() && this.isYsmModel()) {
+            Component name = this.getYsmModelName();
+            if (name.equals(Component.empty())) {
+                return Component.literal(this.getYsmModelId());
+            }
+            return name;
+        }
+        // 然后才是默认模型名
         Optional<MaidModelInfo> info = ServerCustomPackLoader.SERVER_MAID_MODELS.getInfo(getModelId());
         return info.map(maidModelInfo -> ParseI18n.parse(maidModelInfo.getName())).orElseGet(() -> Component.literal(getType().getDescriptionId()));
     }
@@ -1671,14 +1689,17 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
         this.entityData.set(DATA_MODEL_ID, modelId);
     }
 
+    @Override
     public boolean isYsmModel() {
         return this.entityData.get(DATA_IS_YSM_MODEL);
     }
 
+    @Override
     public void setIsYsmModel(boolean isYsmModel) {
         this.entityData.set(DATA_IS_YSM_MODEL, isYsmModel);
     }
 
+    @Override
     public String getYsmModelId() {
         return this.entityData.get(DATA_YSM_MODEL_ID);
     }
@@ -1687,6 +1708,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
         this.entityData.set(DATA_YSM_MODEL_ID, modelId);
     }
 
+    @Override
     public String getYsmModelTexture() {
         return this.entityData.get(DATA_YSM_MODEL_TEXTURE);
     }
@@ -1695,9 +1717,20 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
         this.entityData.set(DATA_YSM_MODEL_TEXTURE, texture);
     }
 
-    public void setYsmModel(String modelId, String texture) {
+    @Override
+    public Component getYsmModelName() {
+        return this.entityData.get(DATA_YSM_MODEL_NAME);
+    }
+
+    protected void setYsmModelName(Component name) {
+        this.entityData.set(DATA_YSM_MODEL_NAME, name);
+    }
+
+    @Override
+    public void setYsmModel(String modelId, String texture, Component name) {
         this.setYsmModelId(modelId);
         this.setYsmModelTexture(texture);
+        this.setYsmModelName(name);
     }
 
     public String getSoundPackId() {

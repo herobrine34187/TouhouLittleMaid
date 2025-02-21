@@ -7,6 +7,7 @@ import com.github.tartaricacid.touhoulittlemaid.entity.backpack.BackpackManager;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.entity.task.TaskManager;
 import com.github.tartaricacid.touhoulittlemaid.util.BiomeCacheUtil;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
@@ -102,9 +103,18 @@ public interface IMaid {
     }
 
     /**
-     * 设置 YSM 模型 ID 和材质名称
+     * 获取 YSM 模型显示名称
+     *
+     * @return 显示名称
      */
-    default void setYsmModel(String modelId, String texture) {
+    default Component getYsmModelName() {
+        return Component.empty();
+    }
+
+    /**
+     * 设置 YSM 模型 ID 和材质名称。还有显示名称
+     */
+    default void setYsmModel(String modelId, String texture, Component name) {
     }
 
     /**

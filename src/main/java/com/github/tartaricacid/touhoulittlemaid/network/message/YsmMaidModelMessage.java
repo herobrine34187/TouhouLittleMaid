@@ -12,15 +12,16 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public record YsmMaidModelMessage(int maidId, String modeId, String texture) {
+public record YsmMaidModelMessage(int maidId, String modeId, String texture, Component name) {
     public static void encode(YsmMaidModelMessage message, FriendlyByteBuf buf) {
         buf.writeInt(message.maidId);
         buf.writeUtf(message.modeId);
         buf.writeUtf(message.texture);
+        buf.writeComponent(message.name);
     }
 
     public static YsmMaidModelMessage decode(FriendlyByteBuf buf) {
-        return new YsmMaidModelMessage(buf.readInt(), buf.readUtf(), buf.readUtf());
+        return new YsmMaidModelMessage(buf.readInt(), buf.readUtf(), buf.readUtf(), buf.readComponent());
     }
 
     public static void handle(YsmMaidModelMessage message, Supplier<NetworkEvent.Context> contextSupplier) {
@@ -35,7 +36,7 @@ public record YsmMaidModelMessage(int maidId, String modeId, String texture) {
                 if (entity instanceof EntityMaid maid && maid.isOwnedBy(sender)) {
                     if (sender.isCreative() || MaidConfig.MAID_CHANGE_MODEL.get()) {
                         maid.setIsYsmModel(true);
-                        maid.setYsmModel(message.modeId, message.texture);
+                        maid.setYsmModel(message.modeId, message.texture, message.name);
                         InitTrigger.MAID_EVENT.trigger(sender, TriggerType.CHANGE_MAID_MODEL);
                     } else {
                         sender.sendSystemMessage(Component.translatable("message.touhou_little_maid.change_model.disabled"));
