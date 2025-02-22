@@ -1,5 +1,9 @@
 package com.github.tartaricacid.touhoulittlemaid.compat.ysm;
 
+import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
+import com.github.tartaricacid.touhoulittlemaid.inventory.tooltip.YsmMaidInfo;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
@@ -33,5 +37,16 @@ public class YsmCompat {
 
     public static boolean isInstalled() {
         return INSTALLED;
+    }
+
+    public static YsmMaidInfo getYsmMaidInfo(CompoundTag maidData) {
+        if (isInstalled()) {
+            boolean isYsmModel = maidData.getBoolean(EntityMaid.IS_YSM_MODEL_TAG);
+            String ysmModelId = maidData.getString(EntityMaid.YSM_MODEL_ID_TAG);
+            String ysmTextureId = maidData.getString(EntityMaid.YSM_MODEL_TEXTURE_TAG);
+            String ysmName = maidData.getString(EntityMaid.YSM_MODEL_NAME_TAG);
+            return new YsmMaidInfo(isYsmModel, ysmModelId, ysmTextureId, Component.Serializer.fromJson(ysmName));
+        }
+        return YsmMaidInfo.EMPTY;
     }
 }

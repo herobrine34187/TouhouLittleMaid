@@ -3,6 +3,7 @@ package com.github.tartaricacid.touhoulittlemaid.client.renderer.tileentity;
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.client.model.StatueBaseModel;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
+import com.github.tartaricacid.touhoulittlemaid.init.InitEntities;
 import com.github.tartaricacid.touhoulittlemaid.tileentity.TileEntityStatue;
 import com.github.tartaricacid.touhoulittlemaid.util.EntityCacheUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -62,10 +63,16 @@ public class TileEntityStatueRenderer implements BlockEntityRenderer<TileEntityS
     }
 
     private void renderEntity(TileEntityStatue te, PoseStack poseStack, MultiBufferSource bufferIn, int combinedLightIn, CompoundTag data, Level world, EntityType<?> type) throws ExecutionException {
-        Entity entity = EntityCacheUtil.ENTITY_CACHE.get(type, () -> {
-            Entity e = type.create(world);
-            return Objects.requireNonNullElseGet(e, () -> new EntityMaid(world));
-        });
+        Entity entity;
+        if (type.equals(InitEntities.MAID.get())) {
+            long posId = te.getBlockPos().asLong();
+            entity = EntityCacheUtil.STATUE_CACHE.get(posId, () -> new EntityMaid(world));
+        } else {
+            entity = EntityCacheUtil.ENTITY_CACHE.get(type, () -> {
+                Entity e = type.create(world);
+                return Objects.requireNonNullElseGet(e, () -> new EntityMaid(world));
+            });
+        }
 
         entity.load(data);
         if (entity instanceof EntityMaid) {

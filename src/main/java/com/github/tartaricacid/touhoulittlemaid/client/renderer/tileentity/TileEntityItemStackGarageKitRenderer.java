@@ -4,6 +4,7 @@ import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.client.model.StatueBaseModel;
 import com.github.tartaricacid.touhoulittlemaid.client.resource.CustomPackLoader;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
+import com.github.tartaricacid.touhoulittlemaid.init.InitEntities;
 import com.github.tartaricacid.touhoulittlemaid.item.ItemGarageKit;
 import com.github.tartaricacid.touhoulittlemaid.util.EntityCacheUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -58,7 +59,7 @@ public class TileEntityItemStackGarageKitRenderer extends BlockEntityWithoutLeve
 
         EntityType.byString(data.getString("id")).ifPresent(type -> {
                     try {
-                        renderEntity(poseStack, bufferIn, combinedLightIn, data, world, type);
+                        renderEntity(stack, poseStack, bufferIn, combinedLightIn, data, world, type);
                     } catch (ExecutionException e) {
                         e.printStackTrace();
                     }
@@ -66,11 +67,16 @@ public class TileEntityItemStackGarageKitRenderer extends BlockEntityWithoutLeve
         );
     }
 
-    private void renderEntity(PoseStack poseStack, MultiBufferSource bufferIn, int combinedLightIn, CompoundTag data, Level world, EntityType<?> type) throws ExecutionException {
-        Entity entity = EntityCacheUtil.ENTITY_CACHE.get(type, () -> {
-            Entity e = type.create(world);
-            return Objects.requireNonNullElseGet(e, () -> new EntityMaid(world));
-        });
+    private void renderEntity(ItemStack stack, PoseStack poseStack, MultiBufferSource bufferIn, int combinedLightIn, CompoundTag data, Level world, EntityType<?> type) throws ExecutionException {
+        Entity entity;
+        if (type.equals(InitEntities.MAID.get())) {
+            entity = EntityCacheUtil.GARAGE_KIT_CACHE.get(stack, () -> new EntityMaid(world));
+        } else {
+            entity = EntityCacheUtil.ENTITY_CACHE.get(type, () -> {
+                Entity e = type.create(world);
+                return Objects.requireNonNullElseGet(e, () -> new EntityMaid(world));
+            });
+        }
 
         float renderItemScale = 1;
         entity.load(data);
