@@ -2,7 +2,6 @@ package com.github.tartaricacid.touhoulittlemaid.ai.manager.setting;
 
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.response.ResponseChat;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.Service;
-import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -19,7 +18,6 @@ import java.util.Locale;
 public class PapiReplacer {
     static String replace(String input, EntityMaid maid, String language) {
         Level level = maid.level;
-        Locale locale = Locale.forLanguageTag(language);
         return input.replace("${game_time}", getTime(level))
                 .replace("${weather}", getWeather(level))
                 .replace("${dimension}", getDimension(level))
@@ -28,15 +26,14 @@ public class PapiReplacer {
                 .replace("${inventory_items}", getInventoryItems(maid))
                 .replace("${output_json_format}", getOutputJsonFormat())
                 .replace("${chat_language}", language)
-                .replace("${tts_language}", ttsLanguage());
+                .replace("${tts_language}", ttsLanguage(maid.getAiChatManager().getTtsLanguage()));
     }
 
     /**
      * 不能调用 LanguageManager，那个是客户端方法
      */
-    private static String ttsLanguage() {
+    private static String ttsLanguage(String languageTag) {
         // 将语言代码转换为 Locale 所需的格式，例如 zh_cn -> zh-CN
-        String languageTag = AIConfig.TTS_LANGUAGE.get();
         String[] parts = languageTag.split("_");
         if (parts.length == 2) {
             languageTag = parts[0] + "-" + parts[1].toUpperCase(Locale.ENGLISH);

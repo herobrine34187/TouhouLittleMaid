@@ -1184,6 +1184,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
         }
         this.taskDataMaps.writeSaveData(compound);
         this.killRecordManager.addAdditionalSaveData(compound);
+        this.aiChatManager.writeToTag(compound);
     }
 
     @Override
@@ -1277,6 +1278,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
         this.schedulePos.load(compound, this);
         this.setBackpackShowItem(maidInv.getStackInSlot(MaidBackpackHandler.BACKPACK_ITEM_SLOT));
         this.killRecordManager.readAdditionalSaveData(compound);
+        this.aiChatManager.readFromTag(compound);
     }
 
     public boolean openMaidGui(Player player) {

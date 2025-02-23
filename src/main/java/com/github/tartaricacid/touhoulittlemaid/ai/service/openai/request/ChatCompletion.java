@@ -55,7 +55,8 @@ public class ChatCompletion {
     }
 
     public ChatCompletion temperature(double temperature) {
-        this.temperature = temperature;
+        // 温度的范围是 [0,2)
+        this.temperature = Math.min(temperature, 1.99);
         return this;
     }
 

@@ -38,13 +38,13 @@ public final class Service {
         return chatManager.getSetting().map(s -> {
             String setting = s.getSetting(chatManager.getMaid(), language);
             String model = chatManager.getChatModel();
+            double chatTemperature = chatManager.getChatTemperature();
             CappedQueue<HistoryChat> history = chatManager.getHistory();
 
             // 构建对话
             ChatCompletion chatCompletion = ChatCompletion.create()
                     .model(model)
-                    // 温度的范围是 [0,2)
-                    .temperature(Math.min(AIConfig.CHAT_TEMPERATURE.get(), 1.99))
+                    .temperature(chatTemperature)
                     .setResponseFormat(ResponseFormat.json())
                     .systemChat(setting);
 

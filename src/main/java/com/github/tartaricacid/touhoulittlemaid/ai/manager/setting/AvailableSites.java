@@ -15,18 +15,29 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class AvailableSites {
     public static final String FILE_NAME = "available_sites.yml";
-    public static final Map<String, Site> CHAT_SITES = Maps.newLinkedHashMap();
-    public static final Map<String, Site> TTS_SITES = Maps.newLinkedHashMap();
+
+    // 服务端缓存的站点信息，包含秘钥等敏感信息
+    private static final Map<String, Site> CHAT_SITES = Maps.newLinkedHashMap();
+    private static final Map<String, Site> TTS_SITES = Maps.newLinkedHashMap();
+
+    // 用于向客户端发送的站点信息，用来供玩家选择不同的站点，不包含敏感信息
+    private static final Map<String, List<String>> CLIENT_CHAT_SITES = Maps.newLinkedHashMap();
+    private static final Map<String, List<String>> CLIENT_TTS_SITES = Maps.newLinkedHashMap();
+
     private static final Path SITES_FILES = Paths.get("config", TouhouLittleMaid.MOD_ID, FILE_NAME);
     private static final String JAR_SITES_FILES = String.format("/assets/%s/config/%s", TouhouLittleMaid.MOD_ID, FILE_NAME);
 
     public static void readSites() {
         CHAT_SITES.clear();
         TTS_SITES.clear();
+        CLIENT_CHAT_SITES.clear();
+        CLIENT_TTS_SITES.clear();
+
         Yaml yaml = new Yaml();
         Map<String, LinkedHashMap<String, Object>> allSites = Maps.newLinkedHashMap();
 
@@ -50,11 +61,15 @@ public class AvailableSites {
         allSites.forEach((key, value) -> {
             try {
                 Site site = new Site(value);
-                if (site.isChat()) {
+                // 必须设置了 key 的才能用于聊天
+                if (site.isChat() && StringUtils.isNotBlank(site.getApiKey())) {
                     CHAT_SITES.put(key, site);
+                    CLIENT_CHAT_SITES.put(key, site.getModels());
                 }
-                if (site.isTts()) {
+                // 必须设置了 key 的才能用于 tts
+                if (site.isTts() && StringUtils.isNotBlank(site.getApiKey())) {
                     TTS_SITES.put(key, site);
+                    CLIENT_TTS_SITES.put(key, site.getModels());
                 }
             } catch (Exception e) {
                 TouhouLittleMaid.LOGGER.error("Failed to load site: {}", key, e);
@@ -92,10 +107,25 @@ public class AvailableSites {
 
     @Nullable
     public static Site getFirstAvailableChatSite() {
-        return CHAT_SITES.values().stream().filter(site -> StringUtils.isNotBlank(site.getApiKey())).findFirst().orElse(null);
+        if (CHAT_SITES.isEmpty()) {
+            return null;
+        }
+        return CHAT_SITES.values().stream().findFirst().orElse(null);
     }
 
+    @Nullable
     public static Site getFirstAvailableTtsSite() {
-        return TTS_SITES.values().stream().filter(site -> StringUtils.isNotBlank(site.getApiKey())).findFirst().orElse(null);
+        if (TTS_SITES.isEmpty()) {
+            return null;
+        }
+        return TTS_SITES.values().stream().findFirst().orElse(null);
+    }
+
+    public static Map<String, List<String>> getClientChatSites() {
+        return CLIENT_CHAT_SITES;
+    }
+
+    public static Map<String, List<String>> getClientTtsSites() {
+        return CLIENT_TTS_SITES;
     }
 }

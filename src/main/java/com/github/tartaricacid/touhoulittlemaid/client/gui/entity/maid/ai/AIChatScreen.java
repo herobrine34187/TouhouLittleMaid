@@ -1,12 +1,11 @@
 package com.github.tartaricacid.touhoulittlemaid.client.gui.entity.maid.ai;
 
-import com.github.tartaricacid.touhoulittlemaid.client.gui.mod.ClothConfigScreen;
 import com.github.tartaricacid.touhoulittlemaid.client.gui.widget.button.FlatColorButton;
-import com.github.tartaricacid.touhoulittlemaid.compat.cloth.ClothConfigCompat;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
-import com.github.tartaricacid.touhoulittlemaid.init.registry.CompatRegistry;
 import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
+import com.github.tartaricacid.touhoulittlemaid.network.message.GetMaidAIDataMessage;
 import com.github.tartaricacid.touhoulittlemaid.network.message.SendUserChatMessage;
+import com.google.common.collect.Maps;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -17,11 +16,16 @@ import net.minecraft.client.resources.language.LanguageInfo;
 import net.minecraft.client.resources.language.LanguageManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraftforge.fml.ModList;
 import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.List;
+import java.util.Map;
+
 public class AIChatScreen extends Screen {
+    public static final Map<String, List<String>> CLIENT_CHAT_SITES = Maps.newLinkedHashMap();
+    public static final Map<String, List<String>> CLIENT_TTS_SITES = Maps.newLinkedHashMap();
+
     private final EntityMaid maid;
     private EditBox input;
     private FlatColorButton configButton;
@@ -46,13 +50,9 @@ public class AIChatScreen extends Screen {
         this.addWidget(this.input);
         this.setInitialFocus(this.input);
 
-        this.configButton = new FlatColorButton(posX + 142, posY + 58, 20, 20, Component.literal("✎"), b -> {
-            if (ModList.get().isLoaded(CompatRegistry.CLOTH_CONFIG)) {
-                ClothConfigCompat.openAiChatScreen();
-            } else {
-                ClothConfigScreen.open();
-            }
-        }).setTooltips("ai.touhou_little_maid.chat.config.tip");
+        this.configButton = new FlatColorButton(posX + 142, posY + 58, 20, 20, Component.literal("✎"),
+                b -> NetworkHandler.CHANNEL.sendToServer(new GetMaidAIDataMessage(this.maid.getId())))
+                .setTooltips("ai.touhou_little_maid.chat.config.tip");
         this.addRenderableWidget(this.configButton);
     }
 

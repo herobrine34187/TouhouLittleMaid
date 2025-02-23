@@ -2,9 +2,6 @@ package com.github.tartaricacid.touhoulittlemaid.ai.manager.entity;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.response.ResponseChat;
-import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.AvailableSites;
-import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.CharacterSetting;
-import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.SettingReader;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.Site;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.Service;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.fishaudio.TTSClient;
@@ -17,26 +14,14 @@ import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleMang
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
 import com.github.tartaricacid.touhoulittlemaid.network.message.TTSAudioToClientMessage;
-import com.github.tartaricacid.touhoulittlemaid.util.CappedQueue;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
-
-public final class MaidAIChatManager {
-    private final EntityMaid maid;
-    private final CappedQueue<HistoryChat> history;
-
-    private String chatSite = "";
-    private String chatModel = "";
-    private String ttsSite = "";
-    private String ttsModel = "";
-
+public final class MaidAIChatManager extends MaidAIChatData {
     public MaidAIChatManager(EntityMaid maid) {
-        this.maid = maid;
-        this.history = new CappedQueue<>(AIConfig.MAID_MAX_HISTORY_CHAT_SIZE.get());
+        super(maid);
     }
 
     public void chat(String message, String language) {
@@ -58,89 +43,6 @@ public final class MaidAIChatManager {
         } else {
             ChatBubbleManger.addInnerChatText(maid, "ai.touhou_little_maid.chat.disable");
         }
-    }
-
-    public String getChatModel() {
-        Site site = getChatSite();
-        String model = StringUtils.EMPTY;
-        if (site != null && !site.getModels().isEmpty()) {
-            if (StringUtils.isBlank(chatModel)) {
-                model = site.getModels().get(0);
-            } else {
-                model = chatModel;
-            }
-        }
-        return model;
-    }
-
-    public String getTtsModel() {
-        Site site = getTtsSite();
-        String model = StringUtils.EMPTY;
-        if (site != null && !site.getModels().isEmpty()) {
-            if (StringUtils.isBlank(ttsModel)) {
-                model = site.getModels().get(0);
-            } else {
-                model = ttsModel;
-            }
-        }
-        return model;
-    }
-
-    public CappedQueue<HistoryChat> getHistory() {
-        return history;
-    }
-
-    public EntityMaid getMaid() {
-        return maid;
-    }
-
-    public Optional<CharacterSetting> getSetting() {
-        String modelId = this.maid.getModelId();
-        return SettingReader.getSetting(modelId);
-    }
-
-    public void setChatSite(String chatSite) {
-        this.chatSite = chatSite;
-    }
-
-    public void setChatModel(String chatModel) {
-        this.chatModel = chatModel;
-    }
-
-    public void setTtsSite(String ttsSite) {
-        this.ttsSite = ttsSite;
-    }
-
-    public void setTtsModel(String ttsModel) {
-        this.ttsModel = ttsModel;
-    }
-
-    @Nullable
-    private Site getChatSite() {
-        Site site;
-        if (StringUtils.isBlank(chatSite)) {
-            site = AvailableSites.getFirstAvailableChatSite();
-        } else {
-            site = AvailableSites.getChatSite(chatSite);
-            if (site == null) {
-                site = AvailableSites.getFirstAvailableChatSite();
-            }
-        }
-        return site;
-    }
-
-    @Nullable
-    private Site getTtsSite() {
-        Site site;
-        if (StringUtils.isBlank(ttsSite)) {
-            site = AvailableSites.getFirstAvailableTtsSite();
-        } else {
-            site = AvailableSites.getTtsSite(ttsSite);
-            if (site == null) {
-                site = AvailableSites.getFirstAvailableTtsSite();
-            }
-        }
-        return site;
     }
 
     private void tts(Site site, String chatText, String ttsText) {
@@ -184,13 +86,5 @@ public final class MaidAIChatManager {
             NetworkHandler.sendToNearby(maid, new TTSAudioToClientMessage(this.maid.getId(), data));
             ChatBubbleManger.addAiChatText(maid, chatText);
         });
-    }
-
-    private void addUserHistory(String message) {
-        this.history.add(HistoryChat.userChat(maid, message));
-    }
-
-    private void addAssistantHistory(String message) {
-        this.history.add(HistoryChat.assistantChat(maid, message));
     }
 }

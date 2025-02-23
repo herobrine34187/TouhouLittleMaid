@@ -19,50 +19,37 @@ import net.minecraft.network.chat.MutableComponent;
 import java.nio.file.Path;
 import java.util.SortedMap;
 
-public class AIChatIntegration {
-    public static ConfigBuilder getConfigBuilder() {
-        ConfigBuilder root = ConfigBuilder.create().setTitle(Component.literal("Touhou Little Maid"));
-        root.setGlobalized(true);
-        root.setGlobalizedExpanded(false);
-        ConfigEntryBuilder entryBuilder = root.entryBuilder();
-        init(root, entryBuilder);
-        return root;
-    }
+public class GlobalAIIntegration {
+    public static void aiChat(ConfigBuilder root, ConfigEntryBuilder entryBuilder) {
+        ConfigCategory aiChat = root.getOrCreateCategory(Component.translatable("config.touhou_little_maid.global_ai"));
 
-    public static void init(ConfigBuilder root, ConfigEntryBuilder entryBuilder) {
-        aiChat(root, entryBuilder);
-    }
-
-    private static void aiChat(ConfigBuilder root, ConfigEntryBuilder entryBuilder) {
-        ConfigCategory aiChat = root.getOrCreateCategory(Component.translatable("config.touhou_little_maid.ai_chat"));
-
-        aiChat.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.touhou_little_maid.ai_chat.chat_enable"), AIConfig.CHAT_ENABLED.get())
-                .setDefaultValue(true).setTooltip(Component.translatable("config.touhou_little_maid.ai_chat.chat_enable.tooltip"))
+        aiChat.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.touhou_little_maid.global_ai.chat_enable"), AIConfig.CHAT_ENABLED.get())
+                .setDefaultValue(true).setTooltip(Component.translatable("config.touhou_little_maid.global_ai.chat_enable.tooltip"))
                 .setSaveConsumer(AIConfig.CHAT_ENABLED::set).build());
 
-        aiChat.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.touhou_little_maid.ai_chat.tts_enable"), AIConfig.TTS_ENABLED.get())
-                .setDefaultValue(true).setTooltip(Component.translatable("config.touhou_little_maid.ai_chat.tts_enable.tooltip"))
+        aiChat.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.touhou_little_maid.global_ai.tts_enable"), AIConfig.TTS_ENABLED.get())
+                .setDefaultValue(true).setTooltip(Component.translatable("config.touhou_little_maid.global_ai.tts_enable.tooltip"))
                 .setSaveConsumer(AIConfig.TTS_ENABLED::set).build());
 
-        aiChat.addEntry(entryBuilder.startDoubleField(Component.translatable("config.touhou_little_maid.ai_chat.chat_temperature"), AIConfig.CHAT_TEMPERATURE.get())
+        aiChat.addEntry(entryBuilder.startDoubleField(Component.translatable("config.touhou_little_maid.global_ai.chat_temperature"), AIConfig.CHAT_TEMPERATURE.get())
                 .setDefaultValue(AIConfig.CHAT_TEMPERATURE.getDefault()).setMin(0.0).setMax(2.0)
-                .setTooltip(Component.translatable("config.touhou_little_maid.ai_chat.chat_temperature.tooltip"))
+                .setTooltip(Component.translatable("config.touhou_little_maid.global_ai.chat_temperature.tooltip"))
                 .setSaveConsumer(AIConfig.CHAT_TEMPERATURE::set).build());
 
-        aiChat.addEntry(entryBuilder.startIntSlider(Component.translatable("config.touhou_little_maid.ai_chat.maid_max_history_chat_size"),
+        aiChat.addEntry(entryBuilder.startIntSlider(Component.translatable("config.touhou_little_maid.global_ai.maid_max_history_chat_size"),
                         AIConfig.MAID_MAX_HISTORY_CHAT_SIZE.get(), 1, 128).setDefaultValue(16)
-                .setTooltip(Component.translatable("config.touhou_little_maid.ai_chat.maid_max_history_chat_size.tooltip"))
+                .setTooltip(Component.translatable("config.touhou_little_maid.global_ai.maid_max_history_chat_size.tooltip"))
                 .setSaveConsumer(AIConfig.MAID_MAX_HISTORY_CHAT_SIZE::set).build());
 
         SortedMap<String, LanguageInfo> languages = Minecraft.getInstance().getLanguageManager().getLanguages();
-        aiChat.addEntry(entryBuilder.startStringDropdownMenu(Component.translatable("config.touhou_little_maid.ai_chat.tts_language"),
+        aiChat.addEntry(entryBuilder.startStringDropdownMenu(Component.translatable("config.touhou_little_maid.global_ai.tts_language"),
                         AIConfig.TTS_LANGUAGE.get(), Component::literal, cell(languages)).setSelections(languages.keySet())
-                .setDefaultValue(LanguageManager.DEFAULT_LANGUAGE_CODE).setTooltip(Component.translatable("config.touhou_little_maid.ai_chat.tts_language.tooltip"))
+                .setDefaultValue(LanguageManager.DEFAULT_LANGUAGE_CODE).setTooltip(Component.translatable("config.touhou_little_maid.global_ai.tts_language.tooltip"))
                 .setSaveConsumer(info -> AIConfig.TTS_LANGUAGE.set(info)).build());
 
         Path availableSiteFile = Utils.getConfigFolder().resolve(TouhouLittleMaid.MOD_ID).resolve(AvailableSites.FILE_NAME);
         ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.OPEN_FILE, availableSiteFile.toString());
-        MutableComponent text = Component.translatable("config.touhou_little_maid.chat_site.click");
+        MutableComponent text = Component.translatable("config.touhou_little_maid.global_ai.chat_site.click");
         text.withStyle(s -> s.withUnderlined(true).withColor(ChatFormatting.BLUE).withClickEvent(clickEvent));
         aiChat.addEntry(entryBuilder.startTextDescription(text).build());
     }
