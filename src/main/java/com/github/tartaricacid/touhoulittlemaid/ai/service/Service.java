@@ -21,13 +21,19 @@ import java.time.Duration;
 
 public final class Service {
     public static final Gson GSON = new Gson();
-    // TODO: 增加代理功能？
-    private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
+    private static final HttpClient CHAT_HTTP_CLIENT = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(10))
+            .proxy(new ConfigProxySelector(AIConfig.CHAT_PROXY_ADDRESS))
+            .build();
+    private static final HttpClient TTS_HTTP_CLIENT = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(10))
+            .proxy(new ConfigProxySelector(AIConfig.TTS_PROXY_ADDRESS))
+            .build();
 
     public static ChatClient getChatClient(Site site) {
         String chatApiKey = site.getApiKey();
         String chatBaseUrl = site.getUrl();
-        return ChatClient.create(HTTP_CLIENT)
+        return ChatClient.create(CHAT_HTTP_CLIENT)
                 .apiKey(chatApiKey)
                 .baseUrl(chatBaseUrl);
     }
@@ -66,7 +72,7 @@ public final class Service {
     public static TTSClient getTtsClient(Site site) {
         String ttsApiKey = site.getApiKey();
         String ttsBaseUrl = site.getUrl();
-        return TTSClient.create(HTTP_CLIENT)
+        return TTSClient.create(TTS_HTTP_CLIENT)
                 .apiKey(ttsApiKey)
                 .baseUrl(ttsBaseUrl);
     }

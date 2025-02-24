@@ -5,6 +5,7 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.ResponseCallback;
 
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
 public class TTSCallback implements ResponseCallback<byte[]> {
@@ -20,11 +21,13 @@ public class TTSCallback implements ResponseCallback<byte[]> {
     }
 
     @Override
-    public void onResponse(HttpResponse<byte[]> response) {
+    public void onResponse(HttpResponse<byte[]> response, Consumer<Throwable> failConsumer) {
         if (isSuccessful(response)) {
             consumer.accept(response.body());
         } else {
             TouhouLittleMaid.LOGGER.error("Request failed: {}", response.statusCode());
+            String message = String.format("HTTP Error Code: %d, Response %s", response.statusCode(), new String(response.body(), StandardCharsets.UTF_8));
+            failConsumer.accept(new Throwable(message));
         }
     }
 }

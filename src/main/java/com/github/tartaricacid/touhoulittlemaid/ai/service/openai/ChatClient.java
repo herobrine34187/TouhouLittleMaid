@@ -47,7 +47,7 @@ public final class ChatClient {
         return this;
     }
 
-    public void handle(Consumer<ChatCompletionResponse> consumer) {
+    public void handle(Consumer<ChatCompletionResponse> consumer, Consumer<Throwable> failConsumer) {
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.JSON_UTF_8.toString())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.apiKey)
@@ -60,8 +60,9 @@ public final class ChatClient {
                     ChatCallback callback = new ChatCallback(consumer);
                     if (throwable != null) {
                         callback.onFailure(httpRequest, throwable);
+                        failConsumer.accept(throwable);
                     } else {
-                        callback.onResponse(response);
+                        callback.onResponse(response, failConsumer);
                     }
                 });
     }

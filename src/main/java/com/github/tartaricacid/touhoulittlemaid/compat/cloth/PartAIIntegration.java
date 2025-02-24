@@ -47,7 +47,11 @@ public class PartAIIntegration {
             String defaultModel = models.contains(model) ? model : StringUtils.EMPTY;
             ai.addEntry(entryBuilder.startStringDropdownMenu(Component.translatable("config.touhou_little_maid.part_ai.chat_model"), defaultModel)
                     .setDefaultValue(StringUtils.EMPTY).setSelections(models).setTooltip(Component.translatable("config.touhou_little_maid.part_ai.chat_model.tooltip"))
-                    .setSaveConsumer(manager::setChatModel)
+                    .setSaveConsumer(result -> {
+                        if (StringUtils.isNotBlank(chatSite.getValue()) && chatSite.getValue().equals(key)) {
+                            manager.setChatModel(result);
+                        }
+                    })
                     .setDisplayRequirement(() -> StringUtils.isNotBlank(chatSite.getValue()) && chatSite.getValue().equals(key)).build());
         }
 
@@ -71,7 +75,11 @@ public class PartAIIntegration {
             String defaultModel = models.contains(model) ? model : StringUtils.EMPTY;
             ai.addEntry(entryBuilder.startStringDropdownMenu(Component.translatable("config.touhou_little_maid.part_ai.tts_model"), defaultModel)
                     .setDefaultValue(StringUtils.EMPTY).setSelections(models).setTooltip(Component.translatable("config.touhou_little_maid.part_ai.tts_model.tooltip"))
-                    .setSaveConsumer(manager::setTtsModel)
+                    .setSaveConsumer(result -> {
+                        if (StringUtils.isNotBlank(ttsSite.getValue()) && ttsSite.getValue().equals(key)) {
+                            manager.setTtsModel(result);
+                        }
+                    })
                     .setDisplayRequirement(() -> StringUtils.isNotBlank(ttsSite.getValue()) && ttsSite.getValue().equals(key)).build());
         }
 

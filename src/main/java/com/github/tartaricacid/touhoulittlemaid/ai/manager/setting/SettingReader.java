@@ -16,7 +16,7 @@ public class SettingReader {
     private static final String SETTING_FOLDER_NAME = "settings";
     private static final Path SETTINGS_FOLDER = Paths.get("config", TouhouLittleMaid.MOD_ID, SETTING_FOLDER_NAME);
     private static final Map<String, CharacterSetting> SETTINGS = Maps.newHashMap();
-    private static final String TXT = ".txt";
+    private static final String YAML = ".yml";
 
     public static void clear() {
         SETTINGS.clear();
@@ -57,14 +57,11 @@ public class SettingReader {
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
             String entryName = entry.getName();
-            if (!entry.isDirectory() && entryName.startsWith(folder) && entryName.endsWith(TXT)) {
+            if (!entry.isDirectory() && entryName.startsWith(folder) && entryName.endsWith(YAML)) {
                 TouhouLittleMaid.LOGGER.debug("Loading settings from {}", entryName);
                 try (InputStream inputStream = zipFile.getInputStream(entry)) {
-                    int startIndex = folder.length();
-                    int endIndex = entryName.length() - TXT.length();
-                    // 因为 windows 下文件名不允许包含冒号
-                    String id = entryName.substring(startIndex, endIndex).replace("-", ":");
-                    SETTINGS.put(id, new CharacterSetting(inputStream));
+                    CharacterSetting setting = new CharacterSetting(inputStream);
+                    setting.getModelId().forEach(id -> SETTINGS.put(id, setting));
                 } catch (IOException e) {
                     TouhouLittleMaid.LOGGER.error("Failed to read settings from {}", entryName, e);
                 }
@@ -77,11 +74,9 @@ public class SettingReader {
             @Override
             public FileVisitResult visitFile(@NotNull Path file, BasicFileAttributes attributes) throws IOException {
                 String fileName = file.getFileName().toString();
-                if (fileName.endsWith(TXT)) {
-                    int endIndex = fileName.length() - TXT.length();
-                    // 因为 windows 下文件名不允许包含冒号
-                    String id = fileName.substring(0, endIndex).replace("-", ":");
-                    SETTINGS.put(id, new CharacterSetting(file.toFile()));
+                if (fileName.endsWith(YAML)) {
+                    CharacterSetting setting = new CharacterSetting(file.toFile());
+                    setting.getModelId().forEach(id -> SETTINGS.put(id, setting));
                 }
                 return super.visitFile(file, attributes);
             }

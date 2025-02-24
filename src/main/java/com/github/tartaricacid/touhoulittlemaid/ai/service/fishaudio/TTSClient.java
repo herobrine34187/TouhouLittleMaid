@@ -46,7 +46,7 @@ public class TTSClient {
         return this;
     }
 
-    public void handle(Consumer<byte[]> consumer) {
+    public void handle(Consumer<byte[]> consumer, Consumer<Throwable> failConsumer) {
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.JSON_UTF_8.toString())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.apiKey)
@@ -59,8 +59,9 @@ public class TTSClient {
                     TTSCallback callback = new TTSCallback(consumer);
                     if (throwable != null) {
                         callback.onFailure(httpRequest, throwable);
+                        failConsumer.accept(throwable);
                     } else {
-                        callback.onResponse(response);
+                        callback.onResponse(response, failConsumer);
                     }
                 });
     }

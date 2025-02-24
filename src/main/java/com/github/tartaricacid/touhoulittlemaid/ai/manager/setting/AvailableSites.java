@@ -77,14 +77,10 @@ public class AvailableSites {
         });
 
         // 保存
-        saveSites();
+        saveSites(allSites);
     }
 
-    public static void saveSites() {
-        Map<String, LinkedHashMap<String, Object>> allSites = Maps.newLinkedHashMap();
-        CHAT_SITES.forEach((key, value) -> allSites.put(key, value.siteToMap()));
-        TTS_SITES.forEach((key, value) -> allSites.put(key, value.siteToMap()));
-
+    public static void saveSites(Map<String, LinkedHashMap<String, Object>> allSites) {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         Yaml yaml = new Yaml(options);

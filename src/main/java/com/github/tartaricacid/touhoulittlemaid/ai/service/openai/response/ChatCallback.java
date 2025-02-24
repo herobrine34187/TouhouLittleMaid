@@ -22,7 +22,7 @@ public class ChatCallback implements ResponseCallback<String> {
     }
 
     @Override
-    public void onResponse(HttpResponse<String> response) {
+    public void onResponse(HttpResponse<String> response, Consumer<Throwable> failConsumer) {
         try {
             String string = response.body();
             if (isSuccessful(response)) {
@@ -30,9 +30,12 @@ public class ChatCallback implements ResponseCallback<String> {
                 consumer.accept(chatCompletionResponse);
             } else {
                 TouhouLittleMaid.LOGGER.error("Request failed: {}", string);
+                String message = String.format("HTTP Error Code: %d, Response %s", response.statusCode(), string);
+                failConsumer.accept(new Throwable(message));
             }
         } catch (JsonSyntaxException e) {
             TouhouLittleMaid.LOGGER.error("JSON Syntax Exception: ", e);
+            failConsumer.accept(e);
         }
     }
 }

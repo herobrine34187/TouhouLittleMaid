@@ -14,8 +14,11 @@ import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleMang
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
 import com.github.tartaricacid.touhoulittlemaid.network.message.TTSAudioToClientMessage;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,7 +37,7 @@ public final class MaidAIChatManager extends MaidAIChatData {
                 ChatCompletion chatCompletion = Service.getChatCompletion(this, language);
                 if (chatCompletion != null) {
                     chatCompletion.userChat(message);
-                    chatClient.chat(chatCompletion).handle(this::onShowChatSync);
+                    chatClient.chat(chatCompletion).handle(this::onShowChatSync, this::onChatFailSync);
                     this.addUserHistory(message);
                 } else {
                     ChatBubbleManger.addInnerChatText(maid, "ai.touhou_little_maid.chat.no_setting");
@@ -48,7 +51,7 @@ public final class MaidAIChatManager extends MaidAIChatData {
     private void tts(Site site, String chatText, String ttsText) {
         TTSClient ttsClient = Service.getTtsClient(site);
         TTSRequest ttsRequest = Service.getTtsRequest(this.getTtsModel(), ttsText);
-        ttsClient.request(ttsRequest).handle(data -> onPlaySoundSync(chatText, data));
+        ttsClient.request(ttsRequest).handle(data -> onPlaySoundSync(chatText, data), throwable -> onTtsFailSync(chatText, throwable));
     }
 
     private void onShowChatSync(ChatCompletionResponse result) {
@@ -57,12 +60,14 @@ public final class MaidAIChatManager extends MaidAIChatData {
             ResponseChat responseChat = Service.GSON.fromJson(rawMessage, ResponseChat.class);
             if (responseChat == null) {
                 TouhouLittleMaid.LOGGER.error("Error in Response Chat: {}", rawMessage);
+                onChatFailSync(Component.translatable("ai.touhou_little_maid.chat.format.json_format_error", rawMessage));
                 return;
             }
             String chatText = responseChat.getChatText();
             String ttsText = responseChat.getTtsText();
             if (StringUtils.isBlank(chatText) || StringUtils.isBlank(ttsText)) {
                 TouhouLittleMaid.LOGGER.error("Error in Response Chat: {}", rawMessage);
+                onChatFailSync(Component.translatable("ai.touhou_little_maid.chat.format.text_is_empty", rawMessage));
                 return;
             }
             this.addAssistantHistory(rawMessage);
@@ -77,6 +82,33 @@ public final class MaidAIChatManager extends MaidAIChatData {
         }
     }
 
+    private void onChatFailSync(Throwable throwable) {
+        if (!(maid.level instanceof ServerLevel serverLevel)) {
+            return;
+        }
+        MinecraftServer server = serverLevel.getServer();
+        server.submit(() -> {
+            if (maid.getOwner() instanceof ServerPlayer player) {
+                String cause = throwable.getLocalizedMessage();
+                player.sendSystemMessage(Component.translatable("ai.touhou_little_maid.chat.connect.fail")
+                        .append(cause).withStyle(ChatFormatting.RED));
+            }
+        });
+    }
+
+    private void onChatFailSync(Component message) {
+        if (!(maid.level instanceof ServerLevel serverLevel)) {
+            return;
+        }
+        MinecraftServer server = serverLevel.getServer();
+        server.submit(() -> {
+            if (maid.getOwner() instanceof ServerPlayer player) {
+                player.sendSystemMessage(Component.translatable("ai.touhou_little_maid.chat.connect.fail")
+                        .append(message).withStyle(ChatFormatting.RED));
+            }
+        });
+    }
+
     private void onPlaySoundSync(String chatText, byte[] data) {
         if (!(maid.level instanceof ServerLevel serverLevel)) {
             return;
@@ -85,6 +117,21 @@ public final class MaidAIChatManager extends MaidAIChatData {
         server.submit(() -> {
             NetworkHandler.sendToNearby(maid, new TTSAudioToClientMessage(this.maid.getId(), data));
             ChatBubbleManger.addAiChatText(maid, chatText);
+        });
+    }
+
+    private void onTtsFailSync(String chatText, Throwable throwable) {
+        if (!(maid.level instanceof ServerLevel serverLevel)) {
+            return;
+        }
+        MinecraftServer server = serverLevel.getServer();
+        server.submit(() -> {
+            ChatBubbleManger.addAiChatText(maid, chatText);
+            if (maid.getOwner() instanceof ServerPlayer player) {
+                String cause = throwable.getLocalizedMessage();
+                player.sendSystemMessage(Component.translatable("ai.touhou_little_maid.tts.connect.fail")
+                        .append(cause).withStyle(ChatFormatting.RED));
+            }
         });
     }
 }
