@@ -5,6 +5,7 @@ import com.github.tartaricacid.touhoulittlemaid.advancements.maid.TriggerType;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.entity.MaidAIChatManager;
 import com.github.tartaricacid.touhoulittlemaid.api.backpack.IBackpackData;
 import com.github.tartaricacid.touhoulittlemaid.api.backpack.IMaidBackpack;
+import com.github.tartaricacid.touhoulittlemaid.api.client.render.MaidRenderState;
 import com.github.tartaricacid.touhoulittlemaid.api.entity.IMaid;
 import com.github.tartaricacid.touhoulittlemaid.api.entity.data.TaskDataKey;
 import com.github.tartaricacid.touhoulittlemaid.api.event.*;
@@ -256,6 +257,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
     public boolean guiOpening = false;
     public MaidFishingHook fishing = null;
 
+    public MaidRenderState renderState = MaidRenderState.ENTITY;
     public boolean rouletteAnimPlaying = false;
     public String rouletteAnim = "empty";
     public boolean rouletteAnimDirty = false;
