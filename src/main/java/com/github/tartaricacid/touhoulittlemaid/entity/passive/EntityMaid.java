@@ -491,10 +491,10 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
     @Override
     public void rideTick() {
         super.rideTick();
-        // 当玩家抱起女仆时，能够同步朝向
-        if (this.getVehicle() instanceof Player player) {
-            this.setYHeadRot(player.getYRot());
-            this.setYBodyRot(player.getYRot());
+        if (this.getVehicle() != null) {
+            Entity vehicle = this.getVehicle();
+            this.setYHeadRot(vehicle.getYRot());
+            this.setYBodyRot(vehicle.getYRot());
         }
     }
 
