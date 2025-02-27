@@ -16,6 +16,7 @@ import com.github.tartaricacid.touhoulittlemaid.geckolib3.geo.animated.AnimatedG
 import com.github.tartaricacid.touhoulittlemaid.geckolib3.geo.animated.ILocationModel;
 import com.github.tartaricacid.touhoulittlemaid.geckolib3.model.provider.data.EntityModelData;
 import com.github.tartaricacid.touhoulittlemaid.geckolib3.resource.GeckoLibCache;
+import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -165,6 +166,10 @@ public class GeckoMaidEntity<T extends Mob> extends AnimatableEntity<T> implemen
 
     @Override
     public void setYsmModel(String modelId, String texture) {
+    }
+
+    @Override
+    public void updateRoamingVars(Object2FloatOpenHashMap<String> roamingVars) {
     }
 
     private static class MaidState<T extends Mob> {

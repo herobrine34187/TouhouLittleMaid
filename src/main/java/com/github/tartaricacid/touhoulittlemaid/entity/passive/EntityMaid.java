@@ -166,6 +166,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
     public static final String YSM_MODEL_NAME_TAG = "YsmModelName";
     public static final String YSM_ROULETTE_ANIM_TAG = "YsmRouletteAnim";
     public static final String YSM_ROAMING_VARS_TAG = "YsmRoamingVars";
+    public static final String YSM_ROAMING_UPDATE_FLAG_TAG = "YsmRoamingUpdateFlag";
 
     // 女仆默认属性
     public static final String MODEL_ID_TAG = "ModelId";
@@ -261,6 +262,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
     public boolean rouletteAnimPlaying = false;
     public String rouletteAnim = "empty";
     public boolean rouletteAnimDirty = false;
+    public int roamingVarsUpdateFlag = 0;
     public Object2FloatOpenHashMap<String> roamingVars = new Object2FloatOpenHashMap<>();
 
     private List<SendEffectMessage.EffectData> effects = Lists.newArrayList();
@@ -1195,6 +1197,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
         compound.putString(YSM_MODEL_TEXTURE_TAG, getYsmModelTexture());
         compound.putString(YSM_MODEL_NAME_TAG, Component.Serializer.toJson(getYsmModelName()));
         compound.putString(YSM_ROULETTE_ANIM_TAG, rouletteAnim);
+        compound.putInt(YSM_ROAMING_UPDATE_FLAG_TAG, roamingVarsUpdateFlag);
 
         CompoundTag roamingVarsTag = new CompoundTag();
         roamingVars.forEach(roamingVarsTag::putFloat);
@@ -1252,6 +1255,9 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
         }
         if (compound.contains(YSM_ROULETTE_ANIM_TAG, Tag.TAG_STRING)) {
             rouletteAnim = compound.getString(YSM_ROULETTE_ANIM_TAG);
+        }
+        if (compound.contains(YSM_ROAMING_UPDATE_FLAG_TAG, Tag.TAG_INT)) {
+            roamingVarsUpdateFlag = compound.getInt(YSM_ROAMING_UPDATE_FLAG_TAG);
         }
         if (compound.contains(YSM_ROAMING_VARS_TAG, Tag.TAG_COMPOUND)) {
             CompoundTag roamingVarsTag = compound.getCompound(YSM_ROAMING_VARS_TAG);

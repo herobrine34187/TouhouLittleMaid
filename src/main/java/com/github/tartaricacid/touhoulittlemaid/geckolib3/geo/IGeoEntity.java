@@ -15,4 +15,6 @@ public interface IGeoEntity {
     void setMaidInfo(MaidModelInfo info);
 
     void setYsmModel(String modelId, String texture);
+
+    void updateRoamingVars(Object2FloatOpenHashMap<String> roamingVars);
 }

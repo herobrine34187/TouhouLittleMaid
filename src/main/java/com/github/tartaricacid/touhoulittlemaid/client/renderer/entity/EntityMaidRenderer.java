@@ -14,6 +14,7 @@ import com.github.tartaricacid.touhoulittlemaid.client.resource.pojo.MaidModelIn
 import com.github.tartaricacid.touhoulittlemaid.compat.ysm.YsmCompat;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.geckolib3.geo.GeoLayerRenderer;
+import com.github.tartaricacid.touhoulittlemaid.geckolib3.geo.IGeoEntity;
 import com.github.tartaricacid.touhoulittlemaid.geckolib3.geo.IGeoEntityRenderer;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -121,7 +122,11 @@ public class EntityMaidRenderer extends MobRenderer<Mob, BedrockModel<Mob>> {
 
         // YSM 接管渲染
         if (maid.isYsmModel() && this.ysmMaidRenderer != null) {
-            this.ysmMaidRenderer.getGeoEntity(entity).setYsmModel(maid.getYsmModelId(), maid.getYsmModelTexture());
+            IGeoEntity geoEntity = this.ysmMaidRenderer.getGeoEntity(entity);
+            geoEntity.setYsmModel(maid.getYsmModelId(), maid.getYsmModelTexture());
+            if (maidEntity != null) {
+                geoEntity.updateRoamingVars(maidEntity.roamingVars);
+            }
             this.ysmMaidRenderer.geoRender(entity, entityYaw, partialTicks, poseStack, bufferIn, packedLightIn);
             return;
         }
