@@ -3,6 +3,7 @@ package com.github.tartaricacid.touhoulittlemaid.client.renderer.entity.geckolay
 import com.github.tartaricacid.touhoulittlemaid.compat.carryon.RenderFixer;
 import com.github.tartaricacid.touhoulittlemaid.compat.slashblade.SlashBladeCompat;
 import com.github.tartaricacid.touhoulittlemaid.compat.slashblade.SlashBladeRender;
+import com.github.tartaricacid.touhoulittlemaid.geckolib3.core.processor.ILocationBone;
 import com.github.tartaricacid.touhoulittlemaid.geckolib3.geo.GeoLayerRenderer;
 import com.github.tartaricacid.touhoulittlemaid.geckolib3.geo.IGeoEntityRenderer;
 import com.github.tartaricacid.touhoulittlemaid.geckolib3.geo.animated.ILocationModel;
@@ -15,6 +16,8 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+
+import java.util.List;
 
 public class GeckoLayerMaidHeld<T extends Mob, R extends IGeoEntityRenderer<T>> extends GeoLayerRenderer<T, R> {
     private final ItemInHandRenderer itemInHandRenderer;
@@ -59,21 +62,40 @@ public class GeckoLayerMaidHeld<T extends Mob, R extends IGeoEntityRenderer<T>> 
 
     protected void renderArmWithItem(T livingEntity, ItemStack itemStack, ILocationModel geoModel, ItemDisplayContext displayContext, HumanoidArm arm, PoseStack poseStack, MultiBufferSource bufferSource, int light) {
         if (!itemStack.isEmpty() && geoModel != null) {
-            poseStack.pushPose();
-            translateToHand(arm, poseStack, geoModel);
-            poseStack.translate(0, -0.0625, -0.1);
-            poseStack.mulPose(Axis.XP.rotationDegrees(-90.0F));
             boolean isLeftHand = arm == HumanoidArm.LEFT;
-            this.itemInHandRenderer.renderItem(livingEntity, itemStack, displayContext, isLeftHand, poseStack, bufferSource, light);
+
+            // 渲染默认手部物品
+            poseStack.pushPose();
+            boolean scaleResult = translateToHand(arm, poseStack, geoModel);
+            // 缩放不为 0 才会渲染
+            if (!scaleResult) {
+                poseStack.translate(0, -0.0625, -0.1);
+                poseStack.mulPose(Axis.XP.rotationDegrees(-90.0F));
+                this.itemInHandRenderer.renderItem(livingEntity, itemStack, displayContext, isLeftHand, poseStack, bufferSource, light);
+            }
             poseStack.popPose();
+
+            // 渲染额外手部物品
+            List<List<? extends ILocationBone>> extraBones = isLeftHand ? geoModel.extraLeftHandBones() : geoModel.extraRightHandBones();
+            extraBones.forEach(bones -> {
+                poseStack.pushPose();
+                boolean extraScaleResult = RenderUtils.prepMatrixForLocator(poseStack, bones);
+                // 缩放不为 0 才会渲染
+                if (!extraScaleResult) {
+                    poseStack.translate(0, -0.0625, -0.1);
+                    poseStack.mulPose(Axis.XP.rotationDegrees(-90.0F));
+                    this.itemInHandRenderer.renderItem(livingEntity, itemStack, displayContext, isLeftHand, poseStack, bufferSource, light);
+                }
+                poseStack.popPose();
+            });
         }
     }
 
-    protected void translateToHand(HumanoidArm arm, PoseStack poseStack, ILocationModel geoModel) {
+    protected boolean translateToHand(HumanoidArm arm, PoseStack poseStack, ILocationModel geoModel) {
         if (arm == HumanoidArm.LEFT) {
-            RenderUtils.prepMatrixForLocator(poseStack, geoModel.leftHandBones());
+            return RenderUtils.prepMatrixForLocator(poseStack, geoModel.leftHandBones());
         } else {
-            RenderUtils.prepMatrixForLocator(poseStack, geoModel.rightHandBones());
+            return RenderUtils.prepMatrixForLocator(poseStack, geoModel.rightHandBones());
         }
     }
 }

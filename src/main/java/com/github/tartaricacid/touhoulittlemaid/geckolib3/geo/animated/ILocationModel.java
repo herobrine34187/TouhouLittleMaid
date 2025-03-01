@@ -10,7 +10,15 @@ public interface ILocationModel {
         return Collections.emptyList();
     }
 
+    default List<List<? extends ILocationBone>> extraLeftHandBones() {
+        return Collections.emptyList();
+    }
+
     default List<? extends ILocationBone> rightHandBones() {
+        return Collections.emptyList();
+    }
+
+    default List<List<? extends ILocationBone>> extraRightHandBones() {
         return Collections.emptyList();
     }
 
