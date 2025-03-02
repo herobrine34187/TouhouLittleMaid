@@ -29,7 +29,6 @@ public class ClientSetupEvent {
 
         // 客户端兼容
         SimpleHatsCompat.init();
-        YsmCompat.init();
         ImmersiveMelodiesCompat.init();
         OculusCompat.init();
     }
