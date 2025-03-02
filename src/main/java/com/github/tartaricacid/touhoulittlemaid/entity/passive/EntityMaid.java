@@ -174,6 +174,8 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
     public static final String MAID_BACKPACK_TYPE = "MaidBackpackType";
     public static final String MAID_INVENTORY_TAG = "MaidInventory";
     public static final String MAID_BAUBLE_INVENTORY_TAG = "MaidBaubleInventory";
+    public static final String MAID_HIDE_INVENTORY_TAG = "MaidHideInventory";
+    public static final String MAID_TASK_INVENTORY_TAG = "MaidTaskInventory";
     public static final String EXPERIENCE_TAG = "MaidExperience";
 
     // AI 超时检测
@@ -242,10 +244,16 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
 
     public final ItemStack[] handItemsForAnimation = new ItemStack[]{ItemStack.EMPTY, ItemStack.EMPTY};
 
+    // 物品存储相关
     private final EntityArmorInvWrapper armorInvWrapper = new EntityArmorInvWrapper(this);
     private final EntityHandsInvWrapper handsInvWrapper = new MaidHandsInvWrapper(this);
     private final ItemStackHandler maidInv = new MaidBackpackHandler(36, this);
     private final BaubleItemHandler maidBauble = new BaubleItemHandler(9);
+    // 用于暂存副手物品的物品栏
+    private final ItemStackHandler hideInv = new ItemStackHandler(1);
+    // 用于工作任务可能需要的物品栏
+    private final ItemStackHandler taskInv = new ItemStackHandler(9);
+
     private final MaidKillRecordManager killRecordManager = new MaidKillRecordManager();
     private final MaidTaskDataMaps taskDataMaps = new MaidTaskDataMaps();
     private final FavorabilityManager favorabilityManager;
@@ -447,6 +455,11 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
 
             TouhouLittleMaid.LOGGER.error("Maid's AI taking too long! Time: {} ms, Pos: ({},{},{}), Task ID: {}, Search Range: {}",
                     timeMs, blockPos.getX(), blockPos.getY(), blockPos.getZ(), taskId, searchRange);
+        }
+
+        // 掉落隐藏物品栏物品
+        if (this.tickCount % 5 == 0 && !this.isUsingItem() && !this.getHideInv().getStackInSlot(0).isEmpty()) {
+            this.backCurrentHandItemStack();
         }
         super.customServerAiStep();
     }
@@ -1207,6 +1220,8 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
         compound.putString(TASK_TAG, getTask().getUid().toString());
         compound.put(MAID_INVENTORY_TAG, maidInv.serializeNBT());
         compound.put(MAID_BAUBLE_INVENTORY_TAG, maidBauble.serializeNBT());
+        compound.put(MAID_HIDE_INVENTORY_TAG, hideInv.serializeNBT());
+        compound.put(MAID_TASK_INVENTORY_TAG, taskInv.serializeNBT());
         compound.putBoolean(STRUCK_BY_LIGHTNING_TAG, isStruckByLightning());
         compound.putBoolean(INVULNERABLE_TAG, getIsInvulnerable());
         compound.putInt(HUNGER_TAG, getHunger());
@@ -1293,6 +1308,12 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
         }
         if (compound.contains(MAID_BAUBLE_INVENTORY_TAG, Tag.TAG_COMPOUND)) {
             maidBauble.deserializeNBT(compound.getCompound(MAID_BAUBLE_INVENTORY_TAG));
+        }
+        if (compound.contains(MAID_HIDE_INVENTORY_TAG, Tag.TAG_COMPOUND)) {
+            hideInv.deserializeNBT(compound.getCompound(MAID_HIDE_INVENTORY_TAG));
+        }
+        if (compound.contains(MAID_TASK_INVENTORY_TAG, Tag.TAG_COMPOUND)) {
+            taskInv.deserializeNBT(compound.getCompound(MAID_TASK_INVENTORY_TAG));
         }
         if (compound.contains(STRUCK_BY_LIGHTNING_TAG, Tag.TAG_BYTE)) {
             setStruckByLightning(compound.getBoolean(STRUCK_BY_LIGHTNING_TAG));
@@ -1388,7 +1409,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
             tombstone.setMaidName(this.getDisplayName());
 
             // 女仆物品栏
-            CombinedInvWrapper invWrapper = new CombinedInvWrapper(armorInvWrapper, handsInvWrapper, maidInv, maidBauble);
+            CombinedInvWrapper invWrapper = new CombinedInvWrapper(armorInvWrapper, handsInvWrapper, maidInv, maidBauble, hideInv, taskInv);
             for (int i = 0; i < invWrapper.getSlots(); i++) {
                 int size = invWrapper.getSlotLimit(i);
                 tombstone.insertItem(invWrapper.extractItem(i, size, false));
@@ -1436,26 +1457,35 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
      * @param itemStack 当前手上的物品（必须是能使用--需要持续使用的物品）
      */
     public void memoryHandItemStack(ItemStack itemStack) {
-        this.getBrain().setMemory(InitEntities.CURRENT_ITEMSTACK.get(), itemStack);
+        // 先检查内部存储是否已经有物品了，有就掉落
+        ItemStack hideItemStack = this.getHideInv().getStackInSlot(0);
+        if (!hideItemStack.isEmpty()) {
+            ItemStack extractItem = this.getHideInv().extractItem(0, hideItemStack.getCount(), false);
+            if (!extractItem.isEmpty()) {
+                ItemEntity itemEntity = new ItemEntity(this.level(), this.getX(), this.getY() + 0.5, this.getZ(), extractItem);
+                this.level.addFreshEntity(itemEntity);
+            }
+        }
+        // 然后存入我们的物品
+        ItemHandlerHelper.insertItemStacked(this.getHideInv(), itemStack, false);
     }
 
     /**
      * 将之前临时存在背包里的物品再次放在对应的手上
      */
-    public void backCurrentHandItemStack() {
-        this.getBrain().getMemory(InitEntities.CURRENT_ITEMSTACK.get()).ifPresent(itemStack -> {
-            InteractionHand usedItemHand = this.getUsedItemHand();
-            ItemStack itemInHand = this.getItemInHand(usedItemHand);
-            this.swapHandItem(usedItemHand, itemInHand, itemStack);
-            this.getBrain().eraseMemory(InitEntities.CURRENT_ITEMSTACK.get());
-        });
-    }
-
-    private void swapHandItem(InteractionHand hand, ItemStack itemInHand, ItemStack backpackItem) {
-        ItemStack handItemCopy = itemInHand.copy();
-        this.setItemInHand(hand, backpackItem.copy());
-        backpackItem.setCount(0);
-        ItemHandlerHelper.insertItemStacked(this.getAvailableBackpackInv(), handItemCopy, false);
+    private void backCurrentHandItemStack() {
+        // 先看看副手是否为空？
+        ItemStack offhandItem = this.getItemInHand(InteractionHand.OFF_HAND);
+        if (!offhandItem.isEmpty()) {
+            ItemStack stack = ItemHandlerHelper.insertItemStacked(this.getAvailableBackpackInv(), offhandItem.copy(), false);
+            if (!stack.isEmpty()) {
+                ItemEntity itemEntity = new ItemEntity(this.level(), this.getX(), this.getY() + 0.5, this.getZ(), stack);
+                this.level.addFreshEntity(itemEntity);
+            }
+        }
+        // 副手此时为空，那么插入我们的物品
+        ItemStack output = this.getHideInv().extractItem(0, this.getHideInv().getStackInSlot(0).getCount(), false);
+        this.setItemInHand(InteractionHand.OFF_HAND, output);
     }
 
     @Override
@@ -2062,6 +2092,20 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
 
     public BaubleItemHandler getMaidBauble() {
         return maidBauble;
+    }
+
+    /**
+     * 获取隐藏物品栏
+     */
+    public ItemStackHandler getHideInv() {
+        return hideInv;
+    }
+
+    /**
+     * 获取任务物品栏
+     */
+    public ItemStackHandler getTaskInv() {
+        return taskInv;
     }
 
     public boolean getIsInvulnerable() {

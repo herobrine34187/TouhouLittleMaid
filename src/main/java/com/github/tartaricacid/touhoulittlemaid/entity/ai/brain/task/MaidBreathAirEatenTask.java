@@ -106,10 +106,9 @@ public class MaidBreathAirEatenTask extends Behavior<EntityMaid> {
                 continue;
             }
             if (this.isBreatheFood(maid, stack)) {
-                ItemStack foodStack = stack.copy();
+                ItemStack foodStack = backpackInv.extractItem(i, backpackInv.getStackInSlot(i).getCount(), false);
                 ItemStack handStack = itemInHand.copy();
                 maid.setItemInHand(eanHand, foodStack);
-                backpackInv.setStackInSlot(i, handStack);
                 maid.memoryHandItemStack(handStack);
                 itemInHand = maid.getItemInHand(eanHand);
                 hasFood = true;

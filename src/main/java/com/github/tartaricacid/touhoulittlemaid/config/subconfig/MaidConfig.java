@@ -10,6 +10,10 @@ import static com.github.tartaricacid.touhoulittlemaid.util.ItemsUtil.getItemId;
 
 public final class MaidConfig {
     public static final String TAG_PREFIX = "#";
+
+    public static ForgeConfigSpec.IntValue GLOBAL_MAID_SOUND_FREQUENCY;
+    public static ForgeConfigSpec.BooleanValue GLOBAL_MAID_SHOW_CHAT_BUBBLE;
+
     public static ForgeConfigSpec.ConfigValue<String> MAID_TAMED_ITEM;
     public static ForgeConfigSpec.ConfigValue<String> MAID_TEMPTATION_ITEM;
     public static ForgeConfigSpec.ConfigValue<String> MAID_NTR_ITEM;
@@ -49,6 +53,12 @@ public final class MaidConfig {
 
     public static void init(ForgeConfigSpec.Builder builder) {
         builder.push("maid");
+
+        builder.comment("This is a global config that applies to all maids: how often maids speak");
+        GLOBAL_MAID_SOUND_FREQUENCY = builder.defineInRange("GlobalMaidSoundFrequency", 100, 0, 100);
+
+        builder.comment("This is a global config that applies to all maids: Whether or not to display chat bubbles");
+        GLOBAL_MAID_SHOW_CHAT_BUBBLE = builder.define("GlobalMaidShowChatBubble", true);
 
         builder.comment("The item that can tamed maid", "Use the registered name of the item directly or write tag name with # as prefix");
         MAID_TAMED_ITEM = builder.define("MaidTamedItem", "minecraft:cake");

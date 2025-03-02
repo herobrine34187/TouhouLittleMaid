@@ -27,7 +27,7 @@ public class MaidWorkMealTask extends MaidCheckRateTask {
         if (super.checkExtraStartConditions(serverLevel, maid)) {
             String workMealTypeName = Type.WORK_MEAL.getTypeName();
             FavorabilityManager manager = maid.getFavorabilityManager();
-            return !maid.isSleeping() && manager.canAdd(workMealTypeName);
+            return !maid.isSleeping() && maid.getTask().enableEating(maid) && manager.canAdd(workMealTypeName);
         }
         return false;
     }
@@ -73,10 +73,9 @@ public class MaidWorkMealTask extends MaidCheckRateTask {
             }
             for (IMaidMeal maidMeal : maidMeals) {
                 if (maidMeal.canMaidEat(maid, stack, eanHand)) {
-                    ItemStack foodStack = stack.copy();
+                    ItemStack foodStack = backpackInv.extractItem(i, backpackInv.getStackInSlot(i).getCount(), false);
                     ItemStack handStack = itemInHand.copy();
                     maid.setItemInHand(eanHand, foodStack);
-                    backpackInv.setStackInSlot(i, handStack);
                     maid.memoryHandItemStack(handStack);
                     itemInHand = maid.getItemInHand(eanHand);
                     hasFood = true;
