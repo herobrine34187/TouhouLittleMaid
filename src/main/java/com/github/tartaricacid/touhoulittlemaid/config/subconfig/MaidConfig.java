@@ -109,7 +109,7 @@ public final class MaidConfig {
         MAID_BACKPACK_BLACKLIST = builder.define("MaidBackpackBlackList", Lists.newArrayList());
 
         builder.comment("The entity that the maid will not recognize as targets for attack");
-        MAID_ATTACK_IGNORE = builder.define("MaidAttackIgnore", Lists.newArrayList());
+        MAID_ATTACK_IGNORE = builder.define("MaidAttackIgnore", Lists.newArrayList("mekanism:robit"));
 
         builder.comment("The entity that the maid will not hurt when in ranged attack");
         MAID_RANGED_ATTACK_IGNORE = builder.define("MaidRangedAttackIgnore", Lists.newArrayList());
