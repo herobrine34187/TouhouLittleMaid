@@ -18,7 +18,7 @@ import net.minecraft.world.entity.ai.sensing.SensorType;
 import net.minecraft.world.entity.schedule.Activity;
 
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 public final class MaidBrain {
     public static ImmutableList<MemoryModuleType<?>> getMemoryTypes() {
@@ -172,7 +172,7 @@ public final class MaidBrain {
         brain.addActivity(InitEntities.RIDE_REST.get(), ImmutableList.of(updateActivity));
     }
 
-    private static MaidRunOne getLookAndRandomWalk(Function<EntityMaid, Boolean> enableCondition) {
+    private static MaidRunOne getLookAndRandomWalk(Predicate<EntityMaid> enableCondition) {
         Pair<BehaviorControl<? super EntityMaid>, Integer> lookToPlayer = Pair.of(SetEntityLookTarget.create(EntityType.PLAYER, 5), 1);
         Pair<BehaviorControl<? super EntityMaid>, Integer> lookToMaid = Pair.of(SetEntityLookTarget.create(EntityMaid.TYPE, 5), 1);
         Pair<BehaviorControl<? super EntityMaid>, Integer> lookToWolf = Pair.of(SetEntityLookTarget.create(EntityType.WOLF, 5), 1);
@@ -183,7 +183,7 @@ public final class MaidBrain {
         return new MaidRunOne(ImmutableList.of(lookToPlayer, lookToMaid, lookToWolf, lookToCat, lookToParrot, walkRandomly, noLook), enableCondition);
     }
 
-    private static MaidRunOne getLook(Function<EntityMaid, Boolean> enableCondition) {
+    private static MaidRunOne getLook(Predicate<EntityMaid> enableCondition) {
         Pair<BehaviorControl<? super EntityMaid>, Integer> lookToPlayer = Pair.of(SetEntityLookTarget.create(EntityType.PLAYER, 5), 1);
         Pair<BehaviorControl<? super EntityMaid>, Integer> lookToMaid = Pair.of(SetEntityLookTarget.create(EntityMaid.TYPE, 5), 1);
         Pair<BehaviorControl<? super EntityMaid>, Integer> lookToWolf = Pair.of(SetEntityLookTarget.create(EntityType.WOLF, 5), 1);
