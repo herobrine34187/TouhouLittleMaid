@@ -13,7 +13,6 @@ buildscript {
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '[6.0,6.2)', changing: true
         classpath 'org.parchmentmc:librarian:1.+'
-        classpath 'gradle.plugin.com.github.johnrengelman:shadow:7.1.2'
         classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
     }
 }
@@ -24,7 +23,6 @@ apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'java'
 apply plugin: 'idea'
-apply plugin: 'com.github.johnrengelman.shadow'
 
 version = mod_version
 group = 'com.github.tartaricacid'
@@ -93,7 +91,10 @@ minecraft {
     }
 }
 
-sourceSets.main.resources { srcDir 'src/generated/resources' }
+sourceSets.main.resources {
+    srcDir 'src/generated/resources'
+    exclude '.cache/**'
+}
 
 mixin {
     add sourceSets.main, "touhou_little_maid.refmap.json"
@@ -130,33 +131,28 @@ repositories {
     }
 }
 
-configurations {
-    // 自定义一个 minecraftLibrary，方便引入需要 Shadow 的库
-    mcLib
-    minecraftLibrary {
-        extendsFrom mcLib
-    }
-}
-
 jarJar.enable()
 
 dependencies {
     minecraft "net.minecraftforge:forge:${forge_version}"
 
-    // MP3 音频解码库，暂时不需要
-    // mcLib "com.googlecode.soundlibs:mp3spi:1.9.5.4"
-    // mcLib "com.googlecode.soundlibs:jlayer:1.0.1.4"
-    // mcLib "com.googlecode.soundlibs:tritonus-share:0.3.7.4"
-
     // Opus 音频解码库
-    mcLib "org.gagravarr:vorbis-java-core:0.8"
-    mcLib "io.github.jaredmdobson:concentus:1.0.2"
+    jarJar(minecraftLibrary("org.gagravarr:vorbis-java-core:0.8")) {
+        jarJar.ranged(it, "[0.8,)")
+    }
+    jarJar(minecraftLibrary("io.github.jaredmdobson:concentus:1.0.2")) {
+        jarJar.ranged(it, "[1.0.2,)")
+    }
 
     // YAML 库
-    mcLib "org.yaml:snakeyaml:2.4"
+    jarJar(minecraftLibrary("org.yaml:snakeyaml:2.4")) {
+        jarJar.ranged(it, "[2.4,)")
+    }
 
     // 拆分出来的基岩版模型加载库
-    implementation fg.deobf(jarJar("libs:simplebedrockmodel:1.20.1-release-1.0.0"))
+    jarJar(implementation(fg.deobf("libs:simplebedrockmodel:1.20.1-release-1.0.0"))) {
+        jarJar.ranged(it, "[1.0.0,)")
+    }
 
     // 单元测试
     testImplementation 'junit:junit:4.13.2'
@@ -223,36 +219,6 @@ dependencies {
     compileOnly fg.deobf("maven.modrinth:embeddium:0.3.31+mc1.20.1")
     // runtimeOnly fg.deobf('maven.modrinth:oculus:1.20.1-1.7.0')
     // runtimeOnly fg.deobf("curse.maven:maid-storage-manager-1210244:6315697")
-}
-
-shadowJar {
-    configurations = [project.configurations.mcLib]
-
-    // MP3 音频库 居然会把 junit 打包进去……
-    dependencies {
-        exclude(dependency('junit:junit'))
-    }
-
-    // 包重定向
-    // relocate 'javazoom.jl', 'com.github.tartaricacid.touhoulittlemaid.libs.jl'
-    // relocate 'javazoom.spi', 'com.github.tartaricacid.touhoulittlemaid.libs.spi'
-    // relocate 'org.tritonus', 'com.github.tartaricacid.touhoulittlemaid.libs.tritonus'
-    relocate 'io.github.jaredmdobson.concentus', 'com.github.tartaricacid.touhoulittlemaid.libs.concentus'
-    relocate 'org.gagravarr', 'com.github.tartaricacid.touhoulittlemaid.libs.gagravarr'
-    relocate 'org.yaml.snakeyaml', 'com.github.tartaricacid.touhoulittlemaid.libs.snakeyaml'
-
-    // 排除不需要的依赖项和资源
-    exclude 'META-INF/maven/**/*'
-    exclude 'META-INF/versions/**/*'
-    // 这个版权许可都已经手动添加进 licenses 里了
-    exclude 'META-INF/LICENSE'
-
-    mergeServiceFiles()
-    minimize()
-}
-
-reobf {
-    shadowJar {}
 }
 
 tasks.compileJava {
