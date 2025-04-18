@@ -10,6 +10,7 @@ public class MaidAIDataSerializable {
     protected String ttsSiteName = "";
     protected String ttsModel = "";
     protected String ttsLanguage = "";
+    protected String sttSiteName = "";
     protected String ownerName = "";
     protected String customSetting = "";
 
@@ -20,6 +21,7 @@ public class MaidAIDataSerializable {
         ttsSiteName = buf.readUtf();
         ttsModel = buf.readUtf();
         ttsLanguage = buf.readUtf();
+        sttSiteName = buf.readUtf();
         ownerName = buf.readUtf();
         customSetting = buf.readUtf();
     }
@@ -31,6 +33,7 @@ public class MaidAIDataSerializable {
         buf.writeUtf(ttsSiteName);
         buf.writeUtf(ttsModel);
         buf.writeUtf(ttsLanguage);
+        buf.writeUtf(sttSiteName);
         buf.writeUtf(ownerName);
         buf.writeUtf(customSetting);
     }
@@ -42,6 +45,7 @@ public class MaidAIDataSerializable {
         ttsSiteName = data.ttsSiteName;
         ttsModel = data.ttsModel;
         ttsLanguage = data.ttsLanguage;
+        sttSiteName = data.sttSiteName;
         ownerName = data.ownerName;
         customSetting = data.customSetting;
     }
@@ -55,6 +59,7 @@ public class MaidAIDataSerializable {
             ttsSiteName = data.getString("TtsSiteName");
             ttsModel = data.getString("TtsModel");
             ttsLanguage = data.getString("TtsLanguage");
+            sttSiteName = data.getString("SttSiteName");
             ownerName = data.getString("OwnerName");
             customSetting = data.getString("CustomSetting");
         }
@@ -69,6 +74,7 @@ public class MaidAIDataSerializable {
             data.putString("TtsSiteName", ttsSiteName);
             data.putString("TtsModel", ttsModel);
             data.putString("TtsLanguage", ttsLanguage);
+            data.putString("SttSiteName", sttSiteName);
             data.putString("OwnerName", ownerName);
             data.putString("CustomSetting", customSetting);
         }
@@ -121,6 +127,14 @@ public class MaidAIDataSerializable {
 
     public void setTtsLanguage(String ttsLanguage) {
         this.ttsLanguage = ttsLanguage;
+    }
+
+    public void setSttSiteName(String sttSiteName) {
+        this.sttSiteName = sttSiteName;
+    }
+
+    public String getSttSiteName() {
+        return sttSiteName;
     }
 
     public String getOwnerName() {

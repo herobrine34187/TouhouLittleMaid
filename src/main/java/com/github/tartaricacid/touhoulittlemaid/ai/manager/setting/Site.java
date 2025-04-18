@@ -12,6 +12,7 @@ import java.util.Objects;
 public class Site {
     private static final String CHAT = "chat";
     private static final String TTS = "tts";
+    private static final String STT = "stt";
     private static final String TYPE = "type";
     private static final String API_TYPE = "api_type";
     private static final String URL = "url";
@@ -87,6 +88,10 @@ public class Site {
 
     public boolean isTts() {
         return TTS.equals(type);
+    }
+
+    public boolean isStt() {
+        return STT.equals(type);
     }
 
     public Map<String, String> getExtraArgs() {

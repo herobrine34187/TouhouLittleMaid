@@ -97,6 +97,14 @@ public class PartAIIntegration {
                         defaultLanguage, Component::literal, cell(languages)).setSelections(languages.keySet())
                 .setDefaultValue(LanguageManager.DEFAULT_LANGUAGE_CODE).setTooltip(Component.translatable("config.touhou_little_maid.part_ai.tts_language.tooltip"))
                 .setSaveConsumer(manager::setTtsLanguage).build());
+
+        String sttSiteName = manager.getSttSiteName();
+        String defaultSttSiteName = AIChatScreen.CLIENT_STT_SITES.contains(sttSiteName) ? sttSiteName : StringUtils.EMPTY;
+        DropdownBoxEntry<String> sttSite = entryBuilder.startStringDropdownMenu(Component.translatable("config.touhou_little_maid.part_ai.stt_site_name"), defaultSttSiteName)
+                .setDefaultValue(StringUtils.EMPTY).setSelections(AIChatScreen.CLIENT_STT_SITES)
+                .setSaveConsumer(manager::setSttSiteName)
+                .setTooltip(Component.translatable("config.touhou_little_maid.part_ai.stt_site_name.tooltip")).build();
+        ai.addEntry(sttSite);
     }
 
     private static DropdownBoxEntry.SelectionCellCreator<String> cell(SortedMap<String, LanguageInfo> languages) {

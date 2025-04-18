@@ -6,6 +6,7 @@ import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
 import com.github.tartaricacid.touhoulittlemaid.network.message.GetMaidAIDataMessage;
 import com.github.tartaricacid.touhoulittlemaid.network.message.SendUserChatMessage;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -21,10 +22,12 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class AIChatScreen extends Screen {
     public static final Map<String, List<String>> CLIENT_CHAT_SITES = Maps.newLinkedHashMap();
     public static final Map<String, List<String>> CLIENT_TTS_SITES = Maps.newLinkedHashMap();
+    public static final Set<String> CLIENT_STT_SITES = Sets.newHashSet();
 
     private final EntityMaid maid;
     private EditBox input;
