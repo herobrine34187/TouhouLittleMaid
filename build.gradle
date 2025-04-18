@@ -115,19 +115,27 @@ repositories {
     }
     maven {
         url = "https://api.modrinth.com/maven"
-    }
-    maven {
-        url = "https://maven.conczin.net/Artifacts"
+        content {
+            includeGroup "maven.modrinth"
+        }
     }
     maven {
         // location of the maven that hosts JEI files since January 2023
         name = "Jared's maven"
         url = "https://maven.blamejared.com/"
+        content {
+            includeGroup "mezz.jei"
+            includeGroup "vazkii.patchouli"
+        }
     }
     maven {
         // location of a maven mirror for JEI files, as a fallback
         name = "ModMaven"
         url = "https://modmaven.dev"
+        content {
+            includeGroup "mezz.jei"
+            includeGroup "vazkii.patchouli"
+        }
     }
 }
 
@@ -187,15 +195,13 @@ dependencies {
 
     implementation fg.deobf("curse.maven:iron-chests-228756:${iron_chests_id}")
 
-    implementation fg.deobf("net.conczin:immersive_melodies:${immersive_melodies_version}")
+    implementation fg.deobf("maven.modrinth:immersive-melodies:${immersive_melodies_version}")
 
     runtimeOnly fg.deobf("curse.maven:carry-on-274259:${carry_on_id}")
 
     runtimeOnly "curse.maven:kotlin-for-forge-351264:${kotlin_id}"
     runtimeOnly fg.deobf("curse.maven:libipn-679177:${libipn_id}")
     implementation fg.deobf("curse.maven:inventory-profiles-next-495267:${ipn_id}")
-
-    runtimeOnly fg.deobf("curse.maven:catalogue-459701:${catalogue_id}")
 
     runtimeOnly fg.deobf("curse.maven:bookshelf-228525:${bookshelf_id}")
     runtimeOnly fg.deobf("curse.maven:enchantment-descriptions-250419:${enchantment_descriptions_id}")
@@ -208,17 +214,19 @@ dependencies {
     compileOnly fg.deobf("maven.modrinth:torohealth-damage-indicators-updated:1.20.1-forge-1")
 
     implementation fg.deobf("curse.maven:aquaculture-60028:5585290")
-    // runtimeOnly fg.deobf("curse.maven:lavafishing-1035887:5432767")
+
+    runtimeOnly fg.deobf("maven.modrinth:embeddium:0.3.31+mc1.20.1")
+    compileOnly fg.deobf("maven.modrinth:embeddium:0.3.31+mc1.20.1")
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
+    // runtimeOnly fg.deobf("maven.modrinth:farmers-delight:1.20.1-1.2.6-forge")
     // runtimeOnly fg.deobf("maven.modrinth:better-advancements:0.4.2.10-forge")
-    runtimeOnly fg.deobf("maven.modrinth:farmers-delight:1.20.1-1.2.6-forge")
     // runtimeOnly fg.deobf("maven.modrinth:ice-and-fire-dragons:2.1.13-1.20.1-beta-5")
-    runtimeOnly fg.deobf("maven.modrinth:embeddium:0.3.31+mc1.20.1")
-    compileOnly fg.deobf("maven.modrinth:embeddium:0.3.31+mc1.20.1")
     // runtimeOnly fg.deobf('maven.modrinth:oculus:1.20.1-1.7.0')
     // runtimeOnly fg.deobf("curse.maven:maid-storage-manager-1210244:6315697")
+    // runtimeOnly fg.deobf("curse.maven:lavafishing-1035887:5432767")
+    // runtimeOnly fg.deobf("curse.maven:catalogue-459701:${catalogue_id}")
 }
 
 tasks.compileJava {
