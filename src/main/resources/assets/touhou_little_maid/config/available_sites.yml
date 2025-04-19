@@ -69,6 +69,10 @@ gpt-sovits:
     prompt_lang: zh
     # 切句方式，一般不要变
     text_split_method: cut1
+    # 额外参考音频，应该能解决输出空白的问题
+    # 选填项目
+    aux_ref_audio_paths: [
+    ]
 
 fish-audio:
   type: tts
