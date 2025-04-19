@@ -1,7 +1,5 @@
 package com.github.tartaricacid.touhoulittlemaid.client.input;
 
-import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.AvailableSites;
-import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.Site;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.Service;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.player2.STTClient;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
@@ -28,7 +26,6 @@ import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Comparator;
@@ -115,11 +112,11 @@ public class STTChatKey {
             return;
         }
         if (AIConfig.CHAT_ENABLED.get()) {
-            @Nullable Site site = AvailableSites.getFirstAvailableSttSite();
-            if (site == null) {
+            String url = AIConfig.STT_URL.get();
+            if (StringUtils.isBlank(url)) {
                 player.sendSystemMessage(Component.translatable("ai.touhou_little_maid.chat.stt.empty"));
             } else {
-                STTClient sttClient = Service.getSttClient(site);
+                STTClient sttClient = Service.getSttClient(url);
                 sttClient.start(message -> {
                 }, throwable -> {
                     String cause = throwable.getLocalizedMessage();
@@ -139,11 +136,11 @@ public class STTChatKey {
         if (!AIConfig.CHAT_ENABLED.get()) {
             return;
         }
-        @Nullable Site site = AvailableSites.getFirstAvailableSttSite();
-        if (site == null) {
+        String url = AIConfig.STT_URL.get();
+        if (StringUtils.isBlank(url)) {
             return;
         }
-        STTClient sttClient = Service.getSttClient(site);
+        STTClient sttClient = Service.getSttClient(url);
         sttClient.stop(message -> {
             String chatText = message.getText();
             if (StringUtils.isNotBlank(chatText)) {

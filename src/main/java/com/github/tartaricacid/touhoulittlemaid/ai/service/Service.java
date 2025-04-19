@@ -88,8 +88,7 @@ public final class Service {
         return TTSFactory.getTtsRequest(site, ttsText, ttsLang, model);
     }
 
-    public static STTClient getSttClient(Site site) {
-        String url = site.getUrl();
+    public static STTClient getSttClient(String url) {
         return STTClient.create(STT_HTTP_CLIENT)
                 .baseUrl(url);
     }

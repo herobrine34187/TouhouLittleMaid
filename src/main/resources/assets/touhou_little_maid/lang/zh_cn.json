@@ -667,8 +667,6 @@
   "config.touhou_little_maid.part_ai.chat_temperature.tooltip": "也就是 temperature，该数值越大，随机性越大",
   "config.touhou_little_maid.part_ai.tts_site_name": "TTS 站点名称",
   "config.touhou_little_maid.part_ai.tts_site_name.tooltip": "选择一个 AI TTS 站点，用于语音生成",
-  "config.touhou_little_maid.part_ai.stt_site_name": "语音识别站点名称",
-  "config.touhou_little_maid.part_ai.stt_site_name.tooltip": "选择一个 AI 语音识别站点，用于语音识别",
   "config.touhou_little_maid.part_ai.tts_model": "TTS 模型",
   "config.touhou_little_maid.part_ai.tts_model.tooltip": "选择一个 AI TTS 模型",
   "config.touhou_little_maid.part_ai.tts_language": "TTS 语言",

@@ -667,8 +667,6 @@
   "config.touhou_little_maid.part_ai.chat_temperature.tooltip": "Chat temperature, the higher this value, the more random the output will be",
   "config.touhou_little_maid.part_ai.tts_site_name": "TTS Site Name",
   "config.touhou_little_maid.part_ai.tts_site_name.tooltip": "Select the AI TTS site",
-  "config.touhou_little_maid.part_ai.stt_site_name": "STT Site Name",
-  "config.touhou_little_maid.part_ai.stt_site_name.tooltip": "Select the AI STT site",
   "config.touhou_little_maid.part_ai.tts_model": "TTS Model",
   "config.touhou_little_maid.part_ai.tts_model.tooltip": "Select the AI TTS model",
   "config.touhou_little_maid.part_ai.tts_language": "TTS Language",

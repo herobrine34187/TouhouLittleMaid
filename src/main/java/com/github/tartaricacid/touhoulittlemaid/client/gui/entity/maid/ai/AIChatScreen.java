@@ -27,7 +27,6 @@ import java.util.Set;
 public class AIChatScreen extends Screen {
     public static final Map<String, List<String>> CLIENT_CHAT_SITES = Maps.newLinkedHashMap();
     public static final Map<String, List<String>> CLIENT_TTS_SITES = Maps.newLinkedHashMap();
-    public static final Set<String> CLIENT_STT_SITES = Sets.newHashSet();
 
     private final EntityMaid maid;
     private EditBox input;

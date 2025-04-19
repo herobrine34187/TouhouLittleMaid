@@ -5,7 +5,6 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.chat.ChatApiType;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSApiType;
 import com.github.tartaricacid.touhoulittlemaid.util.GetJarResources;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
@@ -17,7 +16,10 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class AvailableSites {
     public static final String FILE_NAME = "available_sites.yml";
@@ -25,12 +27,10 @@ public class AvailableSites {
     // 服务端缓存的站点信息，包含秘钥等敏感信息
     private static final Map<String, Site> CHAT_SITES = Maps.newLinkedHashMap();
     private static final Map<String, Site> TTS_SITES = Maps.newLinkedHashMap();
-    private static final Map<String, Site> STT_SITES = Maps.newLinkedHashMap();
 
     // 用于向客户端发送的站点信息，用来供玩家选择不同的站点，不包含敏感信息
     private static final Map<String, List<String>> CLIENT_CHAT_SITES = Maps.newLinkedHashMap();
     private static final Map<String, List<String>> CLIENT_TTS_SITES = Maps.newLinkedHashMap();
-    private static final Set<String> CLIENT_STT_SITES = Sets.newHashSet();
 
     private static final Path SITES_FILES = Paths.get("config", TouhouLittleMaid.MOD_ID, FILE_NAME);
     private static final String JAR_SITES_FILES = String.format("/assets/%s/config/%s", TouhouLittleMaid.MOD_ID, FILE_NAME);
@@ -38,10 +38,8 @@ public class AvailableSites {
     public static void readSites() {
         CHAT_SITES.clear();
         TTS_SITES.clear();
-        STT_SITES.clear();
         CLIENT_CHAT_SITES.clear();
         CLIENT_TTS_SITES.clear();
-        CLIENT_STT_SITES.clear();
 
         Yaml yaml = new Yaml();
         Map<String, LinkedHashMap<String, Object>> allSites = Maps.newLinkedHashMap();
@@ -77,11 +75,6 @@ public class AvailableSites {
                     TTS_SITES.put(key, site);
                     CLIENT_TTS_SITES.put(key, site.getModels());
                 }
-                // 必须设置了 key 的才能用于 stt
-                if (site.isStt() && StringUtils.isNotBlank(site.getApiKey())) {
-                    STT_SITES.put(key, site);
-                    CLIENT_STT_SITES.add(key);
-                }
             } catch (Exception e) {
                 TouhouLittleMaid.LOGGER.error("Failed to load site: {}", key, e);
             }
@@ -112,10 +105,6 @@ public class AvailableSites {
         return TTS_SITES.get(key);
     }
 
-    public static Site getSttSite(String key) {
-        return STT_SITES.get(key);
-    }
-
     @Nullable
     public static Site getFirstAvailableChatSite() {
         if (CHAT_SITES.isEmpty()) {
@@ -132,24 +121,12 @@ public class AvailableSites {
         return TTS_SITES.values().stream().findFirst().orElse(null);
     }
 
-    @Nullable
-    public static Site getFirstAvailableSttSite() {
-        if (STT_SITES.isEmpty()) {
-            return null;
-        }
-        return STT_SITES.values().stream().findFirst().orElse(null);
-    }
-
     public static Map<String, List<String>> getClientChatSites() {
         return CLIENT_CHAT_SITES;
     }
 
     public static Map<String, List<String>> getClientTtsSites() {
         return CLIENT_TTS_SITES;
-    }
-
-    public static Set<String> getClientSttSites() {
-        return CLIENT_STT_SITES;
     }
 
     private static void fixOldVersionConfig(LinkedHashMap<String, Object> map) {
