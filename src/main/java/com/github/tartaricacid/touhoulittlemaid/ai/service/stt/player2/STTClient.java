@@ -13,6 +13,7 @@ import java.time.Duration;
 import java.util.function.Consumer;
 
 public class STTClient {
+    private static final String PLAYER2_GAME_KEY = "player2-game-key";
     private final HttpClient httpClient;
     private String baseUrl = "";
 
@@ -42,12 +43,13 @@ public class STTClient {
     }
 
     public void start(Consumer<Message> consumer, Consumer<Throwable> failConsumer) {
-        HttpRequest httpRequest = HttpRequest.newBuilder()
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.JSON_UTF_8.toString())
+                .header(PLAYER2_GAME_KEY, "TouhouLittleMaid")
                 .POST(HttpRequest.BodyPublishers.ofString("{\"timeout\":30}"))
                 .timeout(Duration.ofSeconds(20))
-                .uri(URI.create(baseUrl + STTClient.getStartUrl()))
-                .build();
+                .uri(URI.create(baseUrl + STTClient.getStartUrl()));
+        HttpRequest httpRequest = builder.build();
         httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString())
                 .whenComplete((response, throwable) -> {
                     STTCallback callback = new STTCallback(consumer);
@@ -61,12 +63,13 @@ public class STTClient {
     }
 
     public void stop(Consumer<Message> consumer, Consumer<Throwable> failConsumer) {
-        HttpRequest httpRequest = HttpRequest.newBuilder()
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .header(HttpHeaders.CONTENT_TYPE, "application/json; charset=utf-8")
+                .header(PLAYER2_GAME_KEY, "TouhouLittleMaid")
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .timeout(Duration.ofSeconds(20))
-                .uri(URI.create(baseUrl + STTClient.getStopUrl()))
-                .build();
+                .uri(URI.create(baseUrl + STTClient.getStopUrl()));
+        HttpRequest httpRequest = builder.build();
         httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString())
                 .whenComplete((response, throwable) -> {
                     STTCallback callback = new STTCallback(consumer);

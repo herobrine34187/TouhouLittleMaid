@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.net.http.HttpClient;
 import java.time.Duration;
+import java.util.Map;
 
 public final class Service {
     public static final Gson GSON = new Gson();
@@ -37,9 +38,11 @@ public final class Service {
     public static ChatClient getChatClient(Site site) {
         String chatApiKey = site.getApiKey();
         String chatBaseUrl = site.getUrl();
+        Map<String, String> extraHeader = site.getExtraHeader();
         return ChatClient.create(CHAT_HTTP_CLIENT)
                 .apiKey(chatApiKey)
-                .baseUrl(chatBaseUrl);
+                .baseUrl(chatBaseUrl)
+                .extraHeader(extraHeader);
     }
 
     @Nullable
