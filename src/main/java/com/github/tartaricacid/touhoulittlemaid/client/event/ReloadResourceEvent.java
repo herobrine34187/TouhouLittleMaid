@@ -2,6 +2,7 @@ package com.github.tartaricacid.touhoulittlemaid.client.event;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.client.animation.inner.InnerAnimation;
+import com.github.tartaricacid.touhoulittlemaid.client.resource.BedrockModelLoader;
 import com.github.tartaricacid.touhoulittlemaid.client.resource.CustomPackLoader;
 import com.github.tartaricacid.touhoulittlemaid.client.resource.GeckoModelLoader;
 import com.github.tartaricacid.touhoulittlemaid.client.resource.models.PlayerMaidModels;
@@ -38,6 +39,7 @@ public final class ReloadResourceEvent extends SimplePreparableReloadListener<Vo
     private static void reloadAllPack() {
         StopWatch watch = StopWatch.createStarted();
         {
+            BedrockModelLoader.reload();
             GeckoModelLoader.reload();
             InnerAnimation.init();
             CustomPackLoader.reloadPacks();

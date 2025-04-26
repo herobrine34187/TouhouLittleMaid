@@ -1,17 +1,19 @@
 package com.github.tartaricacid.touhoulittlemaid.client.renderer.entity;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
-import com.github.tartaricacid.touhoulittlemaid.client.model.NewEntityFairyModel;
+import com.github.tartaricacid.touhoulittlemaid.client.model.bedrock.SimpleBedrockModel;
+import com.github.tartaricacid.touhoulittlemaid.client.resource.BedrockModelLoader;
 import com.github.tartaricacid.touhoulittlemaid.entity.monster.EntityFairy;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Locale;
 
-public class NewEntityFairyRenderer extends MobRenderer<EntityFairy, NewEntityFairyModel> {
+public class NewEntityFairyRenderer extends MobRenderer<EntityFairy, SimpleBedrockModel<EntityFairy>> {
     private static final ResourceLocation TEXTURE_0 = new ResourceLocation(TouhouLittleMaid.MOD_ID, "textures/entity/new_maid_fairy/maid_fairy_0.png");
     private static final ResourceLocation TEXTURE_1 = new ResourceLocation(TouhouLittleMaid.MOD_ID, "textures/entity/new_maid_fairy/maid_fairy_1.png");
     private static final ResourceLocation TEXTURE_2 = new ResourceLocation(TouhouLittleMaid.MOD_ID, "textures/entity/new_maid_fairy/maid_fairy_2.png");
@@ -32,8 +34,16 @@ public class NewEntityFairyRenderer extends MobRenderer<EntityFairy, NewEntityFa
     private static final ResourceLocation TEXTURE_17 = new ResourceLocation(TouhouLittleMaid.MOD_ID, "textures/entity/new_maid_fairy/maid_fairy_17.png");
     private static final ResourceLocation TEXTURE_RICK = new ResourceLocation(TouhouLittleMaid.MOD_ID, "textures/entity/new_maid_fairy/maid_fairy_rick.png");
 
+    @SuppressWarnings("unchecked")
     public NewEntityFairyRenderer(EntityRendererProvider.Context context) {
-        super(context, new NewEntityFairyModel(context.bakeLayer(NewEntityFairyModel.LAYER)), 0.5f);
+        super(context, (SimpleBedrockModel<EntityFairy>) BedrockModelLoader.getModel(BedrockModelLoader.NEW_MAID_FAIRY), 0.5f);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void render(EntityFairy pEntity, float pEntityYaw, float pPartialTicks, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
+        this.model = (SimpleBedrockModel<EntityFairy>) BedrockModelLoader.getModel(BedrockModelLoader.NEW_MAID_FAIRY);
+        super.render(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);
     }
 
     @Override

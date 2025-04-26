@@ -57,11 +57,8 @@ public final class InitEntitiesRender {
 
     @SubscribeEvent
     public static void onRegisterLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
-        event.registerLayerDefinition(AltarModel.LAYER, AltarModel::createBodyLayer);
         event.registerLayerDefinition(DebugFloorModel.LAYER, DebugFloorModel::createBodyLayer);
         event.registerLayerDefinition(EntityBoxModel.LAYER, EntityBoxModel::createBodyLayer);
-        event.registerLayerDefinition(EntityFairyModel.LAYER, EntityFairyModel::createBodyLayer);
-        event.registerLayerDefinition(NewEntityFairyModel.LAYER, NewEntityFairyModel::createBodyLayer);
         event.registerLayerDefinition(BigBackpackModel.LAYER, BigBackpackModel::createBodyLayer);
         event.registerLayerDefinition(MiddleBackpackModel.LAYER, MiddleBackpackModel::createBodyLayer);
         event.registerLayerDefinition(SmallBackpackModel.LAYER, SmallBackpackModel::createBodyLayer);

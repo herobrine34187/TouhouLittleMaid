@@ -1,7 +1,7 @@
 package com.github.tartaricacid.touhoulittlemaid.client.renderer.tileentity;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
-import com.github.tartaricacid.touhoulittlemaid.client.model.AltarModel;
+import com.github.tartaricacid.touhoulittlemaid.client.resource.BedrockModelLoader;
 import com.github.tartaricacid.touhoulittlemaid.tileentity.TileEntityAltar;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -16,22 +16,23 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 public class TileEntityAltarRenderer implements BlockEntityRenderer<TileEntityAltar> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(TouhouLittleMaid.MOD_ID, "textures/entity/altar.png");
-    private final AltarModel MODEL;
+    private static final ResourceLocation TEXTURE = new ResourceLocation(TouhouLittleMaid.MOD_ID, "textures/block/altar.png");
 
     public TileEntityAltarRenderer(BlockEntityRendererProvider.Context render) {
-        MODEL = new AltarModel(render.bakeLayer(AltarModel.LAYER));
     }
 
     @Override
     public void render(TileEntityAltar te, float partialTicks, PoseStack poseStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
         if (te.isRender()) {
-            poseStack.pushPose();
-            this.setTranslateAndPose(te, poseStack);
-            poseStack.mulPose(Axis.ZN.rotationDegrees(180));
-            VertexConsumer buffer = bufferIn.getBuffer(RenderType.entityTranslucent(TEXTURE));
-            MODEL.renderToBuffer(poseStack, buffer, combinedLightIn, combinedOverlayIn, 1.0F, 1.0F, 1.0F, 1.0F);
-            poseStack.popPose();
+            var model = BedrockModelLoader.getModel(BedrockModelLoader.ALTAR);
+            if (model != null) {
+                poseStack.pushPose();
+                this.setTranslateAndPose(te, poseStack);
+                poseStack.mulPose(Axis.ZN.rotationDegrees(180));
+                VertexConsumer buffer = bufferIn.getBuffer(RenderType.entityTranslucent(TEXTURE));
+                model.renderToBuffer(poseStack, buffer, combinedLightIn, combinedOverlayIn, 1.0F, 1.0F, 1.0F, 1.0F);
+                poseStack.popPose();
+            }
         }
 
         if (te.isCanPlaceItem() && !te.handler.getStackInSlot(0).isEmpty()) {
