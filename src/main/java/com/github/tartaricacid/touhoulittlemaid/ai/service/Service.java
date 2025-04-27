@@ -7,7 +7,8 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.chat.openai.ChatClien
 import com.github.tartaricacid.touhoulittlemaid.ai.service.chat.openai.request.ChatCompletion;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.chat.openai.request.ResponseFormat;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.chat.openai.request.Role;
-import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.player2.STTClient;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.STTClient;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.STTFactory;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSClient;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSFactory;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSRequest;
@@ -91,8 +92,7 @@ public final class Service {
         return TTSFactory.getTtsRequest(site, ttsText, ttsLang, model);
     }
 
-    public static STTClient getSttClient(String url) {
-        return STTClient.create(STT_HTTP_CLIENT)
-                .baseUrl(url);
+    public static STTClient getSttClient() {
+        return STTFactory.getSttClient(STT_HTTP_CLIENT);
     }
 }

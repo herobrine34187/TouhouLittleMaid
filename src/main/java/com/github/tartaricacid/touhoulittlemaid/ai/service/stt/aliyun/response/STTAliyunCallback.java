@@ -1,4 +1,4 @@
-package com.github.tartaricacid.touhoulittlemaid.ai.service.stt.player2.response;
+package com.github.tartaricacid.touhoulittlemaid.ai.service.stt.aliyun.response;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.ResponseCallback;
@@ -9,10 +9,10 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.function.Consumer;
 
-public class STTCallback implements ResponseCallback<String> {
+public class STTAliyunCallback implements ResponseCallback<String> {
     private final Consumer<Message> consumer;
 
-    public STTCallback(Consumer<Message> consumer) {
+    public STTAliyunCallback(Consumer<Message> consumer) {
         this.consumer = consumer;
     }
 
@@ -27,7 +27,12 @@ public class STTCallback implements ResponseCallback<String> {
             String string = response.body();
             if (isSuccessful(response)) {
                 Message message = Service.GSON.fromJson(string, Message.class);
-                consumer.accept(message);
+                if (message.getStatus() == 20000000) {
+                    consumer.accept(message);
+                } else {
+                    TouhouLittleMaid.LOGGER.error("Request failed: {}", message.getMessage());
+                    failConsumer.accept(new Throwable(message.getMessage()));
+                }
             } else {
                 TouhouLittleMaid.LOGGER.error("Request failed: {}", string);
                 String message = String.format("HTTP Error Code: %d, Response %s", response.statusCode(), string);
