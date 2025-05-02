@@ -1,6 +1,7 @@
 package com.github.tartaricacid.touhoulittlemaid.client.renderer.tileentity;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
+import com.github.tartaricacid.touhoulittlemaid.client.model.bedrock.SimpleBedrockModel;
 import com.github.tartaricacid.touhoulittlemaid.client.resource.BedrockModelLoader;
 import com.github.tartaricacid.touhoulittlemaid.tileentity.TileEntityAltar;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -12,27 +13,27 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 public class TileEntityAltarRenderer implements BlockEntityRenderer<TileEntityAltar> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(TouhouLittleMaid.MOD_ID, "textures/block/altar.png");
+    private final SimpleBedrockModel<? extends Entity> model;
 
     public TileEntityAltarRenderer(BlockEntityRendererProvider.Context render) {
+        this.model = BedrockModelLoader.getModel(BedrockModelLoader.ALTAR);
     }
 
     @Override
     public void render(TileEntityAltar te, float partialTicks, PoseStack poseStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
         if (te.isRender()) {
-            var model = BedrockModelLoader.getModel(BedrockModelLoader.ALTAR);
-            if (model != null) {
-                poseStack.pushPose();
-                this.setTranslateAndPose(te, poseStack);
-                poseStack.mulPose(Axis.ZN.rotationDegrees(180));
-                VertexConsumer buffer = bufferIn.getBuffer(RenderType.entityTranslucent(TEXTURE));
-                model.renderToBuffer(poseStack, buffer, combinedLightIn, combinedOverlayIn, 1.0F, 1.0F, 1.0F, 1.0F);
-                poseStack.popPose();
-            }
+            poseStack.pushPose();
+            this.setTranslateAndPose(te, poseStack);
+            poseStack.mulPose(Axis.ZN.rotationDegrees(180));
+            VertexConsumer buffer = bufferIn.getBuffer(RenderType.entityTranslucent(TEXTURE));
+            model.renderToBuffer(poseStack, buffer, combinedLightIn, combinedOverlayIn, 1.0F, 1.0F, 1.0F, 1.0F);
+            poseStack.popPose();
         }
 
         if (te.isCanPlaceItem() && !te.handler.getStackInSlot(0).isEmpty()) {

@@ -46,7 +46,6 @@ public class EntityFairyRenderer extends MobRenderer<EntityFairy, SimpleBedrockM
         if (MiscConfig.USE_NEW_MAID_FAIRY_MODEL.get()) {
             newEntityFairyRenderer.render(fairy, entityYaw, partialTicks, poseStack, buffer, packedLight);
         } else {
-            this.model = (SimpleBedrockModel<EntityFairy>) BedrockModelLoader.getModel(BedrockModelLoader.MAID_FAIRY);
             super.render(fairy, entityYaw, partialTicks, poseStack, buffer, packedLight);
         }
     }

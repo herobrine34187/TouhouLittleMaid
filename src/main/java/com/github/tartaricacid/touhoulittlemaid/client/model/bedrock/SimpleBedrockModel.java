@@ -1,6 +1,6 @@
 package com.github.tartaricacid.touhoulittlemaid.client.model.bedrock;
 
-import com.github.tartaricacid.simplebedrockmodel.client.bedrock.AbstractBedrockModel;
+import com.github.tartaricacid.simplebedrockmodel.client.bedrock.AbstractBedrockEntityModel;
 import com.github.tartaricacid.simplebedrockmodel.client.bedrock.model.BedrockPart;
 import com.github.tartaricacid.simplebedrockmodel.client.bedrock.pojo.BedrockModelPOJO;
 import com.github.tartaricacid.simplebedrockmodel.client.bedrock.pojo.BedrockVersion;
@@ -8,7 +8,7 @@ import net.minecraft.world.entity.Entity;
 
 import java.io.InputStream;
 
-public class SimpleBedrockModel<T extends Entity> extends AbstractBedrockModel<T> {
+public class SimpleBedrockModel<T extends Entity> extends AbstractBedrockEntityModel<T> {
     public static final BedrockPart EMPTY = new BedrockPart();
 
     public SimpleBedrockModel(InputStream stream) {

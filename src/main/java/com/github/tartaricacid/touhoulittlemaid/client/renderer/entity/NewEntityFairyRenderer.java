@@ -6,7 +6,6 @@ import com.github.tartaricacid.touhoulittlemaid.client.resource.BedrockModelLoad
 import com.github.tartaricacid.touhoulittlemaid.entity.monster.EntityFairy;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
@@ -37,13 +36,6 @@ public class NewEntityFairyRenderer extends MobRenderer<EntityFairy, SimpleBedro
     @SuppressWarnings("unchecked")
     public NewEntityFairyRenderer(EntityRendererProvider.Context context) {
         super(context, (SimpleBedrockModel<EntityFairy>) BedrockModelLoader.getModel(BedrockModelLoader.NEW_MAID_FAIRY), 0.5f);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public void render(EntityFairy pEntity, float pEntityYaw, float pPartialTicks, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
-        this.model = (SimpleBedrockModel<EntityFairy>) BedrockModelLoader.getModel(BedrockModelLoader.NEW_MAID_FAIRY);
-        super.render(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);
     }
 
     @Override
