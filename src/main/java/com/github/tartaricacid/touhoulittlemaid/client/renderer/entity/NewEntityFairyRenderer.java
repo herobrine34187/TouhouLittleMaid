@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Locale;
+import java.util.Objects;
 
 public class NewEntityFairyRenderer extends MobRenderer<EntityFairy, SimpleBedrockModel<EntityFairy>> {
     private static final ResourceLocation TEXTURE_0 = new ResourceLocation(TouhouLittleMaid.MOD_ID, "textures/entity/new_maid_fairy/maid_fairy_0.png");
@@ -35,7 +36,7 @@ public class NewEntityFairyRenderer extends MobRenderer<EntityFairy, SimpleBedro
 
     @SuppressWarnings("unchecked")
     public NewEntityFairyRenderer(EntityRendererProvider.Context context) {
-        super(context, (SimpleBedrockModel<EntityFairy>) BedrockModelLoader.getModel(BedrockModelLoader.NEW_MAID_FAIRY), 0.5f);
+        super(context, Objects.requireNonNull(BedrockModelLoader.getModel(BedrockModelLoader.NEW_MAID_FAIRY)), 0.5f);
     }
 
     @Override

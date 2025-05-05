@@ -3,8 +3,9 @@ package com.github.tartaricacid.touhoulittlemaid.client.renderer.tileentity;
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.api.game.chess.Position;
 import com.github.tartaricacid.touhoulittlemaid.block.BlockGomoku;
-import com.github.tartaricacid.touhoulittlemaid.client.model.WChessModel;
 import com.github.tartaricacid.touhoulittlemaid.client.model.WChessPiecesModel;
+import com.github.tartaricacid.touhoulittlemaid.client.model.bedrock.SimpleBedrockModel;
+import com.github.tartaricacid.touhoulittlemaid.client.resource.BedrockModelLoader;
 import com.github.tartaricacid.touhoulittlemaid.tileentity.TileEntityWChess;
 import com.github.tartaricacid.touhoulittlemaid.util.WChessUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -23,6 +24,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 
 public class TileEntityWChessRenderer implements BlockEntityRenderer<TileEntityWChess> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(TouhouLittleMaid.MOD_ID, "textures/entity/wchess.png");
@@ -31,12 +33,12 @@ public class TileEntityWChessRenderer implements BlockEntityRenderer<TileEntityW
     private static final int PIECE_RENDER_DISTANCE = 24;
     private final Font font;
     private final BlockEntityRenderDispatcher dispatcher;
-    private final WChessModel chessModel;
+    private final SimpleBedrockModel<Entity> chessModel;
     private final WChessPiecesModel[] chessPiecesModels;
     private final WChessPiecesModel selectedModels;
 
     public TileEntityWChessRenderer(BlockEntityRendererProvider.Context context) {
-        chessModel = new WChessModel(context.bakeLayer(WChessModel.LAYER));
+        chessModel = BedrockModelLoader.getModel(BedrockModelLoader.WCHESS);
         chessPiecesModels = WChessPiecesModel.initModel();
         selectedModels = WChessPiecesModel.getSelectedModel();
         dispatcher = context.getBlockEntityRenderDispatcher();
