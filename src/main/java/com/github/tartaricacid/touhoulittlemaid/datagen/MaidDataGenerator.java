@@ -50,5 +50,6 @@ public class MaidDataGenerator {
         generator.addProvider(event.includeServer(), new EntityTypeGenerator(packOutput, registries, existingFileHelper));
 
         //generator.addProvider(true, new LanguageGenerator(packOutput));
+        generator.addProvider(event.includeClient(), new ItemModelGenerator(packOutput, existingFileHelper));
     }
 }
