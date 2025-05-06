@@ -453,6 +453,8 @@
   "gui.touhou_little_maid.monster_type.title": "Maid Attack List",
   "gui.touhou_little_maid.monster_type.add": "Add",
   "gui.touhou_little_maid.default_task_config.title": "Current task does not have any config...",
+  "pack.touhou_little_maid.legacy_resources_pack.title": "TLM Legacy Pack",
+  "pack.touhou_little_maid.legacy_resources_pack.desc": "Touhou Little Maid Legacy Resource Pack",
   "chat_bubble.touhou_little_maid.inner.feed_animal.max_number": "So many animals... I can't feed them all!",
   "chat_bubble.touhou_little_maid.inner.home_meal.two_hand_is_full": "My hands were full of items... I couldn't eat!",
   "chat_bubble.touhou_little_maid.inner.home_meal.meal_is_empty": "Hurry up, Hurry up, I don't have anything to eat!",

@@ -35,7 +35,7 @@ public class PicnicBasketRender extends BlockEntityWithoutLevelRenderer {
             poseStack.mulPose(Axis.ZN.rotationDegrees(180));
             GUI_MODEL.renderToBuffer(poseStack, buffer.getBuffer(RenderType.entityCutoutNoCull(GUI_TEXTURE)), packedLight, packedOverlay, 1.0F, 1.0F, 1.0F, 1.0F);
             poseStack.popPose();
-        } else {
+        } else if (model != null) {
             poseStack.pushPose();
             poseStack.translate(0.5, 1.5, 0.5);
             poseStack.mulPose(Axis.ZN.rotationDegrees(180));
