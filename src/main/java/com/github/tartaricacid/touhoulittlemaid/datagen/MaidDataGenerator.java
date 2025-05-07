@@ -39,9 +39,10 @@ public class MaidDataGenerator {
 
         // Loot Tables
         generator.addProvider(event.includeServer(), new LootTableProvider(packOutput,
-                Set.of(LootTableGenerator.CAKE),
-                List.of(new LootTableProvider.SubProviderEntry(LootTableGenerator.AdvancementLootTables::new, LootContextParamSets.ADVANCEMENT_REWARD))
-        ));
+                Set.of(LootTableGenerator.CAKE), List.of(
+                new LootTableProvider.SubProviderEntry(LootTableGenerator.AdvancementLootTables::new, LootContextParamSets.ADVANCEMENT_REWARD),
+                new LootTableProvider.SubProviderEntry(LootTableGenerator.EntityLootTables::new, LootContextParamSets.ENTITY)
+        )));
 
         // Tags
         var blockTagsProvider = vanillaPack.addProvider(output -> new TagBlock(output, registries, TouhouLittleMaid.MOD_ID, existingFileHelper));
