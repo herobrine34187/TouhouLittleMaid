@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.Random;
 
 @Mixin(StructureTemplate.class)
-public abstract class MixinStructureTemplate {
+public abstract class StructureTemplateMixin {
     @Unique
     private static final Random TOUHOU_LITTLE_MAID$RANDOM = new Random();
 

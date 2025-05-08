@@ -1,4 +1,4 @@
-package com.github.tartaricacid.touhoulittlemaid.mixin;
+package com.github.tartaricacid.touhoulittlemaid.mixin.accessor;
 
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;

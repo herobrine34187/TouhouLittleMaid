@@ -49,7 +49,7 @@ import com.github.tartaricacid.touhoulittlemaid.inventory.handler.BaubleItemHand
 import com.github.tartaricacid.touhoulittlemaid.inventory.handler.MaidBackpackHandler;
 import com.github.tartaricacid.touhoulittlemaid.inventory.handler.MaidHandsInvWrapper;
 import com.github.tartaricacid.touhoulittlemaid.item.ItemFilm;
-import com.github.tartaricacid.touhoulittlemaid.mixin.MixinArrowEntity;
+import com.github.tartaricacid.touhoulittlemaid.mixin.accessor.ArrowAccessor;
 import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
 import com.github.tartaricacid.touhoulittlemaid.network.message.ItemBreakMessage;
 import com.github.tartaricacid.touhoulittlemaid.network.message.PlayMaidSoundMessage;
@@ -811,7 +811,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
     }
 
     private ItemStack getArrowFromEntity(AbstractArrow entity) {
-        if (entity instanceof MixinArrowEntity mixinArrow) {
+        if (entity instanceof ArrowAccessor mixinArrow) {
             if (mixinArrow.tlmInGround() || entity.isNoPhysics()) {
                 return mixinArrow.getTlmPickupItem();
             }

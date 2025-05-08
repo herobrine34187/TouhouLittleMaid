@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = ThrownTrident.class)
-public class MixinThrownTrident {
+public class ThrownTridentMixin {
     @Inject(method = "onHitEntity(Lnet/minecraft/world/phys/EntityHitResult;)V", at = @At("HEAD"))
     private void onHitEntity(EntityHitResult result, CallbackInfo ci) {
         ThrownTrident trident = (ThrownTrident) (Object) this;
