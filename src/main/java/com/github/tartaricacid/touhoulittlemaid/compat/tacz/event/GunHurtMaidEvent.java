@@ -69,6 +69,6 @@ public class GunHurtMaidEvent {
     }
 
     private boolean isBulletDamage(DamageSource source) {
-        return source.is(ModDamageTypes.BULLET) || source.is(ModDamageTypes.BULLET_IGNORE_ARMOR);
+        return source.is(ModDamageTypes.BULLETS_TAG);
     }
 }
