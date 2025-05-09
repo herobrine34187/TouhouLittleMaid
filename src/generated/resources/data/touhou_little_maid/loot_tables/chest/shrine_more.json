@@ -9,7 +9,8 @@
           "name": "touhou_little_maid:shrine"
         },
         {
-          "type": "minecraft:empty"
+          "type": "minecraft:empty",
+          "weight": 2
         }
       ],
       "rolls": 1.0

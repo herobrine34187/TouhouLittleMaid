@@ -19,6 +19,7 @@ import net.minecraft.world.level.storage.loot.entries.EmptyLootItem;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.EnchantRandomlyFunction;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
+import net.minecraft.world.level.storage.loot.functions.SetItemDamageFunction;
 import net.minecraft.world.level.storage.loot.functions.SetNbtFunction;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
@@ -31,16 +32,16 @@ import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
 public class LootTableGenerator {
-    public static final ResourceLocation POWER_POINT = new ResourceLocation(TouhouLittleMaid.MOD_ID, "advancement/power_point");
+    public static final ResourceLocation ADVANCEMENT_POWER_POINT = new ResourceLocation(TouhouLittleMaid.MOD_ID, "advancement/power_point");
     public static final ResourceLocation CAKE = new ResourceLocation(TouhouLittleMaid.MOD_ID, "advancement/cake");
 
     public static final ResourceLocation CHEST_POWER_POINT = new ResourceLocation(TouhouLittleMaid.MOD_ID, "chest/power_point");
+    public static final ResourceLocation FISHING_POWER_POINT = new ResourceLocation(TouhouLittleMaid.MOD_ID, "fishing/power_point");
 
     public static final ResourceLocation SHRINE_LESS = new ResourceLocation(TouhouLittleMaid.MOD_ID, "chest/shrine_less");
-    public static final ResourceLocation SHRINE_MIDDLE = new ResourceLocation(TouhouLittleMaid.MOD_ID, "chest/shrine_middle");
     public static final ResourceLocation SHRINE_MORE = new ResourceLocation(TouhouLittleMaid.MOD_ID, "chest/shrine_more");
 
-    public static final ResourceLocation SPAWN_BONUS_NORMAL_BACKPACK = new ResourceLocation(TouhouLittleMaid.MOD_ID, "chest/spawn_bonus_normal_backpack");
+    public static final ResourceLocation SPAWN_BONUS = new ResourceLocation(TouhouLittleMaid.MOD_ID, "chest/spawn_bonus");
     public static final ResourceLocation NORMAL_BACKPACK = new ResourceLocation(TouhouLittleMaid.MOD_ID, "chest/normal_backpack");
     public static final ResourceLocation FURNACE_OR_CRAFTING_TABLE_BACKPACK = new ResourceLocation(TouhouLittleMaid.MOD_ID, "chest/furnace_or_crafting_table_backpack");
     public static final ResourceLocation TANK_BACKPACK = new ResourceLocation(TouhouLittleMaid.MOD_ID, "chest/tank_backpack");
@@ -50,10 +51,13 @@ public class LootTableGenerator {
     public static final ResourceLocation RARE_BAUBLE = new ResourceLocation(TouhouLittleMaid.MOD_ID, "chest/rare_bauble");
     public static final ResourceLocation VERY_RARE_BAUBLE = new ResourceLocation(TouhouLittleMaid.MOD_ID, "chest/very_rare_bauble");
 
+    public static final ResourceLocation STRUCTURE_SPAWN_MAID_GIFT = new ResourceLocation(TouhouLittleMaid.MOD_ID, "chest/structure_spawn_maid_gift");
+    public static final ResourceLocation MAID_BURIED_TREASURE = new ResourceLocation(TouhouLittleMaid.MOD_ID, "chest/maid_buried_treasure");
+
     public static class AdvancementLootTables implements LootTableSubProvider {
         @Override
         public void generate(BiConsumer<ResourceLocation, LootTable.Builder> consumer) {
-            consumer.accept(POWER_POINT, LootTable.lootTable().withPool(LootPool.lootPool()
+            consumer.accept(ADVANCEMENT_POWER_POINT, LootTable.lootTable().withPool(LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(5))
                     .add(LootItem.lootTableItem(InitItems.POWER_POINT.get()))));
 
@@ -73,26 +77,32 @@ public class LootTableGenerator {
                             .apply(SetItemCountFunction.setCount(UniformGenerator.between(1, 2))))
                     .add(EmptyLootItem.emptyItem().setWeight(2))));
 
+            consumer.accept(FISHING_POWER_POINT, LootTable.lootTable().withPool(LootPool.lootPool()
+                    .setRolls(ConstantValue.exactly(1))
+                    .add(LootItem.lootTableItem(InitItems.POWER_POINT.get()))
+                    .add(EmptyLootItem.emptyItem().setWeight(9))));
+
             consumer.accept(SHRINE_LESS, LootTable.lootTable().withPool(LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(1))
                     .add(LootItem.lootTableItem(InitItems.SHRINE.get()))
                     .add(EmptyLootItem.emptyItem().setWeight(9))));
 
-            consumer.accept(SHRINE_MIDDLE, LootTable.lootTable().withPool(LootPool.lootPool()
-                    .setRolls(ConstantValue.exactly(1))
-                    .add(LootItem.lootTableItem(InitItems.SHRINE.get()))
-                    .add(EmptyLootItem.emptyItem().setWeight(4))));
-
             consumer.accept(SHRINE_MORE, LootTable.lootTable().withPool(LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(1))
                     .add(LootItem.lootTableItem(InitItems.SHRINE.get()))
-                    .add(EmptyLootItem.emptyItem())));
+                    .add(EmptyLootItem.emptyItem().setWeight(2))));
 
-            consumer.accept(SPAWN_BONUS_NORMAL_BACKPACK, LootTable.lootTable().withPool(LootPool.lootPool()
-                    .setRolls(ConstantValue.exactly(1))
-                    .add(LootItem.lootTableItem(InitItems.MAID_BACKPACK_SMALL.get()).setWeight(3))
-                    .add(LootItem.lootTableItem(InitItems.MAID_BACKPACK_MIDDLE.get()).setWeight(9))
-                    .add(LootItem.lootTableItem(InitItems.MAID_BACKPACK_BIG.get()).setWeight(4))));
+            consumer.accept(SPAWN_BONUS, LootTable.lootTable()
+                    .withPool(LootPool.lootPool()
+                            .setRolls(ConstantValue.exactly(1))
+                            .add(LootItem.lootTableItem(InitItems.MAID_BACKPACK_SMALL.get()).setWeight(3))
+                            .add(LootItem.lootTableItem(InitItems.MAID_BACKPACK_MIDDLE.get()).setWeight(9))
+                            .add(LootItem.lootTableItem(InitItems.MAID_BACKPACK_BIG.get()).setWeight(4)))
+                    .withPool(LootPool.lootPool()
+                            .setRolls(ConstantValue.exactly(1))
+                            .add(LootItem.lootTableItem(InitItems.POWER_POINT.get())
+                                    .apply(SetItemCountFunction.setCount(UniformGenerator.between(3, 9))))
+                    ));
 
             consumer.accept(NORMAL_BACKPACK, LootTable.lootTable().withPool(LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(1))
@@ -152,6 +162,25 @@ public class LootTableGenerator {
                     .add(LootItem.lootTableItem(InitItems.ULTRAMARINE_ORB_ELIXIR.get()).apply(EnchantRandomlyFunction.randomApplicableEnchantment()))
                     .add(LootItem.lootTableItem(InitItems.ULTRAMARINE_ORB_ELIXIR.get()).setWeight(2))
                     .add(EmptyLootItem.emptyItem().setWeight(4))));
+
+            var setDamage = SetItemDamageFunction.setDamage(UniformGenerator.between(0.06f, 0.1f));
+            consumer.accept(STRUCTURE_SPAWN_MAID_GIFT, LootTable.lootTable()
+                    .withPool(LootPool.lootPool()
+                            .setRolls(UniformGenerator.between(1, 2))
+                            .add(LootItem.lootTableItem(Items.CAKE)))
+                    .withPool(LootPool.lootPool()
+                            .setRolls(ConstantValue.exactly(1))
+                            .add(LootItem.lootTableItem(InitItems.CAMERA.get()).apply(setDamage))));
+
+            consumer.accept(MAID_BURIED_TREASURE, LootTable.lootTable()
+                    .withPool(LootPool.lootPool()
+                            .setRolls(ConstantValue.exactly(1))
+                            .add(LootItem.lootTableItem(InitItems.SMART_SLAB_EMPTY.get()))
+                            .add(EmptyLootItem.emptyItem().setWeight(4)))
+                    .withPool(LootPool.lootPool()
+                            .setRolls(ConstantValue.exactly(1))
+                            .add(LootItem.lootTableItem(InitItems.SHRINE.get()))
+                            .add(EmptyLootItem.emptyItem())));
         }
 
         @NotNull

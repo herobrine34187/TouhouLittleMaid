@@ -6,15 +6,15 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "touhou_little_maid:shrine"
+          "name": "touhou_little_maid:power_point"
         },
         {
           "type": "minecraft:empty",
-          "weight": 4
+          "weight": 9
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "touhou_little_maid:chest/shrine_middle"
+  "random_sequence": "touhou_little_maid:fishing/power_point"
 }
