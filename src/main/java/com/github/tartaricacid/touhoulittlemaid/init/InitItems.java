@@ -71,6 +71,7 @@ public final class InitItems {
     public static RegistryObject<Item> SCARECROW = ITEMS.register("scarecrow", () -> new BlockItem(InitBlocks.SCARECROW.get(), new Item.Properties()));
     public static RegistryObject<Item> SERVANT_BELL = ITEMS.register("servant_bell", ItemServantBell::new);
     public static RegistryObject<Item> ENTITY_ID_COPY = ITEMS.register("entity_id_copy", ItemEntityIdCopy::new);
+    public static RegistryObject<Item> OWNER_CONVERSION_TOOL = ITEMS.register("owner_conversion_tool", () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC)));
     @SuppressWarnings("deprecation")
     public static RegistryObject<Item> MONSTER_LIST = ITEMS.register("monster_list", ItemMonsterList::new);
 

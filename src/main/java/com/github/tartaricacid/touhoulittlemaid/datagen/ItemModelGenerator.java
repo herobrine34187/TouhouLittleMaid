@@ -27,6 +27,8 @@ public class ItemModelGenerator extends ItemModelProvider {
         addInHandModel(InitItems.EXTINGUISHER.get());
         addInHandModel(InitItems.CAMERA.get());
         addInHandModel(InitItems.MAID_BEACON.get());
+
+        basicItem(InitItems.OWNER_CONVERSION_TOOL.get());
     }
 
     private void addInHandModel(Item item) {

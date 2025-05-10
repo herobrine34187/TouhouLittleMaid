@@ -42,6 +42,7 @@ import com.github.tartaricacid.touhoulittlemaid.entity.projectile.MaidFishingHoo
 import com.github.tartaricacid.touhoulittlemaid.entity.task.TaskIdle;
 import com.github.tartaricacid.touhoulittlemaid.entity.task.TaskManager;
 import com.github.tartaricacid.touhoulittlemaid.init.InitEntities;
+import com.github.tartaricacid.touhoulittlemaid.init.InitItems;
 import com.github.tartaricacid.touhoulittlemaid.init.InitSounds;
 import com.github.tartaricacid.touhoulittlemaid.init.InitTrigger;
 import com.github.tartaricacid.touhoulittlemaid.inventory.container.config.MaidConfigContainer;
@@ -2308,7 +2309,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
 
     @SuppressWarnings("all")
     public static Ingredient getNtrItem() {
-        return getConfigIngredient(MaidConfig.MAID_NTR_ITEM.get(), Items.STRUCTURE_VOID);
+        return Ingredient.of(InitItems.OWNER_CONVERSION_TOOL.get());
     }
 
     private static Ingredient getConfigIngredient(String config, Item defaultItem) {
