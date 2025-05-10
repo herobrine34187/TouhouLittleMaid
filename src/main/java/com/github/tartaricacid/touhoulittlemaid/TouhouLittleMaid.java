@@ -5,6 +5,7 @@ import com.github.tartaricacid.touhoulittlemaid.compat.aquaculture.AquacultureCo
 import com.github.tartaricacid.touhoulittlemaid.config.GeneralConfig;
 import com.github.tartaricacid.touhoulittlemaid.config.ServerConfig;
 import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleManger;
+import com.github.tartaricacid.touhoulittlemaid.entity.info.CommonDefaultPack;
 import com.github.tartaricacid.touhoulittlemaid.init.*;
 import com.google.common.collect.Lists;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -31,7 +32,7 @@ public final class TouhouLittleMaid {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, GeneralConfig.init());
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ServerConfig.init());
         ChatBubbleManger.initDefaultChat();
-
+        CommonDefaultPack.initCommonDefaultPack();
         AquacultureCompat.init();
     }
 
