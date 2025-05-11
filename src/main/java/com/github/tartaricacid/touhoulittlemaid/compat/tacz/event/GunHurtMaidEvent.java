@@ -3,12 +3,15 @@ package com.github.tartaricacid.touhoulittlemaid.compat.tacz.event;
 import com.github.tartaricacid.touhoulittlemaid.api.event.MaidHurtEvent;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
+import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.init.ModDamageTypes;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.level.ExplosionEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class GunHurtMaidEvent {
@@ -68,7 +71,21 @@ public class GunHurtMaidEvent {
         }
     }
 
+    @SubscribeEvent
+    public void onExplosionDetonateEvent(ExplosionEvent.Detonate event) {
+        if (event.getExplosion().getDirectSourceEntity() instanceof EntityKineticBullet) {
+            event.getAffectedEntities().removeIf(e -> e instanceof EntityMaid);
+        }
+    }
+
     private boolean isBulletDamage(DamageSource source) {
-        return source.is(ModDamageTypes.BULLETS_TAG);
+        if (source.is(ModDamageTypes.BULLETS_TAG)) {
+            return true;
+        }
+        if (source.is(DamageTypeTags.IS_EXPLOSION)) {
+            Entity directEntity = source.getDirectEntity();
+            return directEntity instanceof EntityKineticBullet;
+        }
+        return false;
     }
 }
