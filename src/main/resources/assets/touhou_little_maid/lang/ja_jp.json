@@ -442,8 +442,6 @@
   "config.touhou_little_maid.maid.maid_tamed_item.tooltip": "メイドを雇用できるアイテム",
   "config.touhou_little_maid.maid.maid_temptation_item": "メイドを魅了するアイテム",
   "config.touhou_little_maid.maid.maid_temptation_item.tooltip": "メイドが魅了され引き寄せられます",
-  "config.touhou_little_maid.maid.maid_ntr_item": "メイドの引き抜きアイテム",
-  "config.touhou_little_maid.maid.maid_ntr_item.tooltip": "他人のメイドを引き抜きします",
   "config.touhou_little_maid.maid.maid_work_range": "メイドのお仕事範囲",
   "config.touhou_little_maid.maid.maid_work_range.tooltip": "お仕事モードの最大範囲",
   "config.touhou_little_maid.maid.maid_idle_range": "メイドの待機範囲",

@@ -512,8 +512,6 @@
   "config.touhou_little_maid.maid.maid_tamed_item.tooltip": "L'objet qui sera utilisé pour apprivoiser une Maid\nUtilisez directement le nom de l'objet, ou écrivez le nom précédé du tag #",
   "config.touhou_little_maid.maid.maid_temptation_item": "Objet de Tentation",
   "config.touhou_little_maid.maid.maid_temptation_item.tooltip": "L'objet qui tentera les Maids\nUtilisez directement le nom de l'objet, ou écrivez le nom précédé du tag #",
-  "config.touhou_little_maid.maid.maid_ntr_item": "Objet de Cocu",
-  "config.touhou_little_maid.maid.maid_ntr_item.tooltip": "L'item permettant à la Maid de changé de Maitre (Elle vous trompe !)\nUtilisez directement le nom de l'objet, ou écrivez le nom précédé du tag #",
   "config.touhou_little_maid.maid.maid_work_range": "Portée du Mode Travail",
   "config.touhou_little_maid.maid.maid_work_range.tooltip": "Portée maximale que la Maid auras dans son Mode Travail",
   "config.touhou_little_maid.maid.maid_idle_range": "Portée du Mode Inactif",
