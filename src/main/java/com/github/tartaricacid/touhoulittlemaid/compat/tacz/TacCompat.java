@@ -26,6 +26,7 @@ import net.minecraftforge.fml.ModList;
 import javax.annotation.Nullable;
 
 public class TacCompat {
+    public static final ResourceLocation MINIGUN_ID = new ResourceLocation("tacz", "minigun");
     private static final String TACZ_ID = "tacz";
     private static boolean INSTALLED = false;
 
@@ -59,9 +60,9 @@ public class TacCompat {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public static boolean onSwingGun(IMaid maid, @Nullable ModelRendererWrapper armLeft, @Nullable ModelRendererWrapper armRight) {
+    public static boolean onHoldGun(IMaid maid, @Nullable ModelRendererWrapper armLeft, @Nullable ModelRendererWrapper armRight) {
         if (INSTALLED) {
-            return GunBaseAnimation.onSwingGun(maid, armLeft, armRight);
+            return GunBaseAnimation.onHoldGun(maid, armLeft, armRight);
         }
         return false;
     }
