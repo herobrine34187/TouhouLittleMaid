@@ -269,6 +269,10 @@ public class MenuIntegration {
         misc.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.touhou_little_maid.misc.use_new_maid_fairy_model"), MiscConfig.USE_NEW_MAID_FAIRY_MODEL.get())
                 .setDefaultValue(true).setTooltip(Component.translatable("config.touhou_little_maid.misc.use_new_maid_fairy_model.tooltip"))
                 .setSaveConsumer(MiscConfig.USE_NEW_MAID_FAIRY_MODEL::set).build());
+
+        misc.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.touhou_little_maid.misc.invulnerable_particle_effect"), MiscConfig.INVULNERABLE_PARTICLE_EFFECT.get())
+                .setDefaultValue(true).setTooltip(Component.translatable("config.touhou_little_maid.misc.invulnerable_particle_effect.tooltip"))
+                .setSaveConsumer(MiscConfig.INVULNERABLE_PARTICLE_EFFECT::set).build());
     }
 
     private static void vanillaConfig(ConfigBuilder root, ConfigEntryBuilder entryBuilder) {

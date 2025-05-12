@@ -22,6 +22,7 @@ import com.github.tartaricacid.touhoulittlemaid.compat.slashblade.SlashBladeComp
 import com.github.tartaricacid.touhoulittlemaid.compat.ysm.YsmCompat;
 import com.github.tartaricacid.touhoulittlemaid.compat.ysm.event.YsmMaidClientTickEvent;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.MaidConfig;
+import com.github.tartaricacid.touhoulittlemaid.config.subconfig.MiscConfig;
 import com.github.tartaricacid.touhoulittlemaid.datagen.tag.TagItem;
 import com.github.tartaricacid.touhoulittlemaid.entity.ai.brain.MaidBrain;
 import com.github.tartaricacid.touhoulittlemaid.entity.ai.brain.MaidSchedule;
@@ -1137,7 +1138,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
     }
 
     private void spawnPortalParticle() {
-        if (this.level.isClientSide && this.getIsInvulnerable() && this.getOwner() != null) {
+        if (this.level.isClientSide && this.getIsInvulnerable() && MiscConfig.INVULNERABLE_PARTICLE_EFFECT.get() && this.getOwner() != null) {
             this.level.addParticle(ParticleTypes.PORTAL,
                     this.getX() + (this.random.nextDouble() - 0.5D) * (double) this.getBbWidth(),
                     this.getY() + this.random.nextDouble() * (double) this.getBbHeight() - 0.25D,
