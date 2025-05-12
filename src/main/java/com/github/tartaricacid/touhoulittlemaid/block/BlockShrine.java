@@ -8,6 +8,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -56,6 +58,7 @@ public class BlockShrine extends BaseEntityBlock {
                 if (!shrine.isEmpty()) {
                     ItemStack storageItem = shrine.extractStorageItem();
                     ItemHandlerHelper.giveItemToPlayer(playerIn, storageItem);
+                    worldIn.playSound(null, pos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.PLAYERS, 1, 1);
                     return InteractionResult.SUCCESS;
                 }
                 return InteractionResult.PASS;
@@ -64,6 +67,7 @@ public class BlockShrine extends BaseEntityBlock {
                 if (shrine.canInsert(playerIn.getMainHandItem())) {
                     shrine.insertStorageItem(ItemHandlerHelper.copyStackWithSize(playerIn.getMainHandItem(), 1));
                     playerIn.getMainHandItem().shrink(1);
+                    worldIn.playSound(null, pos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.PLAYERS, 1, 1);
                     return InteractionResult.SUCCESS;
                 }
                 if (!worldIn.isClientSide) {

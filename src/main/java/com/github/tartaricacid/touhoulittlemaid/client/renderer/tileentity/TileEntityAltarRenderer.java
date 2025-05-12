@@ -39,7 +39,9 @@ public class TileEntityAltarRenderer implements BlockEntityRenderer<TileEntityAl
         if (te.isCanPlaceItem() && !te.handler.getStackInSlot(0).isEmpty()) {
             ItemStack stack = te.handler.getStackInSlot(0);
             poseStack.pushPose();
-            poseStack.translate(0.5, 1.25, 0.5);
+            double time = (System.currentTimeMillis() + te.getBlockPos().asLong()) % 3600;
+            poseStack.translate(0.5, 1.25 + Math.sin(time / 1800 * Math.PI) * 0.1, 0.5);
+            poseStack.mulPose(Axis.YP.rotationDegrees((float) time / 10));
             Minecraft.getInstance().getItemRenderer().renderStatic(stack, ItemDisplayContext.GROUND, combinedLightIn, combinedOverlayIn, poseStack, bufferIn, te.getLevel(), 0);
             poseStack.popPose();
         }
