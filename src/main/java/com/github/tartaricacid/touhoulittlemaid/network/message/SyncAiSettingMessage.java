@@ -5,6 +5,7 @@ import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.SettingReader
 import com.github.tartaricacid.touhoulittlemaid.client.event.PressAIChatKeyEvent;
 import com.github.tartaricacid.touhoulittlemaid.client.gui.entity.maid.ai.AIChatScreen;
 import com.github.tartaricacid.touhoulittlemaid.util.ByteBufUtils;
+import com.google.common.collect.Maps;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -22,8 +23,8 @@ public class SyncAiSettingMessage {
 
     public SyncAiSettingMessage() {
         this.settings = SettingReader.getAllSettingKeys();
-        this.chatSites = AvailableSites.getClientChatSites();
-        this.ttsSites = AvailableSites.getClientTtsSites();
+        this.chatSites = Maps.newHashMap();
+        this.ttsSites = Maps.newHashMap();
     }
 
     public SyncAiSettingMessage(Set<String> settings, Map<String, List<String>> chatSites, Map<String, List<String>> ttsSites) {

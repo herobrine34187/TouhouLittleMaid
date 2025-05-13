@@ -46,6 +46,7 @@ import com.github.tartaricacid.touhoulittlemaid.init.InitEntities;
 import com.github.tartaricacid.touhoulittlemaid.init.InitItems;
 import com.github.tartaricacid.touhoulittlemaid.init.InitSounds;
 import com.github.tartaricacid.touhoulittlemaid.init.InitTrigger;
+import com.github.tartaricacid.touhoulittlemaid.inventory.container.config.MaidAIChatConfigContainer;
 import com.github.tartaricacid.touhoulittlemaid.inventory.container.config.MaidConfigContainer;
 import com.github.tartaricacid.touhoulittlemaid.inventory.handler.BaubleItemHandler;
 import com.github.tartaricacid.touhoulittlemaid.inventory.handler.MaidBackpackHandler;
@@ -1385,9 +1386,19 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
     }
 
     public boolean openMaidGui(Player player, int tabIndex) {
-        if (player instanceof ServerPlayer && !this.isSleeping()) {
+        if (player instanceof ServerPlayer serverPlayer && !this.isSleeping()) {
             this.navigation.stop();
-            NetworkHooks.openScreen((ServerPlayer) player, getGuiProvider(tabIndex), (buffer) -> buffer.writeInt(getId()));
+            MenuProvider guiProvider = getGuiProvider(tabIndex);
+            int id = getId();
+            if (tabIndex == TabIndex.MAID_AI_CHAT_CONFIG) {
+                CompoundTag configData = this.getAiChatManager().writeToTag(new CompoundTag());
+                NetworkHooks.openScreen(serverPlayer, guiProvider, buffer -> {
+                    buffer.writeInt(id);
+                    buffer.writeNbt(configData);
+                });
+            } else {
+                NetworkHooks.openScreen(serverPlayer, guiProvider, buffer -> buffer.writeInt(id));
+            }
         }
         return true;
     }
@@ -1396,6 +1407,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
         return switch (tabIndex) {
             case TabIndex.TASK_CONFIG -> task.getTaskConfigGuiProvider(this);
             case TabIndex.MAID_CONFIG -> MaidConfigContainer.create(getId());
+            case TabIndex.MAID_AI_CHAT_CONFIG -> MaidAIChatConfigContainer.create(this);
             default -> this.getMaidBackpackType().getGuiProvider(getId());
         };
     }
