@@ -6,13 +6,13 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.STTConfig;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.STTSite;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
+import com.github.tartaricacid.touhoulittlemaid.init.InitSounds;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
@@ -57,19 +57,20 @@ public class STTChatKey {
                 return;
             }
             if (event.getAction() == GLFW.GLFW_PRESS) {
-                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.EXPERIENCE_ORB_PICKUP, 2f));
+                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(InitSounds.RECORDING_START.get(), 1f));
                 getNearestMaid(player, STTChatKey::sttStart);
                 return;
             }
             if (event.getAction() == GLFW.GLFW_RELEASE) {
+                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(InitSounds.RECORDING_END.get(), 1f));
                 getNearestMaid(player, STTChatKey::sttStop);
             }
         }
     }
 
     private static void getNearestMaid(LocalPlayer player, Consumer<EntityMaid> consumer) {
-        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.EXPERIENCE_ORB_PICKUP, 0.5f));
         Level level = player.level;
+        // TODO: 将搜索范围改成可配置的
         AABB aabb = player.getBoundingBox().inflate(12);
         List<EntityMaid> maids = level.getEntitiesOfClass(EntityMaid.class, aabb,
                 maid -> maid.isOwnedBy(player) && maid.isAlive() &&

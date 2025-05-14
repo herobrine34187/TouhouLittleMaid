@@ -72,7 +72,7 @@ public class Player2Site implements STTSite {
                 Codec.STRING.fieldOf(ID).forGetter(Player2Site::id),
                 ResourceLocation.CODEC.fieldOf(ICON).forGetter(Player2Site::icon),
                 Codec.STRING.fieldOf(URL).forGetter(Player2Site::url),
-                Codec.BOOL.optionalFieldOf(ENABLED, true).forGetter(Player2Site::enabled),
+                Codec.BOOL.fieldOf(ENABLED).forGetter(Player2Site::enabled),
                 Codec.unboundedMap(Codec.STRING, Codec.STRING).fieldOf(HEADERS).forGetter(Player2Site::headers)
         ).apply(instance, Player2Site::new));
 
