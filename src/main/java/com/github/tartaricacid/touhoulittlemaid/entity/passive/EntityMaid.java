@@ -4,6 +4,7 @@ import com.github.tartaricacid.simplebedrockmodel.client.bedrock.model.BedrockPa
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.advancements.maid.TriggerType;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.entity.MaidAIChatManager;
+import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.ClientAvailableSitesSync;
 import com.github.tartaricacid.touhoulittlemaid.api.backpack.IBackpackData;
 import com.github.tartaricacid.touhoulittlemaid.api.backpack.IMaidBackpack;
 import com.github.tartaricacid.touhoulittlemaid.api.client.render.MaidRenderState;
@@ -1395,6 +1396,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
                 NetworkHooks.openScreen(serverPlayer, guiProvider, buffer -> {
                     buffer.writeInt(id);
                     buffer.writeNbt(configData);
+                    ClientAvailableSitesSync.writeToNetwork(buffer);
                 });
             } else {
                 NetworkHooks.openScreen(serverPlayer, guiProvider, buffer -> buffer.writeInt(id));

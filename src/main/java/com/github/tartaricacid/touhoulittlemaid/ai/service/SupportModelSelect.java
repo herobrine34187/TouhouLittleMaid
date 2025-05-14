@@ -1,28 +1,27 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.service;
 
-import java.util.List;
+import java.util.Map;
 
-public interface SupportModelSelect<T extends Model> {
-    List<T> models();
+public interface SupportModelSelect {
+    Map<String, String> models();
 
-    default void addModel(T model) {
-        if (models().stream().noneMatch(m -> m.value().equals(model.value()))) {
-            models().add(model);
-        }
+    default void addModel(String id, String name) {
+        models().put(id, name);
     }
 
-    default void removeModel(Model model) {
-        models().removeIf(m -> m.value().equals(model.value()));
+    default void removeModel(String id) {
+        models().remove(id);
     }
 
-    default T getDefaultModel() {
-        return models().get(0);
+    default String getDefaultModel() {
+        return models().keySet().iterator().next();
     }
 
-    default Model getModel(String value) {
-        return models().stream()
-                .filter(model -> model.value().equals(value))
-                .findFirst()
-                .orElse(getDefaultModel());
+    default String getModel(String id) {
+        return models().getOrDefault(id, getDefaultModel());
+    }
+
+    default String getModelName(String id) {
+        return models().get(id);
     }
 }

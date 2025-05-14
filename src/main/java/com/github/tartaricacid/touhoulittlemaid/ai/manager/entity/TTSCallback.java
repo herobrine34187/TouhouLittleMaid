@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
 
 import java.net.http.HttpRequest;
 
@@ -43,9 +44,13 @@ public class TTSCallback implements ResponseCallback<byte[]> {
         if (!(maid.level instanceof ServerLevel serverLevel)) {
             return;
         }
+        LivingEntity owner = maid.getOwner();
+        if (!(owner instanceof ServerPlayer player)) {
+            return;
+        }
         MinecraftServer server = serverLevel.getServer();
         server.submit(() -> {
-            NetworkHandler.sendToNearby(maid, new TTSAudioToClientMessage(this.maid.getId(), data));
+            NetworkHandler.sendToClientPlayer(new TTSAudioToClientMessage(this.maid.getId(), data), player);
             ChatBubbleManger.addAiChatText(maid, chatText);
         });
     }

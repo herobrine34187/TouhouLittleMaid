@@ -1,6 +1,5 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.service.llm.openai;
 
-import com.github.tartaricacid.touhoulittlemaid.ai.service.Model;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.SerializableSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.SupportModelSelect;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMApiType;
@@ -13,21 +12,23 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-public final class OpenAISite implements LLMSite, SupportModelSelect<OpenAISite.OpenAIModel> {
+public final class OpenAISite implements LLMSite, SupportModelSelect {
     public static final String API_TYPE = LLMApiType.OPENAI.getName();
 
     private final String id;
     private final ResourceLocation icon;
     private final Map<String, String> headers;
-    private final List<OpenAIModel> models;
+    private final Map<String, String> models;
 
     private String url;
     private boolean enabled;
     private String secretKey;
 
     public OpenAISite(String id, ResourceLocation icon, String url, boolean enabled,
-                      String secretKey, Map<String, String> headers, List<OpenAIModel> models) {
+                      String secretKey, Map<String, String> headers, Map<String, String> models) {
         this.id = id;
         this.icon = icon;
         this.url = url;
@@ -35,6 +36,12 @@ public final class OpenAISite implements LLMSite, SupportModelSelect<OpenAISite.
         this.secretKey = secretKey;
         this.headers = headers;
         this.models = models;
+    }
+
+    public OpenAISite(String id, ResourceLocation icon, String url, boolean enabled,
+                      String secretKey, Map<String, String> headers, List<String> models) {
+        this(id, icon, url, enabled, secretKey, headers,
+                models.stream().collect(Collectors.toMap(Function.identity(), Function.identity())));
     }
 
     @Override
@@ -45,11 +52,6 @@ public final class OpenAISite implements LLMSite, SupportModelSelect<OpenAISite.
     @Override
     public LLMClient client() {
         return new OpenAIClient(LLM_HTTP_CLIENT, this);
-    }
-
-    @Override
-    public Model getModel(String id) {
-        return null;
     }
 
     @Override
@@ -77,12 +79,12 @@ public final class OpenAISite implements LLMSite, SupportModelSelect<OpenAISite.
     }
 
     @Override
-    public List<OpenAIModel> models() {
+    public Map<String, String> models() {
         return models;
     }
 
     public void addModel(String model) {
-        this.addModel(new OpenAIModel(model));
+        this.addModel(model, model);
     }
 
     @Override
@@ -103,6 +105,10 @@ public final class OpenAISite implements LLMSite, SupportModelSelect<OpenAISite.
     }
 
     public static class Serializer implements SerializableSite<OpenAISite> {
+        private static final Codec<Map<String, String>> MODELS_CODEC = Codec.list(Codec.STRING).xmap(
+                list -> list.stream().collect(Collectors.toMap(Function.identity(), Function.identity())),
+                map -> map.keySet().stream().toList());
+
         public static final Codec<OpenAISite> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 Codec.STRING.fieldOf(ID).forGetter(OpenAISite::id),
                 ResourceLocation.CODEC.fieldOf(ICON).forGetter(OpenAISite::icon),
@@ -110,7 +116,7 @@ public final class OpenAISite implements LLMSite, SupportModelSelect<OpenAISite.
                 Codec.BOOL.fieldOf(ENABLED).forGetter(OpenAISite::enabled),
                 Codec.STRING.fieldOf(SECRET_KEY).forGetter(OpenAISite::secretKey),
                 Codec.unboundedMap(Codec.STRING, Codec.STRING).fieldOf(HEADERS).forGetter(OpenAISite::headers),
-                OpenAIModel.CODEC.listOf().fieldOf(MODELS).forGetter(OpenAISite::models)
+                MODELS_CODEC.fieldOf(MODELS).forGetter(OpenAISite::models)
         ).apply(instance, OpenAISite::new));
 
         @Override
@@ -118,28 +124,13 @@ public final class OpenAISite implements LLMSite, SupportModelSelect<OpenAISite.
             return new OpenAISite(API_TYPE, SerializableSite.defaultIcon(API_TYPE),
                     "https://api.openai.com/v1/chat/completions", false,
                     StringUtils.EMPTY, Map.of(),
-                    List.of(new OpenAIModel("gpt-4o"),
-                            new OpenAIModel("chatgpt-4o-latest"),
-                            new OpenAIModel("gpt-4o-mini"),
-                            new OpenAIModel("o1"),
-                            new OpenAIModel("o1-mini"),
-                            new OpenAIModel("o3-mini"),
-                            new OpenAIModel("o1-preview"))
-            );
+                    List.of("gpt-4o", "chatgpt-4o-latest", "gpt-4o-mini",
+                            "o1", "o1-mini", "o3-mini", "o1-preview"));
         }
 
         @Override
         public Codec<OpenAISite> codec() {
             return CODEC;
-        }
-    }
-
-    public record OpenAIModel(String value) implements Model {
-        public static final Codec<OpenAIModel> CODEC = Codec.STRING.xmap(OpenAIModel::new, OpenAIModel::value);
-
-        @Override
-        public String name() {
-            return this.value;
         }
     }
 }

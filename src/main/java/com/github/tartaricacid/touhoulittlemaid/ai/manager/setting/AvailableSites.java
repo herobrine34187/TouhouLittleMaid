@@ -28,6 +28,8 @@ public class AvailableSites {
         addDefaultSites();
         readSites();
         saveSites();
+
+        ClientAvailableSitesSync.init(LLM_SITES, TTS_SITES);
     }
 
     private static void clearSites() {

@@ -30,7 +30,7 @@ public class TTSFishAudioClient implements TTSClient {
     public void play(String message, TTSConfig config, ResponseCallback<byte[]> callback) {
         URI url = URI.create(this.site.url());
         String apiKey = this.site.secretKey();
-        String model = config.model().value();
+        String model = config.model();
 
         TTSFishAudioRequest request = TTSFishAudioRequest.create()
                 .setReferenceId(model)

@@ -6,7 +6,6 @@ import net.minecraft.network.FriendlyByteBuf;
 public class MaidAIChatSerializable {
     public String llmSite = "";
     public String llmModel = "";
-    public double llmTemperature = -1;
 
     public String ttsSite = "";
     public String ttsModel = "";
@@ -18,7 +17,6 @@ public class MaidAIChatSerializable {
     public void decode(FriendlyByteBuf buf) {
         llmSite = buf.readUtf();
         llmModel = buf.readUtf();
-        llmTemperature = buf.readDouble();
         ttsSite = buf.readUtf();
         ttsModel = buf.readUtf();
         ttsLanguage = buf.readUtf();
@@ -29,7 +27,6 @@ public class MaidAIChatSerializable {
     public void encode(FriendlyByteBuf buf) {
         buf.writeUtf(llmSite);
         buf.writeUtf(llmModel);
-        buf.writeDouble(llmTemperature);
         buf.writeUtf(ttsSite);
         buf.writeUtf(ttsModel);
         buf.writeUtf(ttsLanguage);
@@ -40,7 +37,6 @@ public class MaidAIChatSerializable {
     public void copyFrom(MaidAIChatSerializable data) {
         llmSite = data.llmSite;
         llmModel = data.llmModel;
-        llmTemperature = data.llmTemperature;
         ttsSite = data.ttsSite;
         ttsModel = data.ttsModel;
         ttsLanguage = data.ttsLanguage;
@@ -53,7 +49,6 @@ public class MaidAIChatSerializable {
             CompoundTag data = tag.getCompound("MaidAIChat");
             llmSite = data.getString("LLMSite");
             llmModel = data.getString("LLMModel");
-            llmTemperature = data.getDouble("LLMTemperature");
             ttsSite = data.getString("TTSSiteName");
             ttsModel = data.getString("TTSModel");
             ttsLanguage = data.getString("TTSLanguage");
@@ -68,7 +63,6 @@ public class MaidAIChatSerializable {
         {
             data.putString("LLMSite", llmSite);
             data.putString("LLMModel", llmModel);
-            data.putDouble("LLMTemperature", llmTemperature);
             data.putString("TTSSiteName", ttsSite);
             data.putString("TTSModel", ttsModel);
             data.putString("TTSLanguage", ttsLanguage);

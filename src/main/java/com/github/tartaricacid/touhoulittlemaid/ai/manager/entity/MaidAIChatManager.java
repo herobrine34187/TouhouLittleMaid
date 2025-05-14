@@ -1,6 +1,5 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.manager.entity;
 
-import com.github.tartaricacid.touhoulittlemaid.ai.service.Model;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.SystemServices;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMClient;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMConfig;
@@ -44,7 +43,7 @@ public final class MaidAIChatManager extends MaidAIChatData {
             ChatBubbleManger.addInnerChatText(maid, "ai.touhou_little_maid.chat.no_setting");
         }
         chatCompletion.add(LLMMessage.userChat(maid, message));
-        LLMConfig config = new LLMConfig(this.getLLMModel(), this.getLLMTemperature(), 256);
+        LLMConfig config = new LLMConfig(this.getLLMModel(), AIConfig.LLM_TEMPERATURE.get(), AIConfig.LLM_MAX_TOKEN.get());
         LLMCallback callback = new LLMCallback(this, message);
         chatClient.chat(chatCompletion, config, callback);
     }
@@ -57,7 +56,7 @@ public final class MaidAIChatManager extends MaidAIChatData {
             return;
         }
         TTSClient ttsClient = site.client();
-        Model ttsModel = getTTSModel();
+        String ttsModel = getTTSModel();
         String ttsLang = "en";
         String[] split = this.getTTSLanguage().split("_");
         if (split.length >= 2) {

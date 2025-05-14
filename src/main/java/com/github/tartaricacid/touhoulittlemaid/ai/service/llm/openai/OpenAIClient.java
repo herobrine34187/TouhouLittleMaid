@@ -34,7 +34,7 @@ public final class OpenAIClient implements LLMClient {
     public void chat(List<LLMMessage> messages, LLMConfig config, ResponseCallback<String> callback) {
         URI url = URI.create(this.site.url());
         String apiKey = this.site.secretKey();
-        String model = config.model().value();
+        String model = config.model();
         double temperature = config.temperature();
         int maxTokens = config.maxTokens();
 

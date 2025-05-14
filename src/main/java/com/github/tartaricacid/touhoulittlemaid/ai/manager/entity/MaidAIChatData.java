@@ -3,7 +3,6 @@ package com.github.tartaricacid.touhoulittlemaid.ai.manager.entity;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.AvailableSites;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.CharacterSetting;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.SettingReader;
-import com.github.tartaricacid.touhoulittlemaid.ai.service.Model;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.SupportModelSelect;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.DefaultLLMSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMMessage;
@@ -56,9 +55,9 @@ public abstract class MaidAIChatData extends MaidAIChatSerializable {
         return site;
     }
 
-    public Model getLLMModel() {
+    public String getLLMModel() {
         LLMSite site = getLLMSite();
-        Model model = Model.EMPTY;
+        String model = StringUtils.EMPTY;
         if (site instanceof SupportModelSelect select) {
             if (StringUtils.isBlank(llmModel)) {
                 model = select.getDefaultModel();
@@ -69,9 +68,9 @@ public abstract class MaidAIChatData extends MaidAIChatSerializable {
         return model;
     }
 
-    public Model getTTSModel() {
+    public String getTTSModel() {
         TTSSite site = getTTSSite();
-        Model model = Model.EMPTY;
+        String model = StringUtils.EMPTY;
         if (site instanceof SupportModelSelect select) {
             if (StringUtils.isBlank(ttsModel)) {
                 model = select.getDefaultModel();
@@ -80,13 +79,6 @@ public abstract class MaidAIChatData extends MaidAIChatSerializable {
             }
         }
         return model;
-    }
-
-    public double getLLMTemperature() {
-        if (llmTemperature >= 0) {
-            return llmTemperature;
-        }
-        return AIConfig.LLM_TEMPERATURE.get();
     }
 
     public String getTTSLanguage() {
