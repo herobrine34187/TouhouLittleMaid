@@ -1,7 +1,6 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.service.tts.system;
 
 import com.github.tartaricacid.touhoulittlemaid.ai.service.SerializableSite;
-import com.github.tartaricacid.touhoulittlemaid.ai.service.SystemServices;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSApiType;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSClient;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSSite;
@@ -13,14 +12,14 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Collections;
 import java.util.Map;
 
-public final class SystemSite implements TTSSite, SystemServices {
+public final class TTSSystemSite implements TTSSite {
     public static final String API_TYPE = TTSApiType.SYSTEM.getName();
 
     private final String id;
     private final ResourceLocation icon;
     private boolean enabled;
 
-    public SystemSite(String id, ResourceLocation icon, boolean enabled) {
+    public TTSSystemSite(String id, ResourceLocation icon, boolean enabled) {
         this.id = id;
         this.icon = icon;
         this.enabled = enabled;
@@ -28,7 +27,7 @@ public final class SystemSite implements TTSSite, SystemServices {
 
     @Override
     public TTSClient client() {
-        return new SystemClient();
+        return new TTSSystemClient();
     }
 
     @Override
@@ -65,20 +64,20 @@ public final class SystemSite implements TTSSite, SystemServices {
         this.enabled = enabled;
     }
 
-    public static class Serializer implements SerializableSite<SystemSite> {
-        public static final Codec<SystemSite> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.STRING.fieldOf(ID).forGetter(SystemSite::id),
-                ResourceLocation.CODEC.fieldOf(ICON).forGetter(SystemSite::icon),
-                Codec.BOOL.fieldOf(ENABLED).forGetter(SystemSite::enabled)
-        ).apply(instance, SystemSite::new));
+    public static class Serializer implements SerializableSite<TTSSystemSite> {
+        public static final Codec<TTSSystemSite> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                Codec.STRING.fieldOf(ID).forGetter(TTSSystemSite::id),
+                ResourceLocation.CODEC.fieldOf(ICON).forGetter(TTSSystemSite::icon),
+                Codec.BOOL.fieldOf(ENABLED).forGetter(TTSSystemSite::enabled)
+        ).apply(instance, TTSSystemSite::new));
 
         @Override
-        public SystemSite defaultSite() {
-            return new SystemSite(API_TYPE, SerializableSite.defaultIcon(API_TYPE), true);
+        public TTSSystemSite defaultSite() {
+            return new TTSSystemSite(API_TYPE, SerializableSite.defaultIcon(API_TYPE), true);
         }
 
         @Override
-        public Codec<SystemSite> codec() {
+        public Codec<TTSSystemSite> codec() {
             return CODEC;
         }
     }

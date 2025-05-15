@@ -111,8 +111,8 @@ public final class NetworkHandler {
                 Optional.of(NetworkDirection.PLAY_TO_SERVER));
         // CHANNEL.registerMessage(42, GetMaidAIDataMessage.class, GetMaidAIDataMessage::encode, GetMaidAIDataMessage::decode, GetMaidAIDataMessage::handle,
         //         Optional.of(NetworkDirection.PLAY_TO_SERVER));
-        CHANNEL.registerMessage(43, OpenMaidAIDataScreenMessage.class, OpenMaidAIDataScreenMessage::encode, OpenMaidAIDataScreenMessage::decode, OpenMaidAIDataScreenMessage::handle,
-                Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+        // CHANNEL.registerMessage(43, OpenMaidAIDataScreenMessage.class, OpenMaidAIDataScreenMessage::encode, OpenMaidAIDataScreenMessage::decode, OpenMaidAIDataScreenMessage::handle,
+        //        Optional.of(NetworkDirection.PLAY_TO_CLIENT));
         // 仅安装 YSM 后才会发送此包
         CHANNEL.registerMessage(44, SyncYsmMaidDataMessage.class, SyncYsmMaidDataMessage::encode, SyncYsmMaidDataMessage::decode, SyncYsmMaidDataMessage::handle,
                 Optional.of(NetworkDirection.PLAY_TO_CLIENT));

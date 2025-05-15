@@ -3,14 +3,15 @@ package com.github.tartaricacid.touhoulittlemaid.ai.service;
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.AvailableSites;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMSite;
-import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.openai.OpenAISite;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.openai.LLMOpenAISite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.STTSite;
-import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.aliyun.AliyunSite;
-import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.player2.Player2Site;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.aliyun.STTAliyunSite;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.player2.STTPlayer2Site;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSSite;
-import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.fishaudio.FishAudioSite;
-import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.gptsovits.GptSovitsSite;
-import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.system.SystemSite;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.fishaudio.TTSFishAudioSite;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.gptsovits.TTSGptSovitsSite;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.player2.TTSPlayer2Site;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.system.TTSSystemSite;
 import com.github.tartaricacid.touhoulittlemaid.api.ILittleMaid;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -25,14 +26,15 @@ public final class SerializerRegister {
     public static void init() {
         SerializerRegister register = new SerializerRegister();
 
-        register.register(ServiceType.LLM, OpenAISite.API_TYPE, new OpenAISite.Serializer());
+        register.register(ServiceType.LLM, LLMOpenAISite.API_TYPE, new LLMOpenAISite.Serializer());
 
-        register.register(ServiceType.STT, Player2Site.API_TYPE, new Player2Site.Serializer());
-        register.register(ServiceType.STT, AliyunSite.API_TYPE, new AliyunSite.Serializer());
+        register.register(ServiceType.STT, STTPlayer2Site.API_TYPE, new STTPlayer2Site.Serializer());
+        register.register(ServiceType.STT, STTAliyunSite.API_TYPE, new STTAliyunSite.Serializer());
 
-        register.register(ServiceType.TTS, SystemSite.API_TYPE, new SystemSite.Serializer());
-        register.register(ServiceType.TTS, FishAudioSite.API_TYPE, new FishAudioSite.Serializer());
-        register.register(ServiceType.TTS, GptSovitsSite.API_TYPE, new GptSovitsSite.Serializer());
+        register.register(ServiceType.TTS, TTSSystemSite.API_TYPE, new TTSSystemSite.Serializer());
+        register.register(ServiceType.TTS, TTSFishAudioSite.API_TYPE, new TTSFishAudioSite.Serializer());
+        register.register(ServiceType.TTS, TTSGptSovitsSite.API_TYPE, new TTSGptSovitsSite.Serializer());
+        register.register(ServiceType.TTS, TTSPlayer2Site.API_TYPE, new TTSPlayer2Site.Serializer());
 
         for (ILittleMaid littleMaid : TouhouLittleMaid.EXTENSIONS) {
             littleMaid.registerAIChatSerializer(register);

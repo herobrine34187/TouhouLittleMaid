@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.Map;
 
-public class Player2Site implements STTSite {
+public class STTPlayer2Site implements STTSite {
     public static final String API_TYPE = STTApiType.PLAYER2.getName();
 
     private final String id;
@@ -20,7 +20,7 @@ public class Player2Site implements STTSite {
 
     private boolean enabled;
 
-    public Player2Site(String id, ResourceLocation icon, String url, boolean enabled, Map<String, String> headers) {
+    public STTPlayer2Site(String id, ResourceLocation icon, String url, boolean enabled, Map<String, String> headers) {
         this.id = id;
         this.icon = icon;
         this.url = url;
@@ -67,24 +67,24 @@ public class Player2Site implements STTSite {
         this.enabled = enabled;
     }
 
-    public static class Serializer implements SerializableSite<Player2Site> {
-        public static final Codec<Player2Site> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.STRING.fieldOf(ID).forGetter(Player2Site::id),
-                ResourceLocation.CODEC.fieldOf(ICON).forGetter(Player2Site::icon),
-                Codec.STRING.fieldOf(URL).forGetter(Player2Site::url),
-                Codec.BOOL.fieldOf(ENABLED).forGetter(Player2Site::enabled),
-                Codec.unboundedMap(Codec.STRING, Codec.STRING).fieldOf(HEADERS).forGetter(Player2Site::headers)
-        ).apply(instance, Player2Site::new));
+    public static class Serializer implements SerializableSite<STTPlayer2Site> {
+        public static final Codec<STTPlayer2Site> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                Codec.STRING.fieldOf(ID).forGetter(STTPlayer2Site::id),
+                ResourceLocation.CODEC.fieldOf(ICON).forGetter(STTPlayer2Site::icon),
+                Codec.STRING.fieldOf(URL).forGetter(STTPlayer2Site::url),
+                Codec.BOOL.fieldOf(ENABLED).forGetter(STTPlayer2Site::enabled),
+                Codec.unboundedMap(Codec.STRING, Codec.STRING).fieldOf(HEADERS).forGetter(STTPlayer2Site::headers)
+        ).apply(instance, STTPlayer2Site::new));
 
         @Override
-        public Player2Site defaultSite() {
-            return new Player2Site(API_TYPE, SerializableSite.defaultIcon(API_TYPE),
+        public STTPlayer2Site defaultSite() {
+            return new STTPlayer2Site(API_TYPE, SerializableSite.defaultIcon(API_TYPE),
                     "http://127.0.0.1:4315/v1/stt", true,
                     Map.of("player2-game-key", "TouhouLittleMaid"));
         }
 
         @Override
-        public Codec<Player2Site> codec() {
+        public Codec<STTPlayer2Site> codec() {
             return CODEC;
         }
     }

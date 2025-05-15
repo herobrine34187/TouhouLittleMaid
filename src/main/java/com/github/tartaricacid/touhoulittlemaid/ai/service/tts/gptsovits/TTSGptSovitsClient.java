@@ -16,9 +16,9 @@ import java.time.Duration;
 
 public class TTSGptSovitsClient implements TTSClient {
     private final HttpClient httpClient;
-    private final GptSovitsSite site;
+    private final TTSGptSovitsSite site;
 
-    public TTSGptSovitsClient(HttpClient httpClient, GptSovitsSite site) {
+    public TTSGptSovitsClient(HttpClient httpClient, TTSGptSovitsSite site) {
         this.httpClient = httpClient;
         this.site = site;
     }

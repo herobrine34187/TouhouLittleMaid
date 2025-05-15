@@ -1,6 +1,5 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.manager.entity;
 
-import com.github.tartaricacid.touhoulittlemaid.ai.service.SystemServices;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMClient;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMConfig;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMMessage;
@@ -8,6 +7,7 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSClient;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSConfig;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSSite;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSSystemServices;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
 import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleManger;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
@@ -51,20 +51,22 @@ public final class MaidAIChatManager extends MaidAIChatData {
     @SuppressWarnings("all")
     public void tts(TTSSite site, String chatText, String ttsText) {
         // 调用系统 TTS，那么此时就只需要发送给指定的玩家即可
-        if (site instanceof SystemServices) {
-            onPlaySoundLocal(chatText, ttsText);
-            return;
-        }
         TTSClient ttsClient = site.client();
         String ttsModel = getTTSModel();
+
         String ttsLang = "en";
         String[] split = this.getTTSLanguage().split("_");
         if (split.length >= 2) {
             ttsLang = split[0];
         }
         TTSConfig config = new TTSConfig(ttsModel, ttsLang);
-        TTSCallback callback = new TTSCallback(maid, chatText);
-        ttsClient.play(ttsText, config, callback);
+
+        if (ttsClient instanceof TTSSystemServices services) {
+            onPlaySoundLocal(site.id(), chatText, ttsText, config, services);
+        } else {
+            TTSCallback callback = new TTSCallback(maid, chatText);
+            ttsClient.play(ttsText, config, callback);
+        }
     }
 
     private static List<LLMMessage> getChatCompletion(MaidAIChatManager chatManager, String language) {
@@ -86,14 +88,15 @@ public final class MaidAIChatManager extends MaidAIChatData {
         }).orElse(Collections.emptyList());
     }
 
-    private void onPlaySoundLocal(String chatText, String ttsText) {
+    private void onPlaySoundLocal(String name, String chatText, String ttsText, TTSConfig config, TTSSystemServices services) {
         if (!(maid.level instanceof ServerLevel serverLevel)) {
             return;
         }
         MinecraftServer server = serverLevel.getServer();
         server.submit(() -> {
             if (maid.getOwner() instanceof ServerPlayer player) {
-                NetworkHandler.sendToClientPlayer(new TTSSystemAudioToClientMessage(ttsText), player);
+                TTSSystemAudioToClientMessage message = new TTSSystemAudioToClientMessage(name, ttsText, config, services);
+                NetworkHandler.sendToClientPlayer(message, player);
             }
             ChatBubbleManger.addAiChatText(maid, chatText);
         });

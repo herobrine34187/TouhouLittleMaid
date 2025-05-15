@@ -21,11 +21,11 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
 
-public final class OpenAIClient implements LLMClient {
+public final class LLMOpenAIClient implements LLMClient {
     private final HttpClient httpClient;
-    private final OpenAISite site;
+    private final LLMOpenAISite site;
 
-    public OpenAIClient(HttpClient httpClient, OpenAISite site) {
+    public LLMOpenAIClient(HttpClient httpClient, LLMOpenAISite site) {
         this.httpClient = httpClient;
         this.site = site;
     }

@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 import java.util.Map;
 
-public final class GptSovitsSite implements TTSSite {
+public final class TTSGptSovitsSite implements TTSSite {
     public static final String API_TYPE = TTSApiType.GPT_SOVITS.getName();
 
     private final String id;
@@ -28,11 +28,11 @@ public final class GptSovitsSite implements TTSSite {
     private String promptLang;
     private String textSplitMethod;
 
-    public GptSovitsSite(String id, ResourceLocation icon, String url, boolean enabled,
-                         String secretKey, String refAudioPath,
-                         String promptText, String promptLang,
-                         String textSplitMethod, List<String> auxRefAudioPaths,
-                         Map<String, String> headers) {
+    public TTSGptSovitsSite(String id, ResourceLocation icon, String url, boolean enabled,
+                            String secretKey, String refAudioPath,
+                            String promptText, String promptLang,
+                            String textSplitMethod, List<String> auxRefAudioPaths,
+                            Map<String, String> headers) {
         this.id = id;
         this.icon = icon;
         this.url = url;
@@ -133,24 +133,24 @@ public final class GptSovitsSite implements TTSSite {
         this.textSplitMethod = textSplitMethod;
     }
 
-    public static class Serializer implements SerializableSite<GptSovitsSite> {
-        public static final Codec<GptSovitsSite> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.STRING.fieldOf(ID).forGetter(GptSovitsSite::id),
-                ResourceLocation.CODEC.fieldOf(ICON).forGetter(GptSovitsSite::icon),
-                Codec.STRING.fieldOf(URL).forGetter(GptSovitsSite::url),
-                Codec.BOOL.fieldOf(ENABLED).forGetter(GptSovitsSite::enabled),
-                Codec.STRING.fieldOf(SECRET_KEY).forGetter(GptSovitsSite::secretKey),
-                Codec.STRING.fieldOf("ref_audio_path").forGetter(GptSovitsSite::refAudioPath),
-                Codec.STRING.fieldOf("prompt_text").forGetter(GptSovitsSite::promptText),
-                Codec.STRING.fieldOf("prompt_lang").forGetter(GptSovitsSite::promptLang),
-                Codec.STRING.fieldOf("text_split_method").forGetter(GptSovitsSite::textSplitMethod),
-                Codec.list(Codec.STRING).fieldOf("aux_ref_audio_paths").forGetter(GptSovitsSite::auxRefAudioPaths),
-                Codec.unboundedMap(Codec.STRING, Codec.STRING).fieldOf(HEADERS).forGetter(GptSovitsSite::headers)
-        ).apply(instance, GptSovitsSite::new));
+    public static class Serializer implements SerializableSite<TTSGptSovitsSite> {
+        public static final Codec<TTSGptSovitsSite> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                Codec.STRING.fieldOf(ID).forGetter(TTSGptSovitsSite::id),
+                ResourceLocation.CODEC.fieldOf(ICON).forGetter(TTSGptSovitsSite::icon),
+                Codec.STRING.fieldOf(URL).forGetter(TTSGptSovitsSite::url),
+                Codec.BOOL.fieldOf(ENABLED).forGetter(TTSGptSovitsSite::enabled),
+                Codec.STRING.fieldOf(SECRET_KEY).forGetter(TTSGptSovitsSite::secretKey),
+                Codec.STRING.fieldOf("ref_audio_path").forGetter(TTSGptSovitsSite::refAudioPath),
+                Codec.STRING.fieldOf("prompt_text").forGetter(TTSGptSovitsSite::promptText),
+                Codec.STRING.fieldOf("prompt_lang").forGetter(TTSGptSovitsSite::promptLang),
+                Codec.STRING.fieldOf("text_split_method").forGetter(TTSGptSovitsSite::textSplitMethod),
+                Codec.list(Codec.STRING).fieldOf("aux_ref_audio_paths").forGetter(TTSGptSovitsSite::auxRefAudioPaths),
+                Codec.unboundedMap(Codec.STRING, Codec.STRING).fieldOf(HEADERS).forGetter(TTSGptSovitsSite::headers)
+        ).apply(instance, TTSGptSovitsSite::new));
 
         @Override
-        public GptSovitsSite defaultSite() {
-            return new GptSovitsSite(API_TYPE, SerializableSite.defaultIcon(API_TYPE),
+        public TTSGptSovitsSite defaultSite() {
+            return new TTSGptSovitsSite(API_TYPE, SerializableSite.defaultIcon(API_TYPE),
                     "http://127.0.0.1:9880/tts", false,
                     StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY,
                     "zh", "cut1", List.of(), Map.of()
@@ -158,7 +158,7 @@ public final class GptSovitsSite implements TTSSite {
         }
 
         @Override
-        public Codec<GptSovitsSite> codec() {
+        public Codec<TTSGptSovitsSite> codec() {
             return CODEC;
         }
     }

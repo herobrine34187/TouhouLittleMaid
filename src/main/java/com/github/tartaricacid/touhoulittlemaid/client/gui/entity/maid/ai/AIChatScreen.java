@@ -3,10 +3,7 @@ package com.github.tartaricacid.touhoulittlemaid.client.gui.entity.maid.ai;
 import com.github.tartaricacid.touhoulittlemaid.client.gui.widget.button.FlatColorButton;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
-import com.github.tartaricacid.touhoulittlemaid.network.message.GetMaidAIDataMessage;
 import com.github.tartaricacid.touhoulittlemaid.network.message.SendUserChatMessage;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -19,10 +16,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.glfw.GLFW;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class AIChatScreen extends Screen {
     private final EntityMaid maid;
@@ -50,8 +43,12 @@ public class AIChatScreen extends Screen {
         this.setInitialFocus(this.input);
 
         this.configButton = new FlatColorButton(posX + 142, posY + 58, 20, 20, Component.literal("✎"),
-                b -> NetworkHandler.CHANNEL.sendToServer(new GetMaidAIDataMessage(this.maid.getId())))
-                .setTooltips("ai.touhou_little_maid.chat.config.tip");
+                b -> {
+                    LocalPlayer player = this.getMinecraft().player;
+                    if (player != null) {
+                        player.sendSystemMessage(Component.translatable("ai.touhou_little_maid.chat.config.tip.under_construction"));
+                    }
+                }).setTooltips("ai.touhou_little_maid.chat.config.tip");
         this.addRenderableWidget(this.configButton);
     }
 

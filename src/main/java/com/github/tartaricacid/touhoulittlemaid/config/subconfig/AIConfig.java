@@ -17,6 +17,7 @@ public class AIConfig {
 
     public static ForgeConfigSpec.BooleanValue STT_ENABLED;
     public static ForgeConfigSpec.EnumValue<STTApiType> STT_TYPE;
+    public static ForgeConfigSpec.IntValue MAID_CAN_CHAT_DISTANCE;
     public static ForgeConfigSpec.ConfigValue<String> STT_PROXY_ADDRESS;
 
     public static void init(ForgeConfigSpec.Builder builder) {
@@ -51,6 +52,9 @@ public class AIConfig {
 
         builder.comment("STT Type, currently support player2 app or aliyun");
         STT_TYPE = builder.defineEnum("STTType", STTApiType.PLAYER2, EnumGetMethod.NAME_IGNORECASE);
+
+        builder.comment("The range of search when chatting with the maid");
+        MAID_CAN_CHAT_DISTANCE = builder.defineInRange("MaidCanChatDistance", 12, 1, 256);
 
         builder.comment("STT Proxy Address, such as 127.0.0.1:1080, empty is no proxy, SOCKS proxies are not supported");
         STT_PROXY_ADDRESS = builder.define("STTProxyAddress", "");

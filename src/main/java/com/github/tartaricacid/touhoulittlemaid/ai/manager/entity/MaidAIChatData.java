@@ -8,7 +8,7 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.DefaultLLMSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMMessage;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSSite;
-import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.system.SystemSite;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.system.TTSSystemSite;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.util.CappedQueue;
@@ -45,11 +45,11 @@ public abstract class MaidAIChatData extends MaidAIChatSerializable {
     public TTSSite getTTSSite() {
         TTSSite site;
         if (StringUtils.isBlank(ttsSite)) {
-            site = AvailableSites.getTTSSite(SystemSite.API_TYPE);
+            site = AvailableSites.getTTSSite(TTSSystemSite.API_TYPE);
         } else {
             site = AvailableSites.getTTSSite(ttsSite);
             if (site == null || !site.enabled()) {
-                site = AvailableSites.getTTSSite(SystemSite.API_TYPE);
+                site = AvailableSites.getTTSSite(TTSSystemSite.API_TYPE);
             }
         }
         return site;

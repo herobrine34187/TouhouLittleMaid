@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public final class OpenAISite implements LLMSite, SupportModelSelect {
+public final class LLMOpenAISite implements LLMSite, SupportModelSelect {
     public static final String API_TYPE = LLMApiType.OPENAI.getName();
 
     private final String id;
@@ -27,8 +27,8 @@ public final class OpenAISite implements LLMSite, SupportModelSelect {
     private boolean enabled;
     private String secretKey;
 
-    public OpenAISite(String id, ResourceLocation icon, String url, boolean enabled,
-                      String secretKey, Map<String, String> headers, Map<String, String> models) {
+    public LLMOpenAISite(String id, ResourceLocation icon, String url, boolean enabled,
+                         String secretKey, Map<String, String> headers, Map<String, String> models) {
         this.id = id;
         this.icon = icon;
         this.url = url;
@@ -38,8 +38,8 @@ public final class OpenAISite implements LLMSite, SupportModelSelect {
         this.models = models;
     }
 
-    public OpenAISite(String id, ResourceLocation icon, String url, boolean enabled,
-                      String secretKey, Map<String, String> headers, List<String> models) {
+    public LLMOpenAISite(String id, ResourceLocation icon, String url, boolean enabled,
+                         String secretKey, Map<String, String> headers, List<String> models) {
         this(id, icon, url, enabled, secretKey, headers,
                 models.stream().collect(Collectors.toMap(Function.identity(), Function.identity())));
     }
@@ -51,7 +51,7 @@ public final class OpenAISite implements LLMSite, SupportModelSelect {
 
     @Override
     public LLMClient client() {
-        return new OpenAIClient(LLM_HTTP_CLIENT, this);
+        return new LLMOpenAIClient(LLM_HTTP_CLIENT, this);
     }
 
     @Override
@@ -104,24 +104,24 @@ public final class OpenAISite implements LLMSite, SupportModelSelect {
         this.secretKey = secretKey;
     }
 
-    public static class Serializer implements SerializableSite<OpenAISite> {
+    public static class Serializer implements SerializableSite<LLMOpenAISite> {
         private static final Codec<Map<String, String>> MODELS_CODEC = Codec.list(Codec.STRING).xmap(
                 list -> list.stream().collect(Collectors.toMap(Function.identity(), Function.identity())),
                 map -> map.keySet().stream().toList());
 
-        public static final Codec<OpenAISite> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.STRING.fieldOf(ID).forGetter(OpenAISite::id),
-                ResourceLocation.CODEC.fieldOf(ICON).forGetter(OpenAISite::icon),
-                Codec.STRING.fieldOf(URL).forGetter(OpenAISite::url),
-                Codec.BOOL.fieldOf(ENABLED).forGetter(OpenAISite::enabled),
-                Codec.STRING.fieldOf(SECRET_KEY).forGetter(OpenAISite::secretKey),
-                Codec.unboundedMap(Codec.STRING, Codec.STRING).fieldOf(HEADERS).forGetter(OpenAISite::headers),
-                MODELS_CODEC.fieldOf(MODELS).forGetter(OpenAISite::models)
-        ).apply(instance, OpenAISite::new));
+        public static final Codec<LLMOpenAISite> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                Codec.STRING.fieldOf(ID).forGetter(LLMOpenAISite::id),
+                ResourceLocation.CODEC.fieldOf(ICON).forGetter(LLMOpenAISite::icon),
+                Codec.STRING.fieldOf(URL).forGetter(LLMOpenAISite::url),
+                Codec.BOOL.fieldOf(ENABLED).forGetter(LLMOpenAISite::enabled),
+                Codec.STRING.fieldOf(SECRET_KEY).forGetter(LLMOpenAISite::secretKey),
+                Codec.unboundedMap(Codec.STRING, Codec.STRING).fieldOf(HEADERS).forGetter(LLMOpenAISite::headers),
+                MODELS_CODEC.fieldOf(MODELS).forGetter(LLMOpenAISite::models)
+        ).apply(instance, LLMOpenAISite::new));
 
         @Override
-        public OpenAISite defaultSite() {
-            return new OpenAISite(API_TYPE, SerializableSite.defaultIcon(API_TYPE),
+        public LLMOpenAISite defaultSite() {
+            return new LLMOpenAISite(API_TYPE, SerializableSite.defaultIcon(API_TYPE),
                     "https://api.openai.com/v1/chat/completions", false,
                     StringUtils.EMPTY, Map.of(),
                     List.of("gpt-4o", "chatgpt-4o-latest", "gpt-4o-mini",
@@ -129,7 +129,7 @@ public final class OpenAISite implements LLMSite, SupportModelSelect {
         }
 
         @Override
-        public Codec<OpenAISite> codec() {
+        public Codec<LLMOpenAISite> codec() {
             return CODEC;
         }
     }

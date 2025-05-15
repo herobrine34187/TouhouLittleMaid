@@ -35,6 +35,11 @@ public class GlobalAIIntegration {
                 .setDefaultValue(STTApiType.PLAYER2).setTooltip(Component.translatable("config.touhou_little_maid.global_ai.stt_type.tooltip"))
                 .setSaveConsumer(AIConfig.STT_TYPE::set).build());
 
+        builder.add(entryBuilder.startIntSlider(Component.translatable("config.touhou_little_maid.global_ai.maid_can_chat_distance"),
+                        AIConfig.MAID_CAN_CHAT_DISTANCE.get(), 1, 256).setDefaultValue(12)
+                .setTooltip(Component.translatable("config.touhou_little_maid.global_ai.maid_can_chat_distance.tooltip"))
+                .setSaveConsumer(AIConfig.MAID_CAN_CHAT_DISTANCE::set).build());
+
         builder.add(entryBuilder.startStrField(Component.translatable("config.touhou_little_maid.global_ai.stt_proxy_address"), AIConfig.STT_PROXY_ADDRESS.get())
                 .setDefaultValue(StringUtils.EMPTY)
                 .setTooltip(Component.translatable("config.touhou_little_maid.global_ai.stt_proxy_address.tooltip"))

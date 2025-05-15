@@ -19,9 +19,9 @@ public class STTPlayer2Client implements STTClient {
     private static final String STOP_URL = "/stop";
 
     private final HttpClient httpClient;
-    private final Player2Site site;
+    private final STTPlayer2Site site;
 
-    public STTPlayer2Client(HttpClient httpClient, Player2Site site) {
+    public STTPlayer2Client(HttpClient httpClient, STTPlayer2Site site) {
         this.httpClient = httpClient;
         this.site = site;
     }

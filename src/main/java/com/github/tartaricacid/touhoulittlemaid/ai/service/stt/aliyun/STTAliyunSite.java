@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
-public class AliyunSite implements STTSite {
+public class STTAliyunSite implements STTSite {
     public static final String API_TYPE = STTApiType.ALIYUN.getName();
 
     private final String id;
@@ -30,9 +30,9 @@ public class AliyunSite implements STTSite {
     private boolean enableVoiceDetection;
     private boolean disfluency;
 
-    public AliyunSite(String id, ResourceLocation icon, boolean enabled, String url, String secretKey, String appKey,
-                      String vocabularyId, String customizationId, boolean enablePunctuationPrediction,
-                      boolean enableInverseTextNormalization, boolean enableVoiceDetection, boolean disfluency) {
+    public STTAliyunSite(String id, ResourceLocation icon, boolean enabled, String url, String secretKey, String appKey,
+                         String vocabularyId, String customizationId, boolean enablePunctuationPrediction,
+                         boolean enableInverseTextNormalization, boolean enableVoiceDetection, boolean disfluency) {
         this.id = id;
         this.icon = icon;
         this.enabled = enabled;
@@ -174,25 +174,25 @@ public class AliyunSite implements STTSite {
         return disfluency;
     }
 
-    public static class Serializer implements SerializableSite<AliyunSite> {
-        public static final Codec<AliyunSite> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.STRING.fieldOf(ID).forGetter(AliyunSite::id),
-                ResourceLocation.CODEC.fieldOf(ICON).forGetter(AliyunSite::icon),
-                Codec.BOOL.fieldOf(ENABLED).forGetter(AliyunSite::enabled),
-                Codec.STRING.fieldOf(URL).forGetter(AliyunSite::getBaseUrl),
-                Codec.STRING.fieldOf(SECRET_KEY).forGetter(AliyunSite::getSecretKey),
-                Codec.STRING.fieldOf("app_key").forGetter(AliyunSite::getAppKey),
-                Codec.STRING.optionalFieldOf("vocabulary_id", StringUtils.EMPTY).forGetter(AliyunSite::getVocabularyId),
-                Codec.STRING.optionalFieldOf("customization_id", StringUtils.EMPTY).forGetter(AliyunSite::getCustomizationId),
-                Codec.BOOL.optionalFieldOf("enable_punctuation_prediction", false).forGetter(AliyunSite::isEnablePunctuationPrediction),
-                Codec.BOOL.optionalFieldOf("enable_inverse_text_normalization", false).forGetter(AliyunSite::isEnableInverseTextNormalization),
-                Codec.BOOL.optionalFieldOf("enable_voice_detection", false).forGetter(AliyunSite::isEnableVoiceDetection),
-                Codec.BOOL.optionalFieldOf("disfluency", false).forGetter(AliyunSite::isDisfluency)
-        ).apply(instance, AliyunSite::new));
+    public static class Serializer implements SerializableSite<STTAliyunSite> {
+        public static final Codec<STTAliyunSite> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                Codec.STRING.fieldOf(ID).forGetter(STTAliyunSite::id),
+                ResourceLocation.CODEC.fieldOf(ICON).forGetter(STTAliyunSite::icon),
+                Codec.BOOL.fieldOf(ENABLED).forGetter(STTAliyunSite::enabled),
+                Codec.STRING.fieldOf(URL).forGetter(STTAliyunSite::getBaseUrl),
+                Codec.STRING.fieldOf(SECRET_KEY).forGetter(STTAliyunSite::getSecretKey),
+                Codec.STRING.fieldOf("app_key").forGetter(STTAliyunSite::getAppKey),
+                Codec.STRING.optionalFieldOf("vocabulary_id", StringUtils.EMPTY).forGetter(STTAliyunSite::getVocabularyId),
+                Codec.STRING.optionalFieldOf("customization_id", StringUtils.EMPTY).forGetter(STTAliyunSite::getCustomizationId),
+                Codec.BOOL.optionalFieldOf("enable_punctuation_prediction", false).forGetter(STTAliyunSite::isEnablePunctuationPrediction),
+                Codec.BOOL.optionalFieldOf("enable_inverse_text_normalization", false).forGetter(STTAliyunSite::isEnableInverseTextNormalization),
+                Codec.BOOL.optionalFieldOf("enable_voice_detection", false).forGetter(STTAliyunSite::isEnableVoiceDetection),
+                Codec.BOOL.optionalFieldOf("disfluency", false).forGetter(STTAliyunSite::isDisfluency)
+        ).apply(instance, STTAliyunSite::new));
 
         @Override
-        public AliyunSite defaultSite() {
-            return new AliyunSite(API_TYPE, SerializableSite.defaultIcon(API_TYPE), false,
+        public STTAliyunSite defaultSite() {
+            return new STTAliyunSite(API_TYPE, SerializableSite.defaultIcon(API_TYPE), false,
                     "https://nls-gateway-cn-shanghai.aliyuncs.com/stream/v1/asr",
                     StringUtils.EMPTY, StringUtils.EMPTY,
                     StringUtils.EMPTY, StringUtils.EMPTY,
@@ -200,7 +200,7 @@ public class AliyunSite implements STTSite {
         }
 
         @Override
-        public Codec<AliyunSite> codec() {
+        public Codec<STTAliyunSite> codec() {
             return CODEC;
         }
     }

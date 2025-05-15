@@ -19,9 +19,9 @@ import java.time.Duration;
 
 public class TTSFishAudioClient implements TTSClient {
     private final HttpClient httpClient;
-    private final FishAudioSite site;
+    private final TTSFishAudioSite site;
 
-    public TTSFishAudioClient(HttpClient httpClient, FishAudioSite site) {
+    public TTSFishAudioClient(HttpClient httpClient, TTSFishAudioSite site) {
         this.httpClient = httpClient;
         this.site = site;
     }

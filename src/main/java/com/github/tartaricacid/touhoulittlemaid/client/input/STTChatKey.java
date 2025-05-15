@@ -58,28 +58,30 @@ public class STTChatKey {
             }
             if (event.getAction() == GLFW.GLFW_PRESS) {
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(InitSounds.RECORDING_START.get(), 1f));
-                getNearestMaid(player, STTChatKey::sttStart);
+                getNearestMaid(player, STTChatKey::sttStart, true);
                 return;
             }
             if (event.getAction() == GLFW.GLFW_RELEASE) {
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(InitSounds.RECORDING_END.get(), 1f));
-                getNearestMaid(player, STTChatKey::sttStop);
+                getNearestMaid(player, STTChatKey::sttStop, false);
             }
         }
     }
 
-    private static void getNearestMaid(LocalPlayer player, Consumer<EntityMaid> consumer) {
+    private static void getNearestMaid(LocalPlayer player, Consumer<EntityMaid> consumer, boolean isStart) {
         Level level = player.level;
-        // TODO: 将搜索范围改成可配置的
-        AABB aabb = player.getBoundingBox().inflate(12);
+        int range = AIConfig.MAID_CAN_CHAT_DISTANCE.get();
+        AABB aabb = player.getBoundingBox().inflate(range);
         List<EntityMaid> maids = level.getEntitiesOfClass(EntityMaid.class, aabb,
                 maid -> maid.isOwnedBy(player) && maid.isAlive() &&
                         CAN_CHAT_MAID_IDS.contains(maid.getModelId()));
         maids.sort(Comparator.comparingDouble(maid -> maid.distanceToSqr(player)));
-        if (maids.isEmpty()) {
-            player.sendSystemMessage(Component.translatable("ai.touhou_little_maid.stt.content.no_maid_found"));
-        } else {
+        if (!maids.isEmpty()) {
             consumer.accept(maids.get(0));
+            return;
+        }
+        if (isStart) {
+            player.sendSystemMessage(Component.translatable("ai.touhou_little_maid.stt.content.no_maid_found", range));
         }
     }
 

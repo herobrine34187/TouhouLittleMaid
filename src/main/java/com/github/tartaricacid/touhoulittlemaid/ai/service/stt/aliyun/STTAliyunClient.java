@@ -20,9 +20,9 @@ public class STTAliyunClient implements STTClient {
     private static final AudioFormat FORMAT = new AudioFormat(16000, 16, 1, true, false);
 
     private final HttpClient httpClient;
-    private final AliyunSite site;
+    private final STTAliyunSite site;
 
-    public STTAliyunClient(HttpClient httpClient, AliyunSite site) {
+    public STTAliyunClient(HttpClient httpClient, STTAliyunSite site) {
         this.httpClient = httpClient;
         this.site = site;
     }

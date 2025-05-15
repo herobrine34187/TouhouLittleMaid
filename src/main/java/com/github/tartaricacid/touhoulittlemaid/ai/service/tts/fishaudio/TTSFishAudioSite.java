@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
-public final class FishAudioSite implements TTSSite, SupportModelSelect {
+public final class TTSFishAudioSite implements TTSSite, SupportModelSelect {
     public static final String API_TYPE = TTSApiType.FISH_AUDIO.getName();
 
     private final String id;
@@ -24,8 +24,8 @@ public final class FishAudioSite implements TTSSite, SupportModelSelect {
     private boolean enabled;
     private String secretKey;
 
-    public FishAudioSite(String id, ResourceLocation icon, String url, boolean enabled,
-                         String secretKey, Map<String, String> headers, Map<String, String> models) {
+    public TTSFishAudioSite(String id, ResourceLocation icon, String url, boolean enabled,
+                            String secretKey, Map<String, String> headers, Map<String, String> models) {
         this.id = id;
         this.icon = icon;
         this.url = url;
@@ -91,20 +91,20 @@ public final class FishAudioSite implements TTSSite, SupportModelSelect {
         this.secretKey = secretKey;
     }
 
-    public static class Serializer implements SerializableSite<FishAudioSite> {
-        public static final Codec<FishAudioSite> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.STRING.fieldOf(ID).forGetter(FishAudioSite::id),
-                ResourceLocation.CODEC.fieldOf(ICON).forGetter(FishAudioSite::icon),
-                Codec.STRING.fieldOf(URL).forGetter(FishAudioSite::url),
-                Codec.BOOL.fieldOf(ENABLED).forGetter(FishAudioSite::enabled),
-                Codec.STRING.fieldOf(SECRET_KEY).forGetter(FishAudioSite::secretKey),
-                Codec.unboundedMap(Codec.STRING, Codec.STRING).fieldOf(HEADERS).forGetter(FishAudioSite::headers),
-                Codec.unboundedMap(Codec.STRING, Codec.STRING).fieldOf(MODELS).forGetter(FishAudioSite::models)
-        ).apply(instance, FishAudioSite::new));
+    public static class Serializer implements SerializableSite<TTSFishAudioSite> {
+        public static final Codec<TTSFishAudioSite> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                Codec.STRING.fieldOf(ID).forGetter(TTSFishAudioSite::id),
+                ResourceLocation.CODEC.fieldOf(ICON).forGetter(TTSFishAudioSite::icon),
+                Codec.STRING.fieldOf(URL).forGetter(TTSFishAudioSite::url),
+                Codec.BOOL.fieldOf(ENABLED).forGetter(TTSFishAudioSite::enabled),
+                Codec.STRING.fieldOf(SECRET_KEY).forGetter(TTSFishAudioSite::secretKey),
+                Codec.unboundedMap(Codec.STRING, Codec.STRING).fieldOf(HEADERS).forGetter(TTSFishAudioSite::headers),
+                Codec.unboundedMap(Codec.STRING, Codec.STRING).fieldOf(MODELS).forGetter(TTSFishAudioSite::models)
+        ).apply(instance, TTSFishAudioSite::new));
 
         @Override
-        public FishAudioSite defaultSite() {
-            return new FishAudioSite(API_TYPE, SerializableSite.defaultIcon(API_TYPE),
+        public TTSFishAudioSite defaultSite() {
+            return new TTSFishAudioSite(API_TYPE, SerializableSite.defaultIcon(API_TYPE),
                     "https://api.fish.audio/v1/tts", true, StringUtils.EMPTY, Map.of(),
                     Map.of("b2b2d0fa88ee44d789da28ebbd97421e", "Neuro-sama (EN)",
                             "4858e0be678c4449bf3a7646186edd42", "Nahida (EN)",
@@ -118,7 +118,7 @@ public final class FishAudioSite implements TTSSite, SupportModelSelect {
         }
 
         @Override
-        public Codec<FishAudioSite> codec() {
+        public Codec<TTSFishAudioSite> codec() {
             return CODEC;
         }
     }
