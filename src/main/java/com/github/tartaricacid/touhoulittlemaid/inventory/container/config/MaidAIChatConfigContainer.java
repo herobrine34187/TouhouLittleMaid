@@ -1,6 +1,6 @@
 package com.github.tartaricacid.touhoulittlemaid.inventory.container.config;
 
-import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.ClientAvailableSitesSync;
+import com.github.tartaricacid.touhoulittlemaid.ai.manager.site.ClientAvailableSitesSync;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.inventory.container.AbstractMaidContainer;
 import net.minecraft.nbt.CompoundTag;

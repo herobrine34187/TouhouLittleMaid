@@ -1,7 +1,7 @@
 package com.github.tartaricacid.touhoulittlemaid.client.input;
 
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.entity.STTCallback;
-import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.AvailableSites;
+import com.github.tartaricacid.touhoulittlemaid.ai.manager.site.AvailableSites;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.STTConfig;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.STTSite;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;

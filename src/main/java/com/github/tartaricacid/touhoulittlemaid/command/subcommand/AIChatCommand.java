@@ -1,6 +1,6 @@
 package com.github.tartaricacid.touhoulittlemaid.command.subcommand;
 
-import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.AvailableSites;
+import com.github.tartaricacid.touhoulittlemaid.ai.manager.site.AvailableSites;
 import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
 import com.github.tartaricacid.touhoulittlemaid.network.message.SyncAiSettingMessage;
 import com.mojang.brigadier.Command;

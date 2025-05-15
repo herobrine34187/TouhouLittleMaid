@@ -1,5 +1,6 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.manager.entity;
 
+import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.papi.StringConstant;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMClient;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMConfig;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMMessage;
@@ -78,11 +79,11 @@ public final class MaidAIChatManager extends MaidAIChatData {
             List<LLMMessage> chatList = Lists.newArrayList();
             chatList.add(LLMMessage.systemChat(maid, setting));
             // 塞入一个参考回应，能让 AI 尽可能遵循参考格式进行回复
-            chatList.add(LLMMessage.assistantChat(maid, "{\"chat_text\":\"看到你真开心！要不要一起去挖矿？\",\"tts_text\":\"看到你真开心！要不要一起去挖矿？\"}"));
+            chatList.add(LLMMessage.assistantChat(maid, StringConstant.OUTPUT_SAMPLE));
             // 倒序遍历，将历史对话加载进去
             history.getDeque().descendingIterator().forEachRemaining(chatList::add);
             // 最后强调一下语言类型
-            chatList.add(LLMMessage.userChat(maid, "请用%s语言回复 chat_text 部分！并用%s语言回复 tts_text 部分！"
+            chatList.add(LLMMessage.userChat(maid, StringConstant.SECONDARY_EMPHASIS_LANGUAGE
                     .formatted(language, chatManager.getTTSLanguage())));
             return chatList;
         }).orElse(Collections.emptyList());

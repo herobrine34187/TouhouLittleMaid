@@ -47,7 +47,7 @@ public class SettingReader {
             // 模型包里只能读一层
             readConfigSetting(folder, 1);
         } catch (IOException e) {
-            TouhouLittleMaid.LOGGER.error("Failed to read settings from " + folder, e);
+            TouhouLittleMaid.LOGGER.error("Failed to read settings from {}", folder, e);
         }
     }
 
@@ -72,7 +72,8 @@ public class SettingReader {
     private static void readConfigSetting(Path settingFolder, int maxDepth) throws IOException {
         Files.walkFileTree(settingFolder, EnumSet.noneOf(FileVisitOption.class), maxDepth, new SimpleFileVisitor<>() {
             @Override
-            public FileVisitResult visitFile(@NotNull Path file, BasicFileAttributes attributes) throws IOException {
+            @NotNull
+            public FileVisitResult visitFile(@NotNull Path file, @NotNull BasicFileAttributes attributes) throws IOException {
                 String fileName = file.getFileName().toString();
                 if (fileName.endsWith(YAML)) {
                     CharacterSetting setting = new CharacterSetting(file.toFile());

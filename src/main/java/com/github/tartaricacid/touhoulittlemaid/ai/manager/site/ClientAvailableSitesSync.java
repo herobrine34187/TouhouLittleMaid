@@ -1,4 +1,4 @@
-package com.github.tartaricacid.touhoulittlemaid.ai.manager.setting;
+package com.github.tartaricacid.touhoulittlemaid.ai.manager.site;
 
 import com.github.tartaricacid.touhoulittlemaid.ai.service.SupportModelSelect;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMSite;

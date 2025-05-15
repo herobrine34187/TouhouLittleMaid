@@ -55,7 +55,6 @@ public final class ServerCustomPackLoader {
         SERVER_CHAIR_MODELS.clearAll();
         CRC32_FILE_MAP.clear();
         initPacks();
-        SettingReader.reloadSettings();
     }
 
     private static void initPacks() {

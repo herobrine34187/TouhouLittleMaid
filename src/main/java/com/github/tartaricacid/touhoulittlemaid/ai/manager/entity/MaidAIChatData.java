@@ -1,8 +1,8 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.manager.entity;
 
-import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.AvailableSites;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.CharacterSetting;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.SettingReader;
+import com.github.tartaricacid.touhoulittlemaid.ai.manager.site.AvailableSites;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.SupportModelSelect;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.DefaultLLMSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMMessage;

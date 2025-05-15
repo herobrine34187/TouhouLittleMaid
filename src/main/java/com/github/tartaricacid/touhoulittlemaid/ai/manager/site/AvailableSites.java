@@ -1,6 +1,7 @@
-package com.github.tartaricacid.touhoulittlemaid.ai.manager.setting;
+package com.github.tartaricacid.touhoulittlemaid.ai.manager.site;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
+import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.SettingReader;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.DefaultLLMSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.STTSite;
@@ -28,8 +29,8 @@ public class AvailableSites {
         addDefaultSites();
         readSites();
         saveSites();
-
         ClientAvailableSitesSync.init(LLM_SITES, TTS_SITES);
+        SettingReader.reloadSettings();
     }
 
     private static void clearSites() {

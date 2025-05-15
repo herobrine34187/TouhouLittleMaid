@@ -1,13 +1,11 @@
 package com.github.tartaricacid.touhoulittlemaid.util;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 import net.minecraft.network.FriendlyByteBuf;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public final class ByteBufUtils {
@@ -58,22 +56,5 @@ public final class ByteBufUtils {
             map.put(buf.readUtf(), buf.readFloat());
         }
         return map;
-    }
-
-    public static void writeSites(Map<String, List<String>> sites, FriendlyByteBuf buf) {
-        buf.writeVarInt(sites.size());
-        sites.forEach((key, value) -> {
-            buf.writeUtf(key);
-            writeStringList(value, buf);
-        });
-    }
-
-    public static Map<String, List<String>> readSites(FriendlyByteBuf buf) {
-        int size = buf.readVarInt();
-        Map<String, List<String>> sites = Maps.newLinkedHashMap();
-        for (int i = 0; i < size; i++) {
-            sites.put(buf.readUtf(), readStringList(buf));
-        }
-        return sites;
     }
 }
