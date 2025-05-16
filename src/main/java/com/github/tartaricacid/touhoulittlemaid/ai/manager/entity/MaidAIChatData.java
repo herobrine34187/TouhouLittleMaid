@@ -1,5 +1,6 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.manager.entity;
 
+import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.CharacterSetting;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.SettingReader;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.site.AvailableSites;
@@ -12,19 +13,52 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.system.TTSSystemS
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.util.CappedQueue;
+import com.google.common.collect.Lists;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.ListIterator;
 import java.util.Optional;
 
 @SuppressWarnings("all")
 public abstract class MaidAIChatData extends MaidAIChatSerializable {
+    protected static final String MAID_HISTORY_CHAT_TAG = "MaidHistoryChat";
     protected final EntityMaid maid;
     protected final CappedQueue<LLMMessage> history;
 
     public MaidAIChatData(EntityMaid maid) {
         this.maid = maid;
         this.history = new CappedQueue<>(AIConfig.MAID_MAX_HISTORY_LLM_SIZE.get());
+    }
+
+    @Override
+    public CompoundTag readFromTag(CompoundTag tag) {
+        if (tag.contains(MAID_HISTORY_CHAT_TAG)) {
+            this.history.getDeque().clear();
+            LLMMessage.CODEC.listOf().parse(NbtOps.INSTANCE, tag.get(MAID_HISTORY_CHAT_TAG))
+                    .resultOrPartial(TouhouLittleMaid.LOGGER::error)
+                    .ifPresent(list -> {
+                        ListIterator<LLMMessage> iterator = list.listIterator(list.size());
+                        while (iterator.hasPrevious()) {
+                            history.add(iterator.previous());
+                        }
+                    });
+        }
+        return super.readFromTag(tag);
+    }
+
+    @Override
+    public CompoundTag writeToTag(CompoundTag tag) {
+        if (this.history.size() > 0) {
+            ArrayList<LLMMessage> llmMessages = Lists.newArrayList(this.history.getDeque());
+            LLMMessage.CODEC.listOf().encodeStart(NbtOps.INSTANCE, llmMessages)
+                    .resultOrPartial(TouhouLittleMaid.LOGGER::error)
+                    .ifPresent(t -> tag.put(MAID_HISTORY_CHAT_TAG, t));
+        }
+        return super.writeToTag(tag);
     }
 
     @Nullable

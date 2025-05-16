@@ -118,6 +118,10 @@ public final class NetworkHandler {
                 Optional.of(NetworkDirection.PLAY_TO_CLIENT));
         CHANNEL.registerMessage(45, TTSSystemAudioToClientMessage.class, TTSSystemAudioToClientMessage::encode, TTSSystemAudioToClientMessage::decode, TTSSystemAudioToClientMessage::handle,
                 Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+        CHANNEL.registerMessage(46, ClearMaidAIDataMessage.class, ClearMaidAIDataMessage::encode, ClearMaidAIDataMessage::decode, ClearMaidAIDataMessage::handle,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER));
+        CHANNEL.registerMessage(47, OpenMaidGuiMessage.class, OpenMaidGuiMessage::encode, OpenMaidGuiMessage::decode, OpenMaidGuiMessage::handle,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER));
     }
 
     public static void sendToClientPlayer(Object message, Player player) {

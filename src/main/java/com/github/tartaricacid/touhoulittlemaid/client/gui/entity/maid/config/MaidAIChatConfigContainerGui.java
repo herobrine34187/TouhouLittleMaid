@@ -4,6 +4,7 @@ import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.entity.MaidAIChatManager;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.SupportLanguage;
 import com.github.tartaricacid.touhoulittlemaid.client.gui.entity.maid.AbstractMaidContainerGui;
+import com.github.tartaricacid.touhoulittlemaid.client.gui.entity.maid.ai.HistoryAIChatScreen;
 import com.github.tartaricacid.touhoulittlemaid.client.gui.widget.button.MaidAIChatConfigButton;
 import com.github.tartaricacid.touhoulittlemaid.inventory.container.config.MaidAIChatConfigContainer;
 import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
@@ -13,6 +14,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -84,6 +86,7 @@ public class MaidAIChatConfigContainerGui extends AbstractMaidContainerGui<MaidA
             this.ownerName.render(graphics, mouseX, mouseY, partialTicks);
             this.customSetting.render(graphics, mouseX, mouseY, partialTicks);
         }
+        graphics.blit(ICON, leftPos + 94, topPos + 132, 0, 163, 14, 14);
     }
 
     private void addInput(int buttonLeft, int buttonTop) {
@@ -105,13 +108,21 @@ public class MaidAIChatConfigContainerGui extends AbstractMaidContainerGui<MaidA
     private void addOtherButtons(int buttonLeft) {
         MutableComponent edit = Component.translatable("gui.touhou_little_maid.button.maid_ai_chat_config.edit_custom_setting.edit");
         MutableComponent save = Component.translatable("gui.touhou_little_maid.button.maid_ai_chat_config.edit_custom_setting.save");
+        MutableComponent history = Component.translatable("gui.touhou_little_maid.button.maid_ai_chat_config.open_history_chat");
         MutableComponent buttonName = this.isEditSetting ? save : edit;
 
+        this.addRenderableWidget(Button.builder(Component.empty(), button -> {
+                    this.saveConfig();
+                    this.getMinecraft().setScreen(new HistoryAIChatScreen(this.maid));
+                }).bounds(buttonLeft, topPos + 125, 30, 30)
+                .tooltip(Tooltip.create(history)).build());
+
         this.addRenderableWidget(Button.builder(buttonName, button -> {
-            this.isEditSetting = !this.isEditSetting;
-            this.init();
-            this.saveConfig();
-        }).bounds(buttonLeft, topPos + 125, 164, 30).build());
+                    this.isEditSetting = !this.isEditSetting;
+                    this.init();
+                    this.saveConfig();
+                }).bounds(buttonLeft + 31, topPos + 125, 133, 30)
+                .tooltip(Tooltip.create(buttonName)).build());
     }
 
     private void addConfigButtons(int buttonLeft, int buttonTop) {
