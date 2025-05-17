@@ -146,6 +146,11 @@ public class TaskGunAttack implements IRangedAttackTask {
         return Collections.singletonList(Pair.of("has_tacz_gun", this::mainhandHoldGun));
     }
 
+    @Override
+    public boolean isWeapon(EntityMaid maid, ItemStack stack) {
+        return stack.getItem() instanceof IGun;
+    }
+
     private boolean mainhandHoldGun(EntityMaid maid) {
         return IGun.mainhandHoldGun(maid);
     }

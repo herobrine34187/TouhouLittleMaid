@@ -7,6 +7,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 public class AIConfig {
     public static ForgeConfigSpec.BooleanValue LLM_ENABLED;
     public static ForgeConfigSpec.DoubleValue LLM_TEMPERATURE;
+    public static ForgeConfigSpec.BooleanValue FUNCTION_CALL_ENABLED;
     public static ForgeConfigSpec.ConfigValue<String> LLM_PROXY_ADDRESS;
     public static ForgeConfigSpec.IntValue LLM_MAX_TOKEN;
     public static ForgeConfigSpec.IntValue MAID_MAX_HISTORY_LLM_SIZE;
@@ -27,13 +28,17 @@ public class AIConfig {
         LLM_ENABLED = builder.define("LLMEnabled", true);
 
         builder.comment("LLM temperature, the higher this value, the more random the output will be");
-        LLM_TEMPERATURE = builder.defineInRange("LLMTemperature", 0.5, 0, 2);
+        LLM_TEMPERATURE = builder.defineInRange("LLMTemperature", 0.7, 0, 2);
+
+        builder.comment("Whether to enable the function call function?");
+        builder.comment("The maid will be able to interact with the game after it is enabled, but it will increase the amount of token used");
+        FUNCTION_CALL_ENABLED = builder.define("FunctionCallEnable", true);
 
         builder.comment("LLM AI Proxy Address, such as 127.0.0.1:1080, empty is no proxy, SOCKS proxies are not supported");
         LLM_PROXY_ADDRESS = builder.define("LLMProxyAddress", "");
 
         builder.comment("The maximum token supported by the LLM AI");
-        LLM_MAX_TOKEN = builder.defineInRange("LLMMaxToken", 256, 1, Integer.MAX_VALUE);
+        LLM_MAX_TOKEN = builder.defineInRange("LLMMaxToken", 2048, 1, Integer.MAX_VALUE);
 
         builder.comment("The maximum historical conversation length cached by the maid");
         MAID_MAX_HISTORY_LLM_SIZE = builder.defineInRange("MaidMaxHistoryLLMSize", 16, 1, 128);

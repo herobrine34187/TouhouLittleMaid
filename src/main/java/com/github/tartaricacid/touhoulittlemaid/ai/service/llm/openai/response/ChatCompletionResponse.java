@@ -1,7 +1,8 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.service.llm.openai.response;
 
 import com.google.gson.annotations.SerializedName;
-import org.apache.commons.lang3.StringUtils;
+
+import javax.annotation.Nullable;
 
 public class ChatCompletionResponse {
     @SerializedName("id")
@@ -28,13 +29,13 @@ public class ChatCompletionResponse {
     @SerializedName("usage")
     private Usage usage;
 
-    public String getFirstChoiceMessage() {
+    @Nullable
+    public Message getFirstChoice() {
         if (this.choices.length > 0) {
             Choice choice = this.choices[0];
-            String content = choice.getMessage().getContent();
-            return content == null ? StringUtils.EMPTY : content;
+            return choice.getMessage();
         }
-        return StringUtils.EMPTY;
+        return null;
     }
 
     public String getId() {

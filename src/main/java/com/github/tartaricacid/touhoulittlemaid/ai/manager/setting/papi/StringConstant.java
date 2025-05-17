@@ -73,6 +73,12 @@ public class StringConstant {
             - 输出格式为 JSON 格式：${output_json_format}。
             """;
 
+    public static final String FUNCTION_CALL_NOTE = """
+            如果我没有提供足够的信息来调用函数，请继续提问以确保收集到了足够的信息。
+            在调用函数之前，你必须总结我的描述并向我提供总结，询问我是否需要进行任何修改。
+            继续提问内容或者提供总结内容也请遵循 JSON 格式：${output_json_format}。
+            """;
+
     public static final String LANGUAGE = """
             ## 语言要求
             - 文字（chat_text）字段为${chat_language}回复。
@@ -99,6 +105,7 @@ public class StringConstant {
                CONTEXT + "\n" +
                LENGTH_LIMIT + "\n" +
                OUTPUT_FORMAT + "\n" +
+               FUNCTION_CALL_NOTE + "\n" +
                LANGUAGE;
     }
 }

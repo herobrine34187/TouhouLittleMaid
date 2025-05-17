@@ -87,6 +87,11 @@ public class TaskAttack implements IAttackTask {
         return Lists.newArrayList(Pair.of("assault_weapon", this::hasAssaultWeapon), Pair.of("extinguisher", this::hasExtinguisher));
     }
 
+    @Override
+    public boolean isWeapon(EntityMaid maid, ItemStack stack) {
+        return stack.getAttributeModifiers(EquipmentSlot.MAINHAND).containsKey(Attributes.ATTACK_DAMAGE);
+    }
+
     private boolean hasAssaultWeapon(EntityMaid maid) {
         return maid.getMainHandItem().getAttributeModifiers(EquipmentSlot.MAINHAND).containsKey(Attributes.ATTACK_DAMAGE);
     }

@@ -19,6 +19,7 @@ import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Optional;
@@ -96,6 +97,17 @@ public interface IAttackTask extends IMaidTask {
      * @return 是否成功造成伤害
      */
     default boolean doExtraAttack(EntityMaid maid, Entity target) {
+        return false;
+    }
+
+    /**
+     * 是适合的攻击武器么，用于女仆 AI 判断当前武器在当前模式下是否能正常使用
+     *
+     * @param maid  女仆
+     * @param stack 检查的物品
+     * @return 在当前模式下是否能正常使用
+     */
+    default boolean isWeapon(EntityMaid maid, ItemStack stack) {
         return false;
     }
 

@@ -46,7 +46,7 @@ public final class MaidAIChatManager extends MaidAIChatData {
         chatCompletion.add(LLMMessage.userChat(maid, message));
         LLMConfig config = new LLMConfig(this.getLLMModel(), AIConfig.LLM_TEMPERATURE.get(), AIConfig.LLM_MAX_TOKEN.get());
         LLMCallback callback = new LLMCallback(this, message);
-        chatClient.chat(chatCompletion, config, callback);
+        chatClient.chat(this.maid, chatCompletion, config, callback);
     }
 
     @SuppressWarnings("all")

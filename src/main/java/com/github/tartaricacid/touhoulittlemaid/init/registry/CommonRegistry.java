@@ -2,6 +2,7 @@ package com.github.tartaricacid.touhoulittlemaid.init.registry;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.SerializerRegister;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.function.FunctionCallRegister;
 import com.github.tartaricacid.touhoulittlemaid.block.multiblock.MultiBlockManager;
 import com.github.tartaricacid.touhoulittlemaid.compat.ysm.YsmCompat;
 import com.github.tartaricacid.touhoulittlemaid.debug.target.DebugMaidManager;
@@ -42,6 +43,7 @@ public final class CommonRegistry {
         TaskDataRegister.init();
         FishingTypeManager.init();
         SerializerRegister.init();
+        FunctionCallRegister.init();
         DebugMaidManager.init();
     }
 }

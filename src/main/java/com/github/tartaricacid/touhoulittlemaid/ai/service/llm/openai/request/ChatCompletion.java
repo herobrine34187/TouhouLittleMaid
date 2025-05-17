@@ -12,6 +12,9 @@ public class ChatCompletion {
     @SerializedName("messages")
     private List<ChatMessage> messages = Lists.newArrayList();
 
+    @SerializedName("tools")
+    private List<Tool> tools = Lists.newArrayList();
+
     @SerializedName("response_format")
     private ResponseFormat responseFormat = ResponseFormat.text();
 
@@ -42,6 +45,11 @@ public class ChatCompletion {
 
     public ChatCompletion assistantChat(String message) {
         this.messages.add(ChatMessage.assistantChat(message));
+        return this;
+    }
+
+    public ChatCompletion addTool(Tool tool) {
+        this.tools.add(tool);
         return this;
     }
 
