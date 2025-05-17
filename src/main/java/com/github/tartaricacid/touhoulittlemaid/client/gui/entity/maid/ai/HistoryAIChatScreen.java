@@ -58,14 +58,18 @@ public class HistoryAIChatScreen extends Screen {
         this.addButtons();
 
         // 让滚动一开始就在中间
-        double topMax = this.height / 2.0 - 100;
-        double bottomMax = this.height / 2.0 + 100;
-        double scrollBottom = scroll + maxHeight;
-        if (scroll > topMax) {
-            scroll = topMax;
-        }
-        if (bottomMax > scrollBottom) {
-            scroll = bottomMax - maxHeight;
+        if (this.maxHeight < this.height) {
+            this.scroll = (this.height - this.maxHeight) / 2d;
+        } else {
+            double topMax = this.height / 2.0 - 100;
+            double bottomMax = this.height / 2.0 + 100;
+            double scrollBottom = scroll + maxHeight;
+            if (scroll > topMax) {
+                scroll = topMax;
+            }
+            if (bottomMax > scrollBottom) {
+                scroll = bottomMax - maxHeight;
+            }
         }
     }
 

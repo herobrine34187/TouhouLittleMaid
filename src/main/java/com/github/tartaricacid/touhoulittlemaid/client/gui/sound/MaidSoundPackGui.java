@@ -11,6 +11,7 @@ import com.github.tartaricacid.touhoulittlemaid.client.sound.pojo.SoundPackInfo;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.init.InitSounds;
 import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
+import com.github.tartaricacid.touhoulittlemaid.network.message.OpenMaidGuiMessage;
 import com.github.tartaricacid.touhoulittlemaid.network.message.SetMaidSoundIdMessage;
 import com.github.tartaricacid.touhoulittlemaid.util.ParseI18n;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -207,5 +208,13 @@ public class MaidSoundPackGui extends Screen {
             graphics.blit(ICON, startX + 380, startY + 20, 16, 0, 16, 16, 256, 256);
         }
         this.renderables.stream().filter(b -> b instanceof FlatColorButton).forEach(b -> ((FlatColorButton) b).renderToolTip(graphics, this, pMouseX, pMouseY));
+    }
+
+    @Override
+    public void onClose() {
+        super.onClose();
+        if (this.maid != null) {
+            NetworkHandler.CHANNEL.sendToServer(new OpenMaidGuiMessage(this.maid.getId()));
+        }
     }
 }

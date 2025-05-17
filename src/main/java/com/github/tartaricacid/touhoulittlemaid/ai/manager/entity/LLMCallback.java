@@ -39,16 +39,16 @@ public class LLMCallback implements ResponseCallback<String> {
         try {
             ResponseChat responseChat = Client.GSON.fromJson(response, ResponseChat.class);
             if (responseChat == null) {
-                TouhouLittleMaid.LOGGER.error("Error in Response Chat: {}", response);
                 onChatFailSync(Component.translatable("ai.touhou_little_maid.chat.format.json_format_error", response));
+                TouhouLittleMaid.LOGGER.error("Error in Response Chat: {}", response);
                 return;
             }
 
             String chatText = responseChat.getChatText();
             String ttsText = responseChat.getTtsText();
             if (StringUtils.isBlank(chatText) || StringUtils.isBlank(ttsText)) {
-                TouhouLittleMaid.LOGGER.error("Error in Response Chat: {}", response);
                 onChatFailSync(Component.translatable("ai.touhou_little_maid.chat.format.text_is_empty", response));
+                TouhouLittleMaid.LOGGER.error("Error in Response Chat: {}", response);
                 return;
             }
 
@@ -63,7 +63,8 @@ public class LLMCallback implements ResponseCallback<String> {
                 ChatBubbleManger.addAiChatTextSync(maid, chatText);
             }
         } catch (Exception e) {
-            TouhouLittleMaid.LOGGER.error(e.getMessage());
+            onChatFailSync(Component.translatable("ai.touhou_little_maid.chat.format.json_format_error", response));
+            TouhouLittleMaid.LOGGER.error("Error in Response Chat: {}, {}", response, e.getMessage());
         }
     }
 

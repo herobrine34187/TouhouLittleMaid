@@ -20,7 +20,10 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.SimpleTexture;
-import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -115,8 +118,8 @@ public abstract class AbstractModelGui<T extends LivingEntity, E extends IModelI
         }
 
         // 关闭当前界面的按键
-        this.addRenderableWidget(new ImageButton(startX + 122, startY - 97, 21, 17, 58, 201, 18, BG,
-                (b) -> getMinecraft().submit(() -> getMinecraft().setScreen(null))));
+        this.addRenderableWidget(new ImageButton(startX + 122, startY - 97, 21, 17,
+                58, 201, 18, BG, b -> this.onClickCloseButton()));
 
         // 添加切换页面的按钮
         addPageButton(startX, startY);
@@ -529,5 +532,9 @@ public abstract class AbstractModelGui<T extends LivingEntity, E extends IModelI
     @Override
     public boolean isPauseScreen() {
         return false;
+    }
+
+    protected void onClickCloseButton() {
+        this.onClose();
     }
 }

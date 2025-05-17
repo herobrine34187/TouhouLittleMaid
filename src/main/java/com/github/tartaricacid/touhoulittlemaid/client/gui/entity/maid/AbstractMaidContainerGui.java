@@ -433,7 +433,7 @@ public abstract class AbstractMaidContainerGui<T extends AbstractMaidContainer> 
     }
 
     private void addDownloadButton() {
-        modelDownload = new MaidDownloadButton(leftPos + 20, topPos + 230, BUTTON);
+        modelDownload = new MaidDownloadButton(leftPos + 20, topPos + 230, BUTTON, this.maid);
         this.addRenderableWidget(modelDownload);
     }
 

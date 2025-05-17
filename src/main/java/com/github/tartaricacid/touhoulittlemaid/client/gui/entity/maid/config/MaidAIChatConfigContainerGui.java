@@ -80,24 +80,23 @@ public class MaidAIChatConfigContainerGui extends AbstractMaidContainerGui<MaidA
                 leftPos + 167, topPos + 41, 0xFFFFFF);
         if (this.isEditSetting) {
             graphics.drawString(font, Component.translatable("gui.touhou_little_maid.button.maid_ai_chat_config.owner_name"),
-                    leftPos + 90, topPos + 59, 0x777777, false);
+                    leftPos + 90, topPos + 56, 0x777777, false);
             graphics.drawString(font, Component.translatable("gui.touhou_little_maid.button.maid_ai_chat_config.custom_setting"),
-                    leftPos + 90, topPos + 91, 0x777777, false);
+                    leftPos + 90, topPos + 88, 0x777777, false);
             this.ownerName.render(graphics, mouseX, mouseY, partialTicks);
             this.customSetting.render(graphics, mouseX, mouseY, partialTicks);
         }
-        graphics.blit(ICON, leftPos + 94, topPos + 132, 0, 163, 14, 14);
     }
 
     private void addInput(int buttonLeft, int buttonTop) {
-        this.ownerName = new EditBox(this.font, buttonLeft + 3, buttonTop + 18, 158, 16, Component.literal("Owner Name"));
+        this.ownerName = new EditBox(this.font, buttonLeft + 3, buttonTop + 15, 158, 16, Component.literal("Owner Name"));
         this.ownerName.setMaxLength(128);
         this.ownerName.setValue(this.manager.ownerName);
         this.ownerName.setResponder(s -> this.manager.ownerName = s);
         this.ownerName.setVisible(this.isEditSetting);
         this.addWidget(this.ownerName);
 
-        this.customSetting = new EditBox(this.font, buttonLeft + 3, buttonTop + 50, 158, 16, Component.literal("Custom Setting"));
+        this.customSetting = new EditBox(this.font, buttonLeft + 3, buttonTop + 47, 158, 16, Component.literal("Custom Setting"));
         this.customSetting.setMaxLength(1024);
         this.customSetting.setValue(this.manager.customSetting);
         this.customSetting.setResponder(s -> this.manager.customSetting = s);
@@ -111,18 +110,18 @@ public class MaidAIChatConfigContainerGui extends AbstractMaidContainerGui<MaidA
         MutableComponent history = Component.translatable("gui.touhou_little_maid.button.maid_ai_chat_config.open_history_chat");
         MutableComponent buttonName = this.isEditSetting ? save : edit;
 
-        this.addRenderableWidget(Button.builder(Component.empty(), button -> {
-                    this.saveConfig();
-                    this.getMinecraft().setScreen(new HistoryAIChatScreen(this.maid));
-                }).bounds(buttonLeft, topPos + 125, 30, 30)
-                .tooltip(Tooltip.create(history)).build());
-
         this.addRenderableWidget(Button.builder(buttonName, button -> {
                     this.isEditSetting = !this.isEditSetting;
                     this.init();
                     this.saveConfig();
-                }).bounds(buttonLeft + 31, topPos + 125, 133, 30)
+                }).bounds(buttonLeft + 2, topPos + 120, 160, 18)
                 .tooltip(Tooltip.create(buttonName)).build());
+
+        this.addRenderableWidget(Button.builder(history, button -> {
+                    this.saveConfig();
+                    this.getMinecraft().setScreen(new HistoryAIChatScreen(this.maid));
+                }).bounds(buttonLeft + 2, topPos + 140, 160, 18)
+                .tooltip(Tooltip.create(history)).build());
     }
 
     private void addConfigButtons(int buttonLeft, int buttonTop) {
