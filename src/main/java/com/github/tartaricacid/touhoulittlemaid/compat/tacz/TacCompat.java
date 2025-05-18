@@ -39,6 +39,10 @@ public class TacCompat {
         }
     }
 
+    public static boolean isInstalled() {
+        return INSTALLED;
+    }
+
     public static boolean isGun(ItemStack stack) {
         if (INSTALLED) {
             return TacInnerCompat.isGun(stack);

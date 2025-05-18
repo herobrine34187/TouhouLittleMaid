@@ -1,12 +1,13 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.service.function.implement;
 
+import com.github.tartaricacid.touhoulittlemaid.ai.manager.response.ResponseChat;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.IFunctionCall;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.schema.parameter.ObjectParameter;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.schema.parameter.Parameter;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.schema.parameter.StringParameter;
 import com.github.tartaricacid.touhoulittlemaid.api.task.IAttackTask;
 import com.github.tartaricacid.touhoulittlemaid.api.task.IMaidTask;
-import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleManger;
+import com.github.tartaricacid.touhoulittlemaid.compat.tacz.TacCompat;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.entity.task.TaskManager;
 import com.github.tartaricacid.touhoulittlemaid.util.ItemsUtil;
@@ -36,13 +37,14 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
             - touhou_little_maid:danmaku_attack 表示弹幕攻击模式，你会主动用弹幕攻击周围的敌对生物
             - touhou_little_maid:trident_attack 表示三叉戟攻击模式，你会主动用三叉戟攻击周围的敌对生物
             """;
+    private static final String GUN_TASK_ID_PARAMETER_DESC = "- touhou_little_maid:gun_attack 表示枪械攻击，你会主动用 TACZ 的枪械攻击周围的敌对生物";
     private static final String CHAT_PARAMETER_ID = "chat_text";
     private static final String CHAT_PARAMETER_DESC = """
             你此刻打算说的话，需要符合当前的工作模式切换
             """;
-    private static final String TTS_PARAMETER_ID = "chat_text";
+    private static final String TTS_PARAMETER_ID = "tts_text";
     private static final String TTS_PARAMETER_DESC = """
-            你此刻打算说的话，需要符合当前的工作模式切换
+            将 chat_text 部分翻译成 %s 语言的文本
             """;
 
     @Override
@@ -51,12 +53,12 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
     }
 
     @Override
-    public String getDescription() {
+    public String getDescription(EntityMaid maid) {
         return FUNCTION_DESC;
     }
 
     @Override
-    public Parameter addParameters(ObjectParameter root) {
+    public Parameter addParameters(ObjectParameter root, EntityMaid maid) {
         Parameter taskId = StringParameter.create()
                 .setDescription(TASK_ID_PARAMETER_DESC)
                 .addEnumValues(
@@ -67,8 +69,18 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
                         "touhou_little_maid:danmaku_attack",
                         "touhou_little_maid:trident_attack"
                 );
+        // 兼容 TACZ
+        if (TacCompat.isInstalled()) {
+            taskId.setDescription(TASK_ID_PARAMETER_DESC + "\n" + GUN_TASK_ID_PARAMETER_DESC);
+            taskId.addEnumValues("touhou_little_maid:gun_attack");
+        }
         Parameter chat = StringParameter.create().setDescription(CHAT_PARAMETER_DESC);
-        root.addProperties(TASK_ID_PARAMETER_ID, taskId).addProperties(CHAT_PARAMETER_ID, chat);
+        String ttsLanguage = maid.getAiChatManager().getTTSLanguage();
+        Parameter tts = StringParameter.create().setDescription(TTS_PARAMETER_DESC.formatted(ttsLanguage));
+
+        root.addProperties(TASK_ID_PARAMETER_ID, taskId)
+                .addProperties(CHAT_PARAMETER_ID, chat)
+                .addProperties(TTS_PARAMETER_ID, tts);
         return root;
     }
 
@@ -76,16 +88,18 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
     public Codec<Result> codec() {
         return RecordCodecBuilder.create(instance -> instance.group(
                 ResourceLocation.CODEC.fieldOf(TASK_ID_PARAMETER_ID).forGetter(Result::taskId),
-                Codec.STRING.fieldOf(CHAT_PARAMETER_ID).forGetter(Result::chat)
+                Codec.STRING.fieldOf(CHAT_PARAMETER_ID).forGetter(Result::chat),
+                Codec.STRING.fieldOf(TTS_PARAMETER_ID).forGetter(Result::tts)
         ).apply(instance, Result::new));
     }
 
     @Override
-    public void onToolCall(Result result, EntityMaid maid) {
+    public ResponseChat onToolCall(Result result, EntityMaid maid) {
         ResourceLocation taskId = result.taskId;
+        ResponseChat responseChat = new ResponseChat(result.chat, result.tts);
         Optional<IMaidTask> optional = TaskManager.findTask(taskId);
         if (optional.isEmpty()) {
-            return;
+            return responseChat;
         }
 
         // 空闲模式额外判断
@@ -93,25 +107,21 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
         RangedWrapper backpack = maid.getAvailableBackpackInv();
         if (task == TaskManager.getIdleTask()) {
             putItemBack(maid, backpack);
-            // TODO: 现在的聊天气泡居然不支持 Component，没法给女仆显示翻译过的字符串做提示
-            ChatBubbleManger.addAiChatText(maid, result.chat);
             maid.setTask(task);
-            return;
+            return responseChat;
         }
 
         // 攻击模式判断
         if (!(task instanceof IAttackTask attackTask)) {
-            return;
+            return responseChat;
         }
         // 如果不需要拿武器并切换模式，那么不用执行后面的逻辑
         IMaidTask currentTask = maid.getTask();
         if (attackTask == currentTask && attackTask.isWeapon(maid, maid.getMainHandItem())) {
-            return;
+            return responseChat;
         }
 
-        // TODO: 现在的聊天气泡居然不支持 Component，没法给女仆显示翻译过的字符串做提示
         maid.setTask(task);
-        ChatBubbleManger.addAiChatText(maid, result.chat);
 
         // 将武器取到主手上
         int slot = ItemsUtil.findStackSlot(backpack, item -> attackTask.isWeapon(maid, item));
@@ -124,6 +134,7 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
             }
             maid.setItemInHand(InteractionHand.MAIN_HAND, output);
         }
+        return responseChat;
     }
 
     private void putItemBack(EntityMaid maid, RangedWrapper backpack) {
@@ -141,6 +152,6 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
         }
     }
 
-    public record Result(ResourceLocation taskId, String chat) {
+    public record Result(ResourceLocation taskId, String chat, String tts) {
     }
 }

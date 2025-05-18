@@ -1,9 +1,12 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.service.function;
 
+import com.github.tartaricacid.touhoulittlemaid.ai.manager.response.ResponseChat;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.schema.parameter.ObjectParameter;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.schema.parameter.Parameter;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.mojang.serialization.Codec;
+
+import javax.annotation.Nullable;
 
 /**
  * 女仆能够执行的 Function Call 对象
@@ -18,16 +21,19 @@ public interface IFunctionCall<T> {
 
     /**
      * 告诉 AI，什么时候需要调用这个 function
+     *
+     * @param maid 正在对话的女仆，可以依据女仆来动态生成一些提示词
      */
-    String getDescription();
+    String getDescription(EntityMaid maid);
 
     /**
      * 为 function call 添加参数，告诉 AI 需要返回什么样子的参数
      *
      * @param root 空的对象，往里面存入你的参数，然后返回它就行
+     * @param maid 正在对话的女仆，可以依据女仆来动态生成一些提示词
      * @return 一般还是传入的 root
      */
-    Parameter addParameters(ObjectParameter root);
+    Parameter addParameters(ObjectParameter root, EntityMaid maid);
 
     /**
      * 当 AI 返回 function call 参数时，你解码这个 json 字符串的解码器
@@ -41,6 +47,8 @@ public interface IFunctionCall<T> {
      *
      * @param result 解码后的对象
      * @param maid   正在对话的女仆
+     * @return 该函数执行完毕后，返回给 AI 的聊天内容，可以为空
      */
-    void onToolCall(T result, EntityMaid maid);
+    @Nullable
+    ResponseChat onToolCall(T result, EntityMaid maid);
 }

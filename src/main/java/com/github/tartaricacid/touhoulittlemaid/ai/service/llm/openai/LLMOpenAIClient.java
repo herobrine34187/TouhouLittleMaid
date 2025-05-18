@@ -72,7 +72,7 @@ public final class LLMOpenAIClient implements LLMClient {
         }
         // 添加 function call tool
         if (AIConfig.FUNCTION_CALL_ENABLED.get()) {
-            this.addFunctionCalls(chatCompletion);
+            this.addFunctionCalls(maid, chatCompletion);
         }
 
         HttpRequest.Builder builder = HttpRequest.newBuilder()
@@ -87,12 +87,12 @@ public final class LLMOpenAIClient implements LLMClient {
                         handle(maid, callback, response, throwable, httpRequest));
     }
 
-    private void addFunctionCalls(ChatCompletion chatCompletion) {
+    private void addFunctionCalls(EntityMaid maid, ChatCompletion chatCompletion) {
         FunctionCallRegister.getFunctionCalls().forEach((key, value) -> {
             String id = value.getId();
-            String description = value.getDescription();
+            String description = value.getDescription(maid);
             ObjectParameter root = ObjectParameter.create();
-            Parameter parameter = value.addParameters(root);
+            Parameter parameter = value.addParameters(root, maid);
             Tool tool = FunctionTool.create().setName(id)
                     .setDescription(description)
                     .setParameters(parameter).build();
@@ -139,15 +139,15 @@ public final class LLMOpenAIClient implements LLMClient {
             FunctionToolCall function = toolCall.getFunction();
             String name = function.getName();
             String arguments = function.getArguments();
-            IFunctionCall call = FunctionCallRegister.getFunctionCall(name);
-            if (call == null) {
+            IFunctionCall functionCall = FunctionCallRegister.getFunctionCall(name);
+            if (functionCall == null) {
                 return;
             }
             try {
                 JsonObject parse = GsonHelper.parse(arguments);
-                call.codec().parse(JsonOps.INSTANCE, parse)
+                functionCall.codec().parse(JsonOps.INSTANCE, parse)
                         .resultOrPartial(TouhouLittleMaid.LOGGER::error)
-                        .ifPresent(result -> onAsyncFunctionCall(maid, result, call, arguments));
+                        .ifPresent(result -> onAsyncFunctionCall(maid, result, functionCall, arguments, callback));
             } catch (JsonSyntaxException exception) {
                 String message = "Exception %s, JSON is: %s".formatted(exception.getLocalizedMessage(), arguments);
                 callback.onFailure(request, new Throwable(message), ErrorCode.JSON_DECODE_ERROR);
@@ -156,13 +156,17 @@ public final class LLMOpenAIClient implements LLMClient {
     }
 
     @SuppressWarnings("all")
-    private void onAsyncFunctionCall(EntityMaid maid, Object result, IFunctionCall call, String arguments) {
+    private void onAsyncFunctionCall(EntityMaid maid, Object result, IFunctionCall functionCall,
+                                     String arguments, ResponseCallback<ResponseChat> callback) {
         // 因为获取网络流是在独立的线程上，所以需要推送到主线程执行
         if (maid.level instanceof ServerLevel serverLevel) {
             serverLevel.getServer().submit(() -> {
-                call.onToolCall(result, maid);
+                ResponseChat responseChat = functionCall.onToolCall(result, maid);
+                if (responseChat != null) {
+                    callback.onSuccess(responseChat);
+                }
                 // 需要记录下工具调用，方便 debug
-                TouhouLittleMaid.LOGGER.debug("Function call: {}, arguments is {}", call.getId(), arguments);
+                TouhouLittleMaid.LOGGER.debug("Use function call: {}, arguments is {}", functionCall.getId(), arguments);
             });
         }
     }

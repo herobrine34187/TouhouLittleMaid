@@ -17,6 +17,14 @@ public class ResponseChat {
         return ttsText;
     }
 
+    public ResponseChat() {
+    }
+
+    public ResponseChat(String chatText, String ttsText) {
+        this.chatText = chatText;
+        this.ttsText = ttsText;
+    }
+
     @Override
     public String toString() {
         return "{\"chat_text\":\"%s\",\"tts_text\":\"%s\"}"
