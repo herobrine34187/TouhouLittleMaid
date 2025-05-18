@@ -78,8 +78,6 @@ public final class MaidAIChatManager extends MaidAIChatData {
             CappedQueue<LLMMessage> history = chatManager.getHistory();
             List<LLMMessage> chatList = Lists.newArrayList();
             chatList.add(LLMMessage.systemChat(maid, setting));
-            // 塞入一个参考回应，能让 AI 尽可能遵循参考格式进行回复
-            chatList.add(LLMMessage.assistantChat(maid, StringConstant.OUTPUT_SAMPLE));
             // 倒序遍历，将历史对话加载进去
             history.getDeque().descendingIterator().forEachRemaining(chatList::add);
             // 最后强调一下语言类型

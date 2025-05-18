@@ -58,7 +58,7 @@ public class PapiReplacer {
         for (String key : PAPI_MAP.keySet()) {
             valueMap.put(key, PAPI_MAP.get(key).apply(maid, language));
         }
-        return new StrSubstitutor(valueMap).replace(getFullPrompt());
+        return new StrSubstitutor(valueMap).replace(FULL_SETTING);
     }
 
     public static void registerContext(String key, BiFunction<EntityMaid, String, String> function) {

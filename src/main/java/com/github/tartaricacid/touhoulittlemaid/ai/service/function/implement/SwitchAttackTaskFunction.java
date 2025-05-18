@@ -23,8 +23,9 @@ import java.util.Optional;
 public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskFunction.Result> {
     private static final String FUNCTION_ID = "switch_maid_attack_task";
     private static final String FUNCTION_DESC = """
-            当你需要切换与击杀怪物相关的工作模式时，才会调用此函数。
-            参数需要给定一个工作模式的 ID，和一个此刻你打算说的话
+            当你需要切换与击杀怪物相关的工作模式时，可以调用此函数。
+            参数需要给定一个工作模式的 ID，和一个此刻你打算说的话。
+            根据对话记录自动选择工作模式的 ID
             如果我提供的信息缺少工具所需要的必填参数，你需要进一步追问让我提供更多信息。
             """;
     private static final String TASK_ID_PARAMETER_ID = "task_id";
