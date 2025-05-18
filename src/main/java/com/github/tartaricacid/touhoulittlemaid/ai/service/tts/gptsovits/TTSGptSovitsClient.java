@@ -1,6 +1,5 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.service.tts.gptsovits;
 
-import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.ResponseCallback;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSClient;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSConfig;
@@ -11,10 +10,11 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 public class TTSGptSovitsClient implements TTSClient {
+    private static final Duration MAX_TIMEOUT = Duration.ofSeconds(20);
+
     private final HttpClient httpClient;
     private final TTSGptSovitsSite site;
 
@@ -39,24 +39,11 @@ public class TTSGptSovitsClient implements TTSClient {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.JSON_UTF_8.toString())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.site.secretKey())
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(request)))
-                .timeout(Duration.ofSeconds(20))
+                .timeout(MAX_TIMEOUT)
                 .uri(uri).build();
 
         httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofByteArray())
-                .whenComplete((response, throwable) -> handle(callback, response, throwable, httpRequest));
-    }
-
-    private void handle(ResponseCallback<byte[]> callback, HttpResponse<byte[]> response, Throwable throwable, HttpRequest httpRequest) {
-        if (throwable != null) {
-            callback.onFailure(httpRequest, throwable);
-            return;
-        }
-        if (isSuccessful(response)) {
-            callback.onSuccess(response.body());
-        } else {
-            TouhouLittleMaid.LOGGER.error("Request failed: {}", response.statusCode());
-            String error = String.format("HTTP Error Code: %d, Response %s", response.statusCode(), new String(response.body(), StandardCharsets.UTF_8));
-            callback.onFailure(httpRequest, new Throwable(error));
-        }
+                .whenComplete((response, throwable) ->
+                        handleResponse(callback, response, throwable, httpRequest));
     }
 }

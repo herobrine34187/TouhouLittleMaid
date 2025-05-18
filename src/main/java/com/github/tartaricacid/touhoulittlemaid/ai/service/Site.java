@@ -102,7 +102,7 @@ public interface Site {
      */
     @Beta
     default Component getName() {
-        return Component.translatable("ai.touhou_little_maid.site.%s.name".formatted(id()));
+        return Component.translatable("ai.touhou_little_maid.chat.site.%s.name".formatted(id()));
     }
 
     /**
@@ -110,6 +110,6 @@ public interface Site {
      */
     @Beta
     default Component getDesc() {
-        return Component.translatable("ai.touhou_little_maid.site.%s.desc".formatted(id()));
+        return Component.translatable("ai.touhou_little_maid.chat.site.%s.desc".formatted(id()));
     }
 }

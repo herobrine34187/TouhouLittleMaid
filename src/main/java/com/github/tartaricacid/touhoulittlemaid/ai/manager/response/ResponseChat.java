@@ -16,4 +16,10 @@ public class ResponseChat {
     public String getTtsText() {
         return ttsText;
     }
+
+    @Override
+    public String toString() {
+        return "{\"chat_text\":\"%s\",\"tts_text\":\"%s\"}"
+                .formatted(chatText, ttsText);
+    }
 }

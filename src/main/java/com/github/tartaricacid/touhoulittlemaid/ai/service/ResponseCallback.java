@@ -12,10 +12,11 @@ public interface ResponseCallback<T> {
     /**
      * 请求失败时调用
      *
-     * @param request 请求对象
-     * @param e       异常信息
+     * @param request   请求对象
+     * @param throwable 异常信息
+     * @param errorCode 错误代码
      */
-    void onFailure(HttpRequest request, Throwable e);
+    void onFailure(HttpRequest request, Throwable throwable, int errorCode);
 
     /**
      * 请求成功时调用

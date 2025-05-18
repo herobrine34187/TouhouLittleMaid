@@ -2,6 +2,9 @@ package com.github.tartaricacid.touhoulittlemaid.ai.service.llm.openai;
 
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
+import com.github.tartaricacid.touhoulittlemaid.ai.manager.response.ResponseChat;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.Client;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.ErrorCode;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.ResponseCallback;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.FunctionCallRegister;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.IFunctionCall;
@@ -36,6 +39,8 @@ import java.time.Duration;
 import java.util.List;
 
 public final class LLMOpenAIClient implements LLMClient {
+    private static final Duration MAX_TIMEOUT = Duration.ofSeconds(15);
+
     private final HttpClient httpClient;
     private final LLMOpenAISite site;
 
@@ -45,7 +50,7 @@ public final class LLMOpenAIClient implements LLMClient {
     }
 
     @Override
-    public void chat(EntityMaid maid, List<LLMMessage> messages, LLMConfig config, ResponseCallback<String> callback) {
+    public void chat(EntityMaid maid, List<LLMMessage> messages, LLMConfig config, ResponseCallback<ResponseChat> callback) {
         URI url = URI.create(this.site.url());
         String apiKey = this.site.secretKey();
         String model = config.model();
@@ -74,9 +79,7 @@ public final class LLMOpenAIClient implements LLMClient {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.JSON_UTF_8.toString())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(chatCompletion)))
-                .timeout(Duration.ofSeconds(20))
-                .uri(url);
-
+                .timeout(MAX_TIMEOUT).uri(url);
         this.site.headers().forEach(builder::header);
         HttpRequest httpRequest = builder.build();
         httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString())
@@ -90,48 +93,48 @@ public final class LLMOpenAIClient implements LLMClient {
             String description = value.getDescription();
             ObjectParameter root = ObjectParameter.create();
             Parameter parameter = value.addParameters(root);
-            Tool tool = FunctionTool.create()
-                    .setName(id)
+            Tool tool = FunctionTool.create().setName(id)
                     .setDescription(description)
                     .setParameters(parameter).build();
             chatCompletion.addTool(tool);
         });
     }
 
-    private void handle(EntityMaid maid, ResponseCallback<String> callback, HttpResponse<String> response, Throwable throwable, HttpRequest httpRequest) {
-        if (throwable != null) {
-            callback.onFailure(httpRequest, throwable);
-            return;
-        }
-        try {
-            String string = response.body();
-            if (isSuccessful(response)) {
-                ChatCompletionResponse completionResponse = GSON.fromJson(string, ChatCompletionResponse.class);
-                Message firstChoice = completionResponse.getFirstChoice();
-                if (firstChoice != null) {
-                    this.onSuccess(maid, callback, firstChoice);
-                    return;
-                }
-                String message = String.format("No Choice Found: %s", response);
-                callback.onFailure(httpRequest, new Throwable(message));
-                TouhouLittleMaid.LOGGER.error(message);
-            } else {
-                TouhouLittleMaid.LOGGER.error("Request failed: {}", string);
-                String message = String.format("HTTP Error Code: %d, Response %s", response.statusCode(), string);
-                callback.onFailure(httpRequest, new Throwable(message));
+    private void handle(EntityMaid maid, ResponseCallback<ResponseChat> callback, HttpResponse<String> response, Throwable throwable, HttpRequest request) {
+        this.<ChatCompletionResponse>handleResponse(callback, response, throwable, request, chat -> {
+            Message firstChoice = chat.getFirstChoice();
+            if (firstChoice == null) {
+                String message = "No Choice Found: %s".formatted(response);
+                callback.onFailure(request, new Throwable(message), ErrorCode.CHAT_CHOICE_IS_EMPTY);
+                return;
             }
-        } catch (JsonSyntaxException e) {
-            TouhouLittleMaid.LOGGER.error("JSON Syntax Exception: ", e);
-            callback.onFailure(httpRequest, e);
+            if (firstChoice.hasToolCall()) {
+                this.onFunctionCall(maid, callback, request, firstChoice);
+            } else {
+                this.onTextCall(callback, response, request, firstChoice);
+            }
+        }, ChatCompletionResponse.class);
+    }
+
+    private void onTextCall(ResponseCallback<ResponseChat> callback, HttpResponse<String> response, HttpRequest request, Message firstChoice) {
+        String content = firstChoice.getContent();
+        ResponseChat chat;
+        try {
+            chat = Client.GSON.fromJson(content, ResponseChat.class);
+            if (chat == null || chat.getChatText().isBlank() || chat.getTtsText().isBlank()) {
+                String message = "Error in Response Chat: %s".formatted(chat);
+                callback.onFailure(request, new Throwable(message), ErrorCode.CHAT_TEXT_IS_EMPTY);
+            } else {
+                callback.onSuccess(chat);
+            }
+        } catch (JsonSyntaxException error) {
+            String message = "Exception %s, JSON is: %s".formatted(error.getLocalizedMessage(), content);
+            callback.onFailure(request, new Throwable(message), ErrorCode.JSON_DECODE_ERROR);
         }
     }
 
     @SuppressWarnings("all")
-    private void onSuccess(EntityMaid maid, ResponseCallback<String> callback, Message firstChoice) {
-        if (!firstChoice.hasToolCall()) {
-            callback.onSuccess(firstChoice.getContent());
-            return;
-        }
+    private void onFunctionCall(EntityMaid maid, ResponseCallback<ResponseChat> callback, HttpRequest request, Message firstChoice) {
         firstChoice.getToolCalls().forEach(toolCall -> {
             FunctionToolCall function = toolCall.getFunction();
             String name = function.getName();
@@ -144,15 +147,16 @@ public final class LLMOpenAIClient implements LLMClient {
                 JsonObject parse = GsonHelper.parse(arguments);
                 call.codec().parse(JsonOps.INSTANCE, parse)
                         .resultOrPartial(TouhouLittleMaid.LOGGER::error)
-                        .ifPresent(result -> onAsyncCallFunction(maid, result, call, arguments));
-            } catch (Exception e) {
-                TouhouLittleMaid.LOGGER.error("Error while parsing JSON: {}", e.getMessage());
+                        .ifPresent(result -> onAsyncFunctionCall(maid, result, call, arguments));
+            } catch (JsonSyntaxException exception) {
+                String message = "Exception %s, JSON is: %s".formatted(exception.getLocalizedMessage(), arguments);
+                callback.onFailure(request, new Throwable(message), ErrorCode.JSON_DECODE_ERROR);
             }
         });
     }
 
     @SuppressWarnings("all")
-    private void onAsyncCallFunction(EntityMaid maid, Object result, IFunctionCall call, String arguments) {
+    private void onAsyncFunctionCall(EntityMaid maid, Object result, IFunctionCall call, String arguments) {
         // 因为获取网络流是在独立的线程上，所以需要推送到主线程执行
         if (maid.level instanceof ServerLevel serverLevel) {
             serverLevel.getServer().submit(() -> {

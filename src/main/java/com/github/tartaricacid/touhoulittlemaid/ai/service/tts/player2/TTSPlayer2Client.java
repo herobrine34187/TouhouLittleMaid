@@ -1,7 +1,9 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.service.tts.player2;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.ErrorCode;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.ResponseCallback;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.ServiceType;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSClient;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSConfig;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSSystemServices;
@@ -10,7 +12,7 @@ import com.google.common.net.MediaType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -23,6 +25,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 public class TTSPlayer2Client implements TTSClient, TTSSystemServices {
+    private static final Duration MAX_TIMEOUT = Duration.ofSeconds(20);
+
     private final HttpClient httpClient;
     private final TTSPlayer2Site site;
 
@@ -49,7 +53,7 @@ public class TTSPlayer2Client implements TTSClient, TTSSystemServices {
         HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.JSON_UTF_8.toString())
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(request)))
-                .timeout(Duration.ofSeconds(20))
+                .timeout(MAX_TIMEOUT)
                 .uri(url);
 
         this.site.headers().forEach(builder::header);
@@ -63,16 +67,16 @@ public class TTSPlayer2Client implements TTSClient, TTSSystemServices {
             }
             if (throwable != null) {
                 String cause = throwable.getLocalizedMessage();
-                player.sendSystemMessage(Component.translatable("ai.touhou_little_maid.tts.connect.fail")
-                        .append(cause).withStyle(ChatFormatting.RED));
-                TouhouLittleMaid.LOGGER.error("TTS playing error", throwable);
+                MutableComponent errorMessage = ErrorCode.getErrorMessage(ServiceType.TTS, ErrorCode.REQUEST_SENDING_ERROR, cause);
+                player.sendSystemMessage(errorMessage.withStyle(ChatFormatting.RED));
+                TouhouLittleMaid.LOGGER.error("TTS request failed: {}, error is {}", request, throwable.getMessage());
             }
             if (!isSuccessful(response)) {
                 String string = new String(response.body(), StandardCharsets.UTF_8);
                 String cause = String.format("HTTP Error Code: %d, Response %s", response.statusCode(), string);
-                player.sendSystemMessage(Component.translatable("ai.touhou_little_maid.tts.connect.fail")
-                        .append(cause).withStyle(ChatFormatting.RED));
-                TouhouLittleMaid.LOGGER.error("Request failed: {}", string);
+                MutableComponent errorMessage = ErrorCode.getErrorMessage(ServiceType.TTS, ErrorCode.REQUEST_RECEIVED_ERROR, cause);
+                player.sendSystemMessage(errorMessage.withStyle(ChatFormatting.RED));
+                TouhouLittleMaid.LOGGER.error("TTS request failed: {}, error is {}", request, cause);
             }
         });
     }

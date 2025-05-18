@@ -35,13 +35,13 @@ public final class MaidAIChatManager extends MaidAIChatData {
         }
         @Nullable LLMSite site = this.getLLMSite();
         if (site == null || !site.enabled()) {
-            ChatBubbleManger.addInnerChatText(maid, "ai.touhou_little_maid.chat.api_key.empty");
+            ChatBubbleManger.addInnerChatText(maid, "ai.touhou_little_maid.chat.llm.empty");
             return;
         }
         LLMClient chatClient = site.client();
         List<LLMMessage> chatCompletion = getChatCompletion(this, language);
         if (chatCompletion.isEmpty()) {
-            ChatBubbleManger.addInnerChatText(maid, "ai.touhou_little_maid.chat.no_setting");
+            ChatBubbleManger.addInnerChatText(maid, "ai.touhou_little_maid.chat.llm.role_no_setting");
         }
         chatCompletion.add(LLMMessage.userChat(maid, message));
         LLMConfig config = new LLMConfig(this.getLLMModel(), AIConfig.LLM_TEMPERATURE.get(), AIConfig.LLM_MAX_TOKEN.get());

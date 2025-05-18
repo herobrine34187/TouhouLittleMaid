@@ -6,6 +6,7 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.function.schema.param
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.schema.parameter.StringParameter;
 import com.github.tartaricacid.touhoulittlemaid.api.task.IAttackTask;
 import com.github.tartaricacid.touhoulittlemaid.api.task.IMaidTask;
+import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleManger;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.entity.task.TaskManager;
 import com.github.tartaricacid.touhoulittlemaid.util.ItemsUtil;
@@ -22,11 +23,11 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
     private static final String FUNCTION_ID = "switch_maid_attack_task";
     private static final String FUNCTION_DESC = """
             当你需要切换与击杀怪物相关的工作模式时，才会调用此函数。
-            参数需要给定一个工作模式的 ID！
+            参数需要给定一个工作模式的 ID，和一个此刻你打算说的话
             如果我提供的信息缺少工具所需要的必填参数，你需要进一步追问让我提供更多信息。
             """;
-    private static final String PARAMETER_ID = "task_id";
-    private static final String PARAMETER_DESC = """
+    private static final String TASK_ID_PARAMETER_ID = "task_id";
+    private static final String TASK_ID_PARAMETER_DESC = """
             你需要切换的工作模式 ID：
             - touhou_little_maid:idle 表示空闲模式，此工作模式下，你什么也不会做
             - touhou_little_maid:attack 表示近战模式，你会主动攻击周围的敌对生物
@@ -35,7 +36,14 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
             - touhou_little_maid:danmaku_attack 表示弹幕攻击模式，你会主动用弹幕攻击周围的敌对生物
             - touhou_little_maid:trident_attack 表示三叉戟攻击模式，你会主动用三叉戟攻击周围的敌对生物
             """;
-    private static final String RESPONSE_TEXT = "你已经切换%s模式";
+    private static final String CHAT_PARAMETER_ID = "chat_text";
+    private static final String CHAT_PARAMETER_DESC = """
+            你此刻打算说的话，需要符合当前的工作模式切换
+            """;
+    private static final String TTS_PARAMETER_ID = "chat_text";
+    private static final String TTS_PARAMETER_DESC = """
+            你此刻打算说的话，需要符合当前的工作模式切换
+            """;
 
     @Override
     public String getId() {
@@ -50,7 +58,7 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
     @Override
     public Parameter addParameters(ObjectParameter root) {
         Parameter taskId = StringParameter.create()
-                .setDescription(PARAMETER_DESC)
+                .setDescription(TASK_ID_PARAMETER_DESC)
                 .addEnumValues(
                         "touhou_little_maid:idle",
                         "touhou_little_maid:attack",
@@ -59,14 +67,16 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
                         "touhou_little_maid:danmaku_attack",
                         "touhou_little_maid:trident_attack"
                 );
-        root.addProperties(PARAMETER_ID, taskId);
+        Parameter chat = StringParameter.create().setDescription(CHAT_PARAMETER_DESC);
+        root.addProperties(TASK_ID_PARAMETER_ID, taskId).addProperties(CHAT_PARAMETER_ID, chat);
         return root;
     }
 
     @Override
     public Codec<Result> codec() {
         return RecordCodecBuilder.create(instance -> instance.group(
-                ResourceLocation.CODEC.fieldOf(PARAMETER_ID).forGetter(Result::taskId)
+                ResourceLocation.CODEC.fieldOf(TASK_ID_PARAMETER_ID).forGetter(Result::taskId),
+                Codec.STRING.fieldOf(CHAT_PARAMETER_ID).forGetter(Result::chat)
         ).apply(instance, Result::new));
     }
 
@@ -84,6 +94,7 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
         if (task == TaskManager.getIdleTask()) {
             putItemBack(maid, backpack);
             // TODO: 现在的聊天气泡居然不支持 Component，没法给女仆显示翻译过的字符串做提示
+            ChatBubbleManger.addAiChatText(maid, result.chat);
             maid.setTask(task);
             return;
         }
@@ -100,6 +111,7 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
 
         // TODO: 现在的聊天气泡居然不支持 Component，没法给女仆显示翻译过的字符串做提示
         maid.setTask(task);
+        ChatBubbleManger.addAiChatText(maid, result.chat);
 
         // 将武器取到主手上
         int slot = ItemsUtil.findStackSlot(backpack, item -> attackTask.isWeapon(maid, item));
@@ -129,6 +141,6 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
         }
     }
 
-    public record Result(ResourceLocation taskId) {
+    public record Result(ResourceLocation taskId, String chat) {
     }
 }

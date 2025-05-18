@@ -81,7 +81,7 @@ public class STTChatKey {
             return;
         }
         if (isStart) {
-            player.sendSystemMessage(Component.translatable("ai.touhou_little_maid.stt.content.no_maid_found", range));
+            player.sendSystemMessage(Component.translatable("ai.touhou_little_maid.chat.stt.no_maid_found", range));
         }
     }
 

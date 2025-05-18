@@ -1,6 +1,9 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.manager.entity;
 
+import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.ErrorCode;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.ResponseCallback;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.ServiceType;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
 import com.github.tartaricacid.touhoulittlemaid.network.message.SendUserChatMessage;
@@ -9,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.LanguageInfo;
 import net.minecraft.client.resources.language.LanguageManager;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -27,10 +31,11 @@ public class STTCallback implements ResponseCallback<String> {
     }
 
     @Override
-    public void onFailure(HttpRequest request, Throwable throwable) {
+    public void onFailure(HttpRequest request, Throwable throwable, int errorCode) {
         String cause = throwable.getLocalizedMessage();
-        player.sendSystemMessage(Component.translatable("ai.touhou_little_maid.stt.connect.fail")
-                .append(cause).withStyle(ChatFormatting.RED));
+        MutableComponent errorMessage = ErrorCode.getErrorMessage(ServiceType.STT, errorCode, cause);
+        player.sendSystemMessage(errorMessage.withStyle(ChatFormatting.RED));
+        TouhouLittleMaid.LOGGER.error("STT request failed: {}, error is {}", request, throwable.getMessage());
     }
 
     @Override
@@ -49,7 +54,8 @@ public class STTCallback implements ResponseCallback<String> {
             String format = String.format("<%s> %s", name, chatText);
             player.sendSystemMessage(Component.literal(format).withStyle(ChatFormatting.GRAY));
         } else {
-            player.sendSystemMessage(Component.translatable("ai.touhou_little_maid.stt.content.empty").withStyle(ChatFormatting.GRAY));
+            MutableComponent component = Component.translatable("ai.touhou_little_maid.chat.stt.content_is_empty");
+            player.sendSystemMessage(component.withStyle(ChatFormatting.GRAY));
         }
     }
 }

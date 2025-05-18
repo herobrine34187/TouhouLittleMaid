@@ -1,12 +1,15 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.manager.entity;
 
+import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.ErrorCode;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.ResponseCallback;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.ServiceType;
 import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleManger;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
 import com.github.tartaricacid.touhoulittlemaid.network.message.TTSAudioToClientMessage;
 import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,19 +27,19 @@ public class TTSCallback implements ResponseCallback<byte[]> {
     }
 
     @Override
-    public void onFailure(HttpRequest request, Throwable throwable) {
-        if (!(maid.level instanceof ServerLevel serverLevel)) {
-            return;
-        }
-        MinecraftServer server = serverLevel.getServer();
-        server.submit(() -> {
+    public void onFailure(HttpRequest request, Throwable throwable, int errorCode) {
+        if (maid.level instanceof ServerLevel serverLevel) {
             ChatBubbleManger.addAiChatText(maid, chatText);
-            if (maid.getOwner() instanceof ServerPlayer player) {
-                String cause = throwable.getLocalizedMessage();
-                player.sendSystemMessage(Component.translatable("ai.touhou_little_maid.tts.connect.fail")
-                        .append(cause).withStyle(ChatFormatting.RED));
-            }
-        });
+            MinecraftServer server = serverLevel.getServer();
+            server.submit(() -> {
+                if (maid.getOwner() instanceof ServerPlayer player) {
+                    String cause = throwable.getLocalizedMessage();
+                    MutableComponent errorMessage = ErrorCode.getErrorMessage(ServiceType.TTS, errorCode, cause);
+                    player.sendSystemMessage(errorMessage.withStyle(ChatFormatting.RED));
+                }
+            });
+        }
+        TouhouLittleMaid.LOGGER.error("LLM request failed: {}, error is {}", request, throwable.getMessage());
     }
 
     @Override
