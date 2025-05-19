@@ -2,10 +2,15 @@ package com.github.tartaricacid.touhoulittlemaid.client.sound.record;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.google.common.collect.Lists;
+import net.minecraft.util.VisibleForDebug;
+import org.apache.commons.io.FileUtils;
 
 import javax.annotation.Nullable;
 import javax.sound.sampled.*;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
@@ -19,6 +24,12 @@ public class MicrophoneManager {
     private static final ScheduledExecutorService SERVICE = Executors.newSingleThreadScheduledExecutor();
     private static final AtomicBoolean IS_RECORDING = new AtomicBoolean();
     private static CompletableFuture<?> TASK = null;
+
+    public static Mixer.Info getMicrophoneInfo(AudioFormat audioFormat) {
+        List<Mixer.Info> allMicrophoneInfo = getAllMicrophoneInfo(audioFormat);
+        // TODO 需要支持配置文件选择麦克风
+        return allMicrophoneInfo.get(0);
+    }
 
     public static List<Mixer.Info> getAllMicrophoneInfo(AudioFormat format) {
         List<Mixer.Info> output = Lists.newArrayList();
@@ -90,13 +101,37 @@ public class MicrophoneManager {
 
             dataLine.stop();
             dataLine.flush();
-            consumer.accept(stream.toByteArray());
+
+            byte[] byteArray = pcmToWav(stream.toByteArray(), format);
+            // debugFile(byteArray);
+            consumer.accept(byteArray);
 
             TouhouLittleMaid.LOGGER.debug("Microphone stop record...");
         } catch (LineUnavailableException e) {
             TouhouLittleMaid.LOGGER.error("Microphone is not found: {}", e.getMessage());
+        } catch (Exception e) {
+            TouhouLittleMaid.LOGGER.error("Microphone record error: {}", e.getMessage());
         } finally {
             IS_RECORDING.set(false);
+        }
+    }
+
+    private static byte[] pcmToWav(byte[] pcmData, AudioFormat format) throws IOException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        int length = pcmData.length / format.getFrameSize();
+        try (ByteArrayInputStream input = new ByteArrayInputStream(pcmData);
+             AudioInputStream audio = new AudioInputStream(input, format, length)) {
+            AudioSystem.write(audio, AudioFileFormat.Type.WAVE, output);
+        }
+        return output.toByteArray();
+    }
+
+    @VisibleForDebug
+    private static void debugFile(byte[] byteArray) {
+        try {
+            FileUtils.writeByteArrayToFile(new File("test.wav"), byteArray);
+        } catch (IOException e) {
+            TouhouLittleMaid.LOGGER.error("Failed to write test.wav file: {}", e.getMessage());
         }
     }
 }

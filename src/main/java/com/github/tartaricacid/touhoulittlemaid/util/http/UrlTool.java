@@ -1,4 +1,4 @@
-package com.github.tartaricacid.touhoulittlemaid.util;
+package com.github.tartaricacid.touhoulittlemaid.util.http;
 
 import com.google.common.base.Joiner;
 import com.google.common.escape.Escaper;

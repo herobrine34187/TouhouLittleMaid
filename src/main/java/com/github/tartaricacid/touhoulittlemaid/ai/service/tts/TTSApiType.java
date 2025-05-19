@@ -4,6 +4,7 @@ public enum TTSApiType {
     PLAYER2("player2"),
     FISH_AUDIO("fish-audio"),
     GPT_SOVITS("gpt-sovits"),
+    SILICONFLOW("siliconflow"),
     SYSTEM("system");
 
     private final String name;

@@ -1,5 +1,6 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.service.llm;
 
+import com.github.tartaricacid.touhoulittlemaid.ai.manager.site.AvailableSites;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.SerializableSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.openai.LLMOpenAISite;
 import com.google.common.collect.Lists;
@@ -25,11 +26,23 @@ public final class DefaultLLMSite {
             "https://api.hunyuan.cloud.tencent.com/v1/chat/completions",
             "hunyuan-lite", "hunyuan-standard", "hunyuan-role", "hunyuan-turbo-latest", "hunyuan-large");
 
+    public static LLMOpenAISite SILICONFLOW = createSite("siliconflow",
+            "https://api.siliconflow.cn/v1/chat/completions",
+            "Qwen/Qwen3-8B", "THUDM/GLM-Z1-9B-0414", "deepseek-ai/DeepSeek-V3");
+
     public static LLMOpenAISite createSite(String name, String url, String... models) {
         return createSite(name, url, false, Map.of(), models);
     }
 
     public static LLMOpenAISite createSite(String name, String url, boolean enabled, Map<String, String> header, String... models) {
         return new LLMOpenAISite(name, SerializableSite.defaultIcon(name), url, enabled, StringUtils.EMPTY, header, Lists.newArrayList(models));
+    }
+
+    public static void addDefaultSites() {
+        AvailableSites.LLM_SITES.put(PLAYER2.id(), PLAYER2);
+        AvailableSites.LLM_SITES.put(ALIYUN.id(), ALIYUN);
+        AvailableSites.LLM_SITES.put(DEEPSEEK.id(), DEEPSEEK);
+        AvailableSites.LLM_SITES.put(TENCENT.id(), TENCENT);
+        AvailableSites.LLM_SITES.put(SILICONFLOW.id(), SILICONFLOW);
     }
 }

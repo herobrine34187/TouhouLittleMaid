@@ -20,9 +20,9 @@ public class AvailableSites {
     private static final String FOLDER_NAME = "sites";
 
     // 服务端缓存的站点信息，包含秘钥等敏感信息
-    private static final Map<String, LLMSite> LLM_SITES = Maps.newLinkedHashMap();
-    private static final Map<String, TTSSite> TTS_SITES = Maps.newLinkedHashMap();
-    private static final Map<String, STTSite> STT_SITES = Maps.newLinkedHashMap();
+    public static final Map<String, LLMSite> LLM_SITES = Maps.newLinkedHashMap();
+    public static final Map<String, TTSSite> TTS_SITES = Maps.newLinkedHashMap();
+    public static final Map<String, STTSite> STT_SITES = Maps.newLinkedHashMap();
 
     public static void init() {
         clearSites();
@@ -45,10 +45,7 @@ public class AvailableSites {
         STT_SERIALIZER.forEach((key, value) -> AvailableSites.STT_SITES.put(key, value.defaultSite()));
 
         // 其他额外的默认站点
-        AvailableSites.LLM_SITES.put(DefaultLLMSite.PLAYER2.id(), DefaultLLMSite.PLAYER2);
-        AvailableSites.LLM_SITES.put(DefaultLLMSite.ALIYUN.id(), DefaultLLMSite.ALIYUN);
-        AvailableSites.LLM_SITES.put(DefaultLLMSite.DEEPSEEK.id(), DefaultLLMSite.DEEPSEEK);
-        AvailableSites.LLM_SITES.put(DefaultLLMSite.TENCENT.id(), DefaultLLMSite.TENCENT);
+        DefaultLLMSite.addDefaultSites();
     }
 
     private static void readSites() {

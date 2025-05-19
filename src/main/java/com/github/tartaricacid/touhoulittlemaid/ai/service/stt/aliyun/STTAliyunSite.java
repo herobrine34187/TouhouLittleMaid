@@ -4,7 +4,7 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.SerializableSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.STTApiType;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.STTClient;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.STTSite;
-import com.github.tartaricacid.touhoulittlemaid.util.UrlTool;
+import com.github.tartaricacid.touhoulittlemaid.util.http.UrlTool;
 import com.google.common.collect.Maps;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -117,7 +117,7 @@ public class STTAliyunSite implements STTSite {
         Map<String, String> params = Maps.newHashMap();
 
         params.put("appkey", getAppKey());
-        params.put("format", "pcm");
+        params.put("format", "wav");
         params.put("sample_rate", "16000");
         params.put("enable_punctuation_prediction", String.valueOf(isEnablePunctuationPrediction()));
         params.put("enable_inverse_text_normalization", String.valueOf(isEnableInverseTextNormalization()));

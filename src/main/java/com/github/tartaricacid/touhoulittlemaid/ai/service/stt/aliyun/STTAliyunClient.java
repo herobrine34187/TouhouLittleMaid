@@ -15,7 +15,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.List;
 
 public class STTAliyunClient implements STTClient {
     private static final AudioFormat FORMAT = new AudioFormat(16000, 16, 1, true, false);
@@ -33,15 +32,13 @@ public class STTAliyunClient implements STTClient {
 
     @Override
     public void startRecord(STTConfig config, ResponseCallback<String> callback) {
-        List<Mixer.Info> allMicrophoneInfo = MicrophoneManager.getAllMicrophoneInfo(FORMAT);
-        // TODO 需要支持配置文件选择麦克风
-        Mixer.Info info = allMicrophoneInfo.get(0);
+        Mixer.Info info = MicrophoneManager.getMicrophoneInfo(FORMAT);
         URI uri = URI.create(this.site.url());
 
         MicrophoneManager.startRecord(info.getName(), FORMAT, data -> {
             HttpRequest request = HttpRequest.newBuilder().uri(uri)
                     .header(TOKEN, this.site.getSecretKey())
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.OCTET_STREAM.type())
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.OCTET_STREAM.toString())
                     .POST(HttpRequest.BodyPublishers.ofByteArray(data))
                     .timeout(MAX_TIMEOUT).build();
             httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())

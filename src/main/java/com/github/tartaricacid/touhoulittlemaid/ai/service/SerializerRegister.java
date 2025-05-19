@@ -7,10 +7,12 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.openai.LLMOpenAIS
 import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.STTSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.aliyun.STTAliyunSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.player2.STTPlayer2Site;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.siliconflow.STTSiliconflowSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.fishaudio.TTSFishAudioSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.gptsovits.TTSGptSovitsSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.player2.TTSPlayer2Site;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.siliconflow.TTSSiliconflowSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.system.TTSSystemSite;
 import com.github.tartaricacid.touhoulittlemaid.api.ILittleMaid;
 import com.google.common.collect.ImmutableMap;
@@ -30,11 +32,13 @@ public final class SerializerRegister {
 
         register.register(ServiceType.STT, STTPlayer2Site.API_TYPE, new STTPlayer2Site.Serializer());
         register.register(ServiceType.STT, STTAliyunSite.API_TYPE, new STTAliyunSite.Serializer());
+        register.register(ServiceType.STT, STTSiliconflowSite.API_TYPE, new STTSiliconflowSite.Serializer());
 
         register.register(ServiceType.TTS, TTSSystemSite.API_TYPE, new TTSSystemSite.Serializer());
         register.register(ServiceType.TTS, TTSFishAudioSite.API_TYPE, new TTSFishAudioSite.Serializer());
         register.register(ServiceType.TTS, TTSGptSovitsSite.API_TYPE, new TTSGptSovitsSite.Serializer());
         register.register(ServiceType.TTS, TTSPlayer2Site.API_TYPE, new TTSPlayer2Site.Serializer());
+        register.register(ServiceType.TTS, TTSSiliconflowSite.API_TYPE, new TTSSiliconflowSite.Serializer());
 
         for (ILittleMaid littleMaid : TouhouLittleMaid.EXTENSIONS) {
             littleMaid.registerAIChatSerializer(register);
