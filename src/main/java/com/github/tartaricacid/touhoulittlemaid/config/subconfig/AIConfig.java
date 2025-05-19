@@ -3,6 +3,7 @@ package com.github.tartaricacid.touhoulittlemaid.config.subconfig;
 import com.electronwill.nightconfig.core.EnumGetMethod;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.STTApiType;
 import net.minecraftforge.common.ForgeConfigSpec;
+import org.apache.commons.lang3.StringUtils;
 
 public class AIConfig {
     public static ForgeConfigSpec.BooleanValue LLM_ENABLED;
@@ -18,6 +19,7 @@ public class AIConfig {
 
     public static ForgeConfigSpec.BooleanValue STT_ENABLED;
     public static ForgeConfigSpec.EnumValue<STTApiType> STT_TYPE;
+    public static ForgeConfigSpec.ConfigValue<String> STT_MICROPHONE;
     public static ForgeConfigSpec.IntValue MAID_CAN_CHAT_DISTANCE;
     public static ForgeConfigSpec.ConfigValue<String> STT_PROXY_ADDRESS;
 
@@ -57,6 +59,9 @@ public class AIConfig {
 
         builder.comment("STT Type, currently support player2 app or aliyun");
         STT_TYPE = builder.defineEnum("STTType", STTApiType.PLAYER2, EnumGetMethod.NAME_IGNORECASE);
+
+        builder.comment("The name of the microphone device, empty is default");
+        STT_MICROPHONE = builder.define("STTMicrophone", StringUtils.EMPTY);
 
         builder.comment("The range of search when chatting with the maid");
         MAID_CAN_CHAT_DISTANCE = builder.defineInRange("MaidCanChatDistance", 12, 1, 256);

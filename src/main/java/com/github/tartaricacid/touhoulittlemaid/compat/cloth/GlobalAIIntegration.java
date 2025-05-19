@@ -1,6 +1,7 @@
 package com.github.tartaricacid.touhoulittlemaid.compat.cloth;
 
 import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.STTApiType;
+import com.github.tartaricacid.touhoulittlemaid.client.sound.record.MicrophoneManager;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
@@ -34,6 +35,11 @@ public class GlobalAIIntegration {
         builder.add(entryBuilder.startEnumSelector(Component.translatable("config.touhou_little_maid.global_ai.stt_type"), STTApiType.class, AIConfig.STT_TYPE.get())
                 .setDefaultValue(STTApiType.PLAYER2).setTooltip(Component.translatable("config.touhou_little_maid.global_ai.stt_type.tooltip"))
                 .setSaveConsumer(AIConfig.STT_TYPE::set).build());
+
+        builder.add(entryBuilder.startSelector(Component.translatable("config.touhou_little_maid.global_ai.stt_microphone"),
+                        MicrophoneManager.getAllMicrophoneName(), AIConfig.STT_MICROPHONE.get())
+                .setDefaultValue(StringUtils.EMPTY).setTooltip(Component.translatable("config.touhou_little_maid.global_ai.stt_microphone.tooltip"))
+                .setSaveConsumer(AIConfig.STT_MICROPHONE::set).build());
 
         builder.add(entryBuilder.startIntSlider(Component.translatable("config.touhou_little_maid.global_ai.maid_can_chat_distance"),
                         AIConfig.MAID_CAN_CHAT_DISTANCE.get(), 1, 256).setDefaultValue(12)

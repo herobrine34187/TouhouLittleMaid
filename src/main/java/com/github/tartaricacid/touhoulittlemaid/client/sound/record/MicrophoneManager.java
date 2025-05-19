@@ -1,6 +1,7 @@
 package com.github.tartaricacid.touhoulittlemaid.client.sound.record;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
+import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
 import com.google.common.collect.Lists;
 import net.minecraft.util.VisibleForDebug;
 import org.apache.commons.io.FileUtils;
@@ -20,6 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 public class MicrophoneManager {
+    private static final AudioFormat DEFAULT_FORMAT = new AudioFormat(16000, 16, 1, true, false);
     private static final int MAX_RECORD_TIME_SECONDS = 20;
     private static final ScheduledExecutorService SERVICE = Executors.newSingleThreadScheduledExecutor();
     private static final AtomicBoolean IS_RECORDING = new AtomicBoolean();
@@ -27,8 +29,29 @@ public class MicrophoneManager {
 
     public static Mixer.Info getMicrophoneInfo(AudioFormat audioFormat) {
         List<Mixer.Info> allMicrophoneInfo = getAllMicrophoneInfo(audioFormat);
-        // TODO 需要支持配置文件选择麦克风
+        String name = AIConfig.STT_MICROPHONE.get();
+        if (name.isBlank()) {
+            return allMicrophoneInfo.get(0);
+        }
+        for (Mixer.Info info : allMicrophoneInfo) {
+            if (info.getName().equals(name)) {
+                return info;
+            }
+        }
         return allMicrophoneInfo.get(0);
+    }
+
+    public static String[] getAllMicrophoneName() {
+        Mixer.Info[] allInfos = AudioSystem.getMixerInfo();
+        List<String> names = Lists.newArrayList();
+        for (Mixer.Info info : allInfos) {
+            Mixer mixer = AudioSystem.getMixer(info);
+            DataLine.Info lineInfo = new DataLine.Info(TargetDataLine.class, DEFAULT_FORMAT);
+            if (mixer.isLineSupported(lineInfo)) {
+                names.add(info.getName());
+            }
+        }
+        return names.toArray(new String[0]);
     }
 
     public static List<Mixer.Info> getAllMicrophoneInfo(AudioFormat format) {
