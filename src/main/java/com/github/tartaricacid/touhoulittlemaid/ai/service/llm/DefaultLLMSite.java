@@ -30,6 +30,11 @@ public final class DefaultLLMSite {
             "https://api.siliconflow.cn/v1/chat/completions",
             "Qwen/Qwen3-8B", "THUDM/GLM-Z1-9B-0414", "deepseek-ai/DeepSeek-V3");
 
+    public static LLMOpenAISite DOUBAO = createSite("doubao",
+            "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
+            "doubao-1.5-pro-32k-250115", "doubao-1.5-pro-256k-250115",
+            "doubao-1.5-lite-32k-250115", "deepseek-v3-250324");
+
     public static LLMOpenAISite createSite(String name, String url, String... models) {
         return createSite(name, url, false, Map.of(), models);
     }
@@ -44,5 +49,6 @@ public final class DefaultLLMSite {
         AvailableSites.LLM_SITES.put(DEEPSEEK.id(), DEEPSEEK);
         AvailableSites.LLM_SITES.put(TENCENT.id(), TENCENT);
         AvailableSites.LLM_SITES.put(SILICONFLOW.id(), SILICONFLOW);
+        AvailableSites.LLM_SITES.put(DOUBAO.id(), DOUBAO);
     }
 }
