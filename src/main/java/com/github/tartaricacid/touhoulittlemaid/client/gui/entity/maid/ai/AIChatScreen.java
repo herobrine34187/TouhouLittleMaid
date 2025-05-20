@@ -1,5 +1,6 @@
 package com.github.tartaricacid.touhoulittlemaid.client.gui.entity.maid.ai;
 
+import com.github.tartaricacid.touhoulittlemaid.ai.manager.entity.ChatClientInfo;
 import com.github.tartaricacid.touhoulittlemaid.client.gui.widget.button.FlatColorButton;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
@@ -10,8 +11,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.resources.language.LanguageInfo;
-import net.minecraft.client.resources.language.LanguageManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.apache.commons.lang3.StringUtils;
@@ -30,6 +29,8 @@ public class AIChatScreen extends Screen {
 
     @Override
     protected void init() {
+        this.clearWidgets();
+
         int posX = this.width / 2;
         int posY = this.height / 2;
 
@@ -132,15 +133,8 @@ public class AIChatScreen extends Screen {
         String value = input.getValue();
         LocalPlayer player = this.getMinecraft().player;
         if (StringUtils.isNotBlank(value) && player != null) {
-            LanguageManager languageManager = Minecraft.getInstance().getLanguageManager();
-            LanguageInfo info = languageManager.getLanguage(languageManager.getSelected());
-            String language;
-            if (info != null) {
-                language = info.toComponent().getString();
-            } else {
-                language = "English (US)";
-            }
-            NetworkHandler.CHANNEL.sendToServer(new SendUserChatMessage(this.maid.getId(), value, language));
+            ChatClientInfo clientInfo = ChatClientInfo.fromMaid(this.maid);
+            NetworkHandler.CHANNEL.sendToServer(new SendUserChatMessage(this.maid.getId(), value, clientInfo));
             String name = player.getScoreboardName();
             String format = String.format("<%s> %s", name, value);
             player.sendSystemMessage(Component.literal(format).withStyle(ChatFormatting.GRAY));

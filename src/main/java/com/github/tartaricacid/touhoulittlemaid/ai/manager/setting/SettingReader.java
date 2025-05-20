@@ -2,6 +2,7 @@ package com.github.tartaricacid.touhoulittlemaid.ai.manager.setting;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.google.common.collect.Maps;
+import net.minecraftforge.fml.loading.FMLPaths;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -14,7 +15,7 @@ import java.util.zip.ZipFile;
 
 public class SettingReader {
     private static final String SETTING_FOLDER_NAME = "settings";
-    private static final Path SETTINGS_FOLDER = Paths.get("config", TouhouLittleMaid.MOD_ID, SETTING_FOLDER_NAME);
+    private static final Path SETTINGS_FOLDER = FMLPaths.CONFIGDIR.get().resolve(TouhouLittleMaid.MOD_ID).resolve(SETTING_FOLDER_NAME);
     private static final Map<String, CharacterSetting> SETTINGS = Maps.newHashMap();
     private static final String YAML = ".yml";
 
@@ -90,5 +91,9 @@ public class SettingReader {
 
     public static Set<String> getAllSettingKeys() {
         return SETTINGS.keySet();
+    }
+
+    public static Path getSettingsFolder() {
+        return SETTINGS_FOLDER;
     }
 }

@@ -327,12 +327,6 @@ public class MenuIntegration {
 
         render.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.touhou_little_maid.render.enable_shears_tip"), RenderConfig.ENABLE_SHEARS_TIP.get())
                 .setDefaultValue(true).setSaveConsumer(RenderConfig.ENABLE_SHEARS_TIP::set).build());
-
-        render.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.touhou_little_maid.render.enable_ysm_roulette_tip"), RenderConfig.ENABLE_YSM_ROULETTE_TIP.get())
-                .setDefaultValue(true).setSaveConsumer(RenderConfig.ENABLE_YSM_ROULETTE_TIP::set).build());
-
-        render.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.touhou_little_maid.render.enable_ai_chat_tip"), RenderConfig.ENABLE_AI_CHAT_TIP.get())
-                .setDefaultValue(true).setSaveConsumer(RenderConfig.ENABLE_AI_CHAT_TIP::set).build());
     }
 
     public static void registerModsPage() {

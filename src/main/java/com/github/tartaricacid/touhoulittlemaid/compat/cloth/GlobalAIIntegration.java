@@ -89,6 +89,16 @@ public class GlobalAIIntegration {
                 .setTooltip(Component.translatable("config.touhou_little_maid.global_ai.llm_temperature.tooltip"))
                 .setSaveConsumer(AIConfig.LLM_TEMPERATURE::set).build());
 
+        builder.add(entryBuilder.startBooleanToggle(Component.translatable("config.touhou_little_maid.global_ai.function_call_enabled"), AIConfig.FUNCTION_CALL_ENABLED.get())
+                .setDefaultValue(true).setTooltip(
+                        Component.translatable("config.touhou_little_maid.global_ai.function_call_enabled.tooltip.1"),
+                        Component.translatable("config.touhou_little_maid.global_ai.function_call_enabled.tooltip.2")
+                ).setSaveConsumer(AIConfig.FUNCTION_CALL_ENABLED::set).build());
+
+        builder.add(entryBuilder.startBooleanToggle(Component.translatable("config.touhou_little_maid.global_ai.auto_gen_setting_enabled"), AIConfig.AUTO_GEN_SETTING_ENABLED.get())
+                .setDefaultValue(true).setTooltip(Component.translatable("config.touhou_little_maid.global_ai.auto_gen_setting_enabled.tooltip"))
+                .setSaveConsumer(AIConfig.AUTO_GEN_SETTING_ENABLED::set).build());
+
         builder.add(entryBuilder.startStrField(Component.translatable("config.touhou_little_maid.global_ai.llm_proxy_address"), AIConfig.LLM_PROXY_ADDRESS.get())
                 .setDefaultValue(StringUtils.EMPTY)
                 .setTooltip(Component.translatable("config.touhou_little_maid.global_ai.llm_proxy_address.tooltip"))

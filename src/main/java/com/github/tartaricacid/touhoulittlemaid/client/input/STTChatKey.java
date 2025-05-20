@@ -28,8 +28,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static com.github.tartaricacid.touhoulittlemaid.client.event.PressAIChatKeyEvent.CAN_CHAT_MAID_IDS;
-
 @OnlyIn(Dist.CLIENT)
 @Mod.EventBusSubscriber(value = Dist.CLIENT)
 public class STTChatKey {
@@ -72,9 +70,7 @@ public class STTChatKey {
         Level level = player.level;
         int range = AIConfig.MAID_CAN_CHAT_DISTANCE.get();
         AABB aabb = player.getBoundingBox().inflate(range);
-        List<EntityMaid> maids = level.getEntitiesOfClass(EntityMaid.class, aabb,
-                maid -> maid.isOwnedBy(player) && maid.isAlive() &&
-                        CAN_CHAT_MAID_IDS.contains(maid.getModelId()));
+        List<EntityMaid> maids = level.getEntitiesOfClass(EntityMaid.class, aabb, maid -> maid.isOwnedBy(player) && maid.isAlive());
         maids.sort(Comparator.comparingDouble(maid -> maid.distanceToSqr(player)));
         if (!maids.isEmpty()) {
             consumer.accept(maids.get(0));

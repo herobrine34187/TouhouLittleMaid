@@ -13,8 +13,6 @@ public class RenderConfig {
     public static ForgeConfigSpec.BooleanValue ENABLE_LEAD_TIP;
     public static ForgeConfigSpec.BooleanValue ENABLE_SADDLE_TIP;
     public static ForgeConfigSpec.BooleanValue ENABLE_SHEARS_TIP;
-    public static ForgeConfigSpec.BooleanValue ENABLE_YSM_ROULETTE_TIP;
-    public static ForgeConfigSpec.BooleanValue ENABLE_AI_CHAT_TIP;
 
     public static void init(ForgeConfigSpec.Builder builder) {
         builder.push("render");
@@ -29,8 +27,6 @@ public class RenderConfig {
         ENABLE_LEAD_TIP = builder.define("EnableLeadTip", true);
         ENABLE_SADDLE_TIP = builder.define("EnableSaddleTip", true);
         ENABLE_SHEARS_TIP = builder.define("EnableShearsTip", true);
-        ENABLE_YSM_ROULETTE_TIP = builder.define("EnableYsmRouletteTip", true);
-        ENABLE_AI_CHAT_TIP = builder.define("EnableAIChatTip", true);
 
         builder.pop();
     }

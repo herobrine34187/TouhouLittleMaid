@@ -7,7 +7,17 @@ public class MetaData {
     private int version = 0;
     private String author = "";
     private List<String> modelId = List.of();
-    private String lanuage = "zh_cn";
+    private String language = "zh_cn";
+
+    public MetaData() {
+    }
+
+    public MetaData(int version, String author, List<String> modelId, String language) {
+        this.version = version;
+        this.author = author;
+        this.modelId = modelId;
+        this.language = language;
+    }
 
     public int getVersion() {
         return version;
@@ -21,8 +31,8 @@ public class MetaData {
         return modelId;
     }
 
-    public String getLanuage() {
-        return lanuage;
+    public String getLanguage() {
+        return language;
     }
 
     public void setVersion(int version) {
@@ -42,7 +52,7 @@ public class MetaData {
         this.modelId = modelId;
     }
 
-    public void setLanuage(String lanuage) {
-        this.lanuage = lanuage;
+    public void setLanguage(String language) {
+        this.language = language;
     }
 }

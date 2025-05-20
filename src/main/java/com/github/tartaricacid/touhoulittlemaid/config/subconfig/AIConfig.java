@@ -9,6 +9,7 @@ public class AIConfig {
     public static ForgeConfigSpec.BooleanValue LLM_ENABLED;
     public static ForgeConfigSpec.DoubleValue LLM_TEMPERATURE;
     public static ForgeConfigSpec.BooleanValue FUNCTION_CALL_ENABLED;
+    public static ForgeConfigSpec.BooleanValue AUTO_GEN_SETTING_ENABLED;
     public static ForgeConfigSpec.ConfigValue<String> LLM_PROXY_ADDRESS;
     public static ForgeConfigSpec.IntValue LLM_MAX_TOKEN;
     public static ForgeConfigSpec.IntValue MAID_MAX_HISTORY_LLM_SIZE;
@@ -35,6 +36,9 @@ public class AIConfig {
         builder.comment("Whether to enable the function call function?");
         builder.comment("The maid will be able to interact with the game after it is enabled, but it will increase the amount of token used");
         FUNCTION_CALL_ENABLED = builder.define("FunctionCallEnable", true);
+
+        builder.comment("Whether to automatically generate the maid's settings");
+        AUTO_GEN_SETTING_ENABLED = builder.define("AutoGenSettingEnabled", true);
 
         builder.comment("LLM AI Proxy Address, such as 127.0.0.1:1080, empty is no proxy, SOCKS proxies are not supported");
         LLM_PROXY_ADDRESS = builder.define("LLMProxyAddress", "");

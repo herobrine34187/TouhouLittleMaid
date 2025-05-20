@@ -1,5 +1,6 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.service;
 
+import javax.annotation.Nullable;
 import java.net.http.HttpRequest;
 
 /**
@@ -16,7 +17,7 @@ public interface ResponseCallback<T> {
      * @param throwable 异常信息
      * @param errorCode 错误代码
      */
-    void onFailure(HttpRequest request, Throwable throwable, int errorCode);
+    void onFailure(@Nullable HttpRequest request, Throwable throwable, int errorCode);
 
     /**
      * 请求成功时调用

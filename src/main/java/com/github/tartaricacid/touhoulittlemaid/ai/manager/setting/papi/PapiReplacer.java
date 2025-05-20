@@ -54,7 +54,6 @@ public class PapiReplacer {
     public static String replace(String input, EntityMaid maid, String language) {
         Map<String, String> valueMap = Maps.newHashMap();
         valueMap.put("main_setting", input);
-        valueMap.put("custom_setting", maid.getAiChatManager().customSetting);
         for (String key : PAPI_MAP.keySet()) {
             valueMap.put(key, PAPI_MAP.get(key).apply(maid, language));
         }

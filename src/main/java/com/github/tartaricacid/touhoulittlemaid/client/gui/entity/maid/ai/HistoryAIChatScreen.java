@@ -48,6 +48,7 @@ public class HistoryAIChatScreen extends Screen {
 
     @Override
     protected void init() {
+        this.clearWidgets();
         historyWidgets.clear();
         this.posX = this.width / 2 - 75;
         this.maxHeight = 10;

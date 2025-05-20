@@ -8,9 +8,6 @@ import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
 import com.github.tartaricacid.touhoulittlemaid.network.message.SendUserChatMessage;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.language.LanguageInfo;
-import net.minecraft.client.resources.language.LanguageManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
@@ -41,15 +38,8 @@ public class STTCallback implements ResponseCallback<String> {
     @Override
     public void onSuccess(String chatText) {
         if (StringUtils.isNotBlank(chatText)) {
-            LanguageManager languageManager = Minecraft.getInstance().getLanguageManager();
-            LanguageInfo info = languageManager.getLanguage(languageManager.getSelected());
-            String language;
-            if (info != null) {
-                language = info.toComponent().getString();
-            } else {
-                language = "English (US)";
-            }
-            NetworkHandler.CHANNEL.sendToServer(new SendUserChatMessage(maid.getId(), chatText, language));
+            ChatClientInfo clientInfo = ChatClientInfo.fromMaid(this.maid);
+            NetworkHandler.CHANNEL.sendToServer(new SendUserChatMessage(maid.getId(), chatText, clientInfo));
             String name = player.getScoreboardName();
             String format = String.format("<%s> %s", name, chatText);
             player.sendSystemMessage(Component.literal(format).withStyle(ChatFormatting.GRAY));

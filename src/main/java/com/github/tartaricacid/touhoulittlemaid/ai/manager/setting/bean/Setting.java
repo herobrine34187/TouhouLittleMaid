@@ -4,6 +4,14 @@ public final class Setting {
     private MetaData meta = new MetaData();
     private String setting = "";
 
+    public Setting() {
+    }
+
+    public Setting(MetaData meta, String setting) {
+        this.meta = meta;
+        this.setting = setting;
+    }
+
     public MetaData getMeta() {
         return meta;
     }

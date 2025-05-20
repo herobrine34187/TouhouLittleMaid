@@ -111,22 +111,17 @@ public final class LLMOpenAIClient implements LLMClient {
             if (firstChoice.hasToolCall()) {
                 this.onFunctionCall(maid, callback, request, firstChoice);
             } else {
-                this.onTextCall(callback, response, request, firstChoice);
+                this.onTextCall(callback, request, firstChoice);
             }
         }, ChatCompletionResponse.class);
     }
 
-    private void onTextCall(ResponseCallback<ResponseChat> callback, HttpResponse<String> response, HttpRequest request, Message firstChoice) {
+    private void onTextCall(ResponseCallback<ResponseChat> callback, HttpRequest request, Message firstChoice) {
         String content = firstChoice.getContent();
         ResponseChat chat;
         try {
             chat = Client.GSON.fromJson(content, ResponseChat.class);
-            if (chat == null || chat.getChatText().isBlank() || chat.getTtsText().isBlank()) {
-                String message = "Error in Response Chat: %s".formatted(chat);
-                callback.onFailure(request, new Throwable(message), ErrorCode.CHAT_TEXT_IS_EMPTY);
-            } else {
-                callback.onSuccess(chat);
-            }
+            callback.onSuccess(chat);
         } catch (JsonSyntaxException error) {
             String message = "Exception %s, JSON is: %s".formatted(error.getLocalizedMessage(), content);
             callback.onFailure(request, new Throwable(message), ErrorCode.JSON_DECODE_ERROR);

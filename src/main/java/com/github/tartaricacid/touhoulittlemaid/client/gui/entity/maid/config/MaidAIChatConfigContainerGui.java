@@ -5,15 +5,14 @@ import com.github.tartaricacid.touhoulittlemaid.ai.manager.entity.MaidAIChatMana
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.SupportLanguage;
 import com.github.tartaricacid.touhoulittlemaid.client.gui.entity.maid.AbstractMaidContainerGui;
 import com.github.tartaricacid.touhoulittlemaid.client.gui.entity.maid.ai.HistoryAIChatScreen;
+import com.github.tartaricacid.touhoulittlemaid.client.gui.entity.maid.ai.SettingEditScreen;
 import com.github.tartaricacid.touhoulittlemaid.client.gui.widget.button.MaidAIChatConfigButton;
 import com.github.tartaricacid.touhoulittlemaid.inventory.container.config.MaidAIChatConfigContainer;
 import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
 import com.github.tartaricacid.touhoulittlemaid.network.message.SaveMaidAIDataMessage;
 import com.google.common.collect.Lists;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -23,7 +22,6 @@ import org.anti_ad.mc.ipn.api.IPNButton;
 import org.anti_ad.mc.ipn.api.IPNGuiHint;
 import org.anti_ad.mc.ipn.api.IPNPlayerSideOnly;
 import org.apache.commons.lang3.StringUtils;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 import java.util.Map;
@@ -41,10 +39,6 @@ public class MaidAIChatConfigContainerGui extends AbstractMaidContainerGui<MaidA
     private final Map<String, Map<String, String>> llmSites;
     private final Map<String, Map<String, String>> ttsSites;
 
-    private boolean isEditSetting = false;
-    private EditBox ownerName;
-    private EditBox customSetting;
-
     public MaidAIChatConfigContainerGui(MaidAIChatConfigContainer screenContainer, Inventory inv, Component titleIn) {
         super(screenContainer, inv, titleIn);
         this.maid.getAiChatManager().readFromTag(screenContainer.getConfigData());
@@ -56,21 +50,14 @@ public class MaidAIChatConfigContainerGui extends AbstractMaidContainerGui<MaidA
     @Override
     protected void renderBg(GuiGraphics graphics, float partialTicks, int x, int y) {
         super.renderBg(graphics, partialTicks, x, y);
-        if (isEditSetting) {
-            graphics.blit(ICON, leftPos + 80, topPos + 28, 0, 0, 176, 24);
-        } else {
-            graphics.blit(ICON, leftPos + 80, topPos + 28, 0, 0, 176, 137);
-        }
+        graphics.blit(ICON, leftPos + 80, topPos + 28, 0, 0, 176, 137);
     }
 
     @Override
     protected void initAdditionWidgets() {
         int buttonLeft = leftPos + 86;
         int buttonTop = topPos + 52;
-        if (!this.isEditSetting) {
-            this.addConfigButtons(buttonLeft, buttonTop);
-        }
-        this.addInput(buttonLeft, buttonTop);
+        this.addConfigButtons(buttonLeft, buttonTop);
         this.addOtherButtons(buttonLeft);
     }
 
@@ -78,44 +65,18 @@ public class MaidAIChatConfigContainerGui extends AbstractMaidContainerGui<MaidA
     protected void renderAddition(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         graphics.drawCenteredString(font, Component.translatable("gui.touhou_little_maid.button.maid_ai_chat_config"),
                 leftPos + 167, topPos + 41, 0xFFFFFF);
-        if (this.isEditSetting) {
-            graphics.drawString(font, Component.translatable("gui.touhou_little_maid.button.maid_ai_chat_config.owner_name"),
-                    leftPos + 90, topPos + 56, 0x777777, false);
-            graphics.drawString(font, Component.translatable("gui.touhou_little_maid.button.maid_ai_chat_config.custom_setting"),
-                    leftPos + 90, topPos + 88, 0x777777, false);
-            this.ownerName.render(graphics, mouseX, mouseY, partialTicks);
-            this.customSetting.render(graphics, mouseX, mouseY, partialTicks);
-        }
-    }
-
-    private void addInput(int buttonLeft, int buttonTop) {
-        this.ownerName = new EditBox(this.font, buttonLeft + 3, buttonTop + 15, 158, 16, Component.literal("Owner Name"));
-        this.ownerName.setMaxLength(128);
-        this.ownerName.setValue(this.manager.ownerName);
-        this.ownerName.setResponder(s -> this.manager.ownerName = s);
-        this.ownerName.setVisible(this.isEditSetting);
-        this.addWidget(this.ownerName);
-
-        this.customSetting = new EditBox(this.font, buttonLeft + 3, buttonTop + 47, 158, 16, Component.literal("Custom Setting"));
-        this.customSetting.setMaxLength(1024);
-        this.customSetting.setValue(this.manager.customSetting);
-        this.customSetting.setResponder(s -> this.manager.customSetting = s);
-        this.customSetting.setVisible(this.isEditSetting);
-        this.addWidget(this.customSetting);
     }
 
     private void addOtherButtons(int buttonLeft) {
         MutableComponent edit = Component.translatable("gui.touhou_little_maid.button.maid_ai_chat_config.edit_custom_setting.edit");
-        MutableComponent save = Component.translatable("gui.touhou_little_maid.button.maid_ai_chat_config.edit_custom_setting.save");
         MutableComponent history = Component.translatable("gui.touhou_little_maid.button.maid_ai_chat_config.open_history_chat");
-        MutableComponent buttonName = this.isEditSetting ? save : edit;
 
-        this.addRenderableWidget(Button.builder(buttonName, button -> {
-                    this.isEditSetting = !this.isEditSetting;
+        this.addRenderableWidget(Button.builder(edit, button -> {
                     this.init();
                     this.saveConfig();
+                    this.getMinecraft().setScreen(new SettingEditScreen(this.maid));
                 }).bounds(buttonLeft + 2, topPos + 120, 160, 18)
-                .tooltip(Tooltip.create(buttonName)).build());
+                .tooltip(Tooltip.create(edit)).build());
 
         this.addRenderableWidget(Button.builder(history, button -> {
                     this.saveConfig();
@@ -287,36 +248,6 @@ public class MaidAIChatConfigContainerGui extends AbstractMaidContainerGui<MaidA
         String id = keys.get(index);
         button.setValue(Component.literal(models.get(id)));
         return id;
-    }
-
-    @Override
-    public void resize(Minecraft minecraft, int width, int height) {
-        String ownerNameValue = this.ownerName.getValue();
-        String customSettingValue = this.customSetting.getValue();
-        super.resize(minecraft, width, height);
-        this.ownerName.setValue(ownerNameValue);
-        this.customSetting.setValue(customSettingValue);
-    }
-
-    @Override
-    protected void containerTick() {
-        super.containerTick();
-        this.ownerName.tick();
-        this.customSetting.tick();
-    }
-
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == GLFW.GLFW_KEY_ESCAPE && this.getMinecraft().player != null) {
-            this.getMinecraft().player.closeContainer();
-        }
-        if (this.ownerName.keyPressed(keyCode, scanCode, modifiers) || this.customSetting.keyPressed(keyCode, scanCode, modifiers)) {
-            return true;
-        }
-        if (this.ownerName.canConsumeInput() || this.customSetting.canConsumeInput()) {
-            return true;
-        }
-        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     private void saveConfig() {
