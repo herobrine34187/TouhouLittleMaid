@@ -28,6 +28,8 @@ import com.google.common.net.MediaType;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.serialization.JsonOps;
+import io.github.haibiiin.json.repair.JSONRepair;
+import io.github.haibiiin.json.repair.JSONRepairConfig;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.GsonHelper;
 
@@ -120,7 +122,12 @@ public final class LLMOpenAIClient implements LLMClient {
         String content = firstChoice.getContent();
         ResponseChat chat;
         try {
-            chat = Client.GSON.fromJson(content, ResponseChat.class);
+            // 修正 JSON
+            JSONRepairConfig config = new JSONRepairConfig();
+            config.enableExtractJSON();
+            JSONRepair repair = new JSONRepair(config);
+            String correct = repair.handle(content);
+            chat = Client.GSON.fromJson(correct, ResponseChat.class);
             callback.onSuccess(chat);
         } catch (JsonSyntaxException error) {
             String message = "Exception %s, JSON is: %s".formatted(error.getLocalizedMessage(), content);

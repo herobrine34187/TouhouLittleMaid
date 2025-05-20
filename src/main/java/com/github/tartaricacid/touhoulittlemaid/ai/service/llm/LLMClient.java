@@ -7,6 +7,8 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.ErrorCode;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.ResponseCallback;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.google.gson.JsonSyntaxException;
+import io.github.haibiiin.json.repair.JSONRepair;
+import io.github.haibiiin.json.repair.JSONRepairConfig;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Type;
