@@ -8,6 +8,7 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.SupportModelSelect;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.DefaultLLMSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMMessage;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMSite;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.openai.response.ToolCall;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.system.TTSSystemSite;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
@@ -20,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
 
@@ -38,6 +40,7 @@ public abstract class MaidAIChatData extends MaidAIChatSerializable {
     public CompoundTag readFromTag(CompoundTag tag) {
         if (tag.contains(MAID_HISTORY_CHAT_TAG)) {
             this.history.getDeque().clear();
+
             LLMMessage.CODEC.listOf().parse(NbtOps.INSTANCE, tag.get(MAID_HISTORY_CHAT_TAG))
                     .resultOrPartial(TouhouLittleMaid.LOGGER::error)
                     .ifPresent(list -> {
@@ -132,6 +135,14 @@ public abstract class MaidAIChatData extends MaidAIChatSerializable {
 
     public void addAssistantHistory(String message) {
         this.history.add(LLMMessage.assistantChat(maid, message));
+    }
+
+    public void addAssistantHistory(String message, List<ToolCall> toolCalls) {
+        this.history.add(LLMMessage.assistantChat(maid, message, toolCalls));
+    }
+
+    public void addToolHistory(String message, String toolCallId) {
+        this.history.add(LLMMessage.toolChat(maid, message, toolCallId));
     }
 
     public EntityMaid getMaid() {

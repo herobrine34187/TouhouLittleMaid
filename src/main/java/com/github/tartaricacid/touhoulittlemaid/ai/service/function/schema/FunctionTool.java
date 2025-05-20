@@ -18,7 +18,7 @@ public class FunctionTool {
     private Parameter parameters;
 
     @SerializedName("strict")
-    private boolean strict = true;
+    private boolean strict = false;
 
     private FunctionTool() {
     }

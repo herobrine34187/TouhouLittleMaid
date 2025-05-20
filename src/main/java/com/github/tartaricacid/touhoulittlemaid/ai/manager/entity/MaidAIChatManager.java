@@ -4,10 +4,7 @@ import com.github.tartaricacid.touhoulittlemaid.ai.manager.response.ResponseChat
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.papi.PapiReplacer;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.papi.StringConstant;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.Client;
-import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMClient;
-import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMConfig;
-import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMMessage;
-import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMSite;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.*;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSClient;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSConfig;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSSite;
@@ -49,21 +46,29 @@ public final class MaidAIChatManager extends MaidAIChatData {
         LLMClient chatClient = site.client();
         List<LLMMessage> chatCompletion = getChatCompletion(this, clientInfo.language());
         if (chatCompletion.isEmpty()) {
-            if (AIConfig.AUTO_GEN_SETTING_ENABLED.get()) {
-                ChatBubbleManger.addInnerChatText(maid, "ai.touhou_little_maid.chat.llm.role_no_setting_and_gen_setting");
-                LLMMessage llmMessage = autoGenSetting(maid, clientInfo);
-                chatCompletion.add(llmMessage);
-                LLMConfig config = new LLMConfig(this.getLLMModel(), AIConfig.LLM_TEMPERATURE.get(), AIConfig.LLM_MAX_TOKEN.get());
-                AutoGenSettingCallback callback = new AutoGenSettingCallback(this, message);
-                chatClient.chat(this.maid, chatCompletion, config, callback);
-            } else {
-                ChatBubbleManger.addInnerChatText(maid, "ai.touhou_little_maid.chat.llm.role_no_setting");
-            }
+            this.onSettingIsEmpty(message, clientInfo, chatCompletion, chatClient);
         } else {
-            chatCompletion.add(LLMMessage.userChat(maid, message));
-            LLMConfig config = new LLMConfig(this.getLLMModel(), AIConfig.LLM_TEMPERATURE.get(), AIConfig.LLM_MAX_TOKEN.get());
-            LLMCallback callback = new LLMCallback(this, message);
-            chatClient.chat(this.maid, chatCompletion, config, callback);
+            this.normalChat(message, chatCompletion, chatClient);
+        }
+    }
+
+    private void normalChat(String message, List<LLMMessage> chatCompletion, LLMClient chatClient) {
+        chatCompletion.add(LLMMessage.userChat(maid, message));
+        LLMConfig config = LLMConfig.normalChat(this.getLLMModel(), this.maid);
+        LLMCallback callback = new LLMCallback(this, message);
+        chatClient.chat(chatCompletion, config, callback);
+    }
+
+    private void onSettingIsEmpty(String message, ChatClientInfo clientInfo, List<LLMMessage> chatCompletion, LLMClient chatClient) {
+        if (AIConfig.AUTO_GEN_SETTING_ENABLED.get()) {
+            ChatBubbleManger.addInnerChatText(maid, "ai.touhou_little_maid.chat.llm.role_no_setting_and_gen_setting");
+            LLMMessage llmMessage = autoGenSetting(maid, clientInfo);
+            chatCompletion.add(llmMessage);
+            LLMConfig config = new LLMConfig(this.getLLMModel(), this.maid, ChatType.AUTO_GEN_SETTING);
+            AutoGenSettingCallback callback = new AutoGenSettingCallback(this, message);
+            chatClient.chat(chatCompletion, config, callback);
+        } else {
+            ChatBubbleManger.addInnerChatText(maid, "ai.touhou_little_maid.chat.llm.role_no_setting");
         }
     }
 
@@ -88,9 +93,9 @@ public final class MaidAIChatManager extends MaidAIChatData {
         }
     }
 
-    private static List<LLMMessage> getChatCompletion(MaidAIChatManager chatManager, String language) {
+    private List<LLMMessage> getChatCompletion(MaidAIChatManager chatManager, String language) {
         // 如果含有自定义设定，则直接使用自定义设定
-        if (!chatManager.customSetting.isBlank()) {
+        if (StringUtils.isNotBlank(chatManager.customSetting)) {
             EntityMaid maid = chatManager.getMaid();
             String setting = PapiReplacer.replace(chatManager.customSetting, maid, language);
             CappedQueue<LLMMessage> history = chatManager.getHistory();
@@ -98,9 +103,6 @@ public final class MaidAIChatManager extends MaidAIChatData {
             chatList.add(LLMMessage.systemChat(maid, setting));
             // 倒序遍历，将历史对话加载进去
             history.getDeque().descendingIterator().forEachRemaining(chatList::add);
-            // 最后强调一下语言类型
-            chatList.add(LLMMessage.userChat(maid, StringConstant.SECONDARY_EMPHASIS_LANGUAGE
-                    .formatted(language, chatManager.getTTSLanguage())));
             return chatList;
         }
 
@@ -113,14 +115,11 @@ public final class MaidAIChatManager extends MaidAIChatData {
             chatList.add(LLMMessage.systemChat(maid, setting));
             // 倒序遍历，将历史对话加载进去
             history.getDeque().descendingIterator().forEachRemaining(chatList::add);
-            // 最后强调一下语言类型
-            chatList.add(LLMMessage.userChat(maid, StringConstant.SECONDARY_EMPHASIS_LANGUAGE
-                    .formatted(language, chatManager.getTTSLanguage())));
             return chatList;
         }).orElse(Lists.newArrayList());
     }
 
-    private static LLMMessage autoGenSetting(EntityMaid maid, ChatClientInfo clientInfo) {
+    private LLMMessage autoGenSetting(EntityMaid maid, ChatClientInfo clientInfo) {
         Map<String, String> valueMap = Maps.newHashMap();
         valueMap.put("output_json_format", Client.GSON.toJson(new ResponseChat()));
         valueMap.put("model_name", clientInfo.name());

@@ -1,12 +1,10 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.service.function;
 
-import com.github.tartaricacid.touhoulittlemaid.ai.manager.response.ResponseChat;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.function.response.ToolResponse;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.schema.parameter.ObjectParameter;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.schema.parameter.Parameter;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.mojang.serialization.Codec;
-
-import javax.annotation.Nullable;
 
 /**
  * 女仆能够执行的 Function Call 对象
@@ -47,8 +45,7 @@ public interface IFunctionCall<T> {
      *
      * @param result 解码后的对象
      * @param maid   正在对话的女仆
-     * @return 该函数执行完毕后，返回给 AI 的聊天内容，可以为空
+     * @return 该函数执行完毕后，返回的工具结果
      */
-    @Nullable
-    ResponseChat onToolCall(T result, EntityMaid maid);
+    ToolResponse onToolCall(T result, EntityMaid maid);
 }

@@ -1,5 +1,6 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.service.llm.openai.request;
 
+import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.openai.response.ToolCall;
 import com.google.common.collect.Lists;
 import com.google.gson.annotations.SerializedName;
 
@@ -45,6 +46,16 @@ public class ChatCompletion {
 
     public ChatCompletion assistantChat(String message) {
         this.messages.add(ChatMessage.assistantChat(message));
+        return this;
+    }
+
+    public ChatCompletion assistantChat(String message, List<ToolCall> toolCalls) {
+        this.messages.add(ChatMessage.assistantChat(message, toolCalls));
+        return this;
+    }
+
+    public ChatCompletion toolChat(String message, String toolCallId) {
+        this.messages.add(ChatMessage.toolChat(message, toolCallId));
         return this;
     }
 

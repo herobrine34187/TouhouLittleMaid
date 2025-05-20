@@ -2,6 +2,9 @@ package com.github.tartaricacid.touhoulittlemaid.ai.service.function.implement;
 
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.response.ResponseChat;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.IFunctionCall;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.function.response.EndToolResponse;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.function.response.KeepToolResponse;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.function.response.ToolResponse;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.schema.parameter.ObjectParameter;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.schema.parameter.Parameter;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.schema.parameter.StringParameter;
@@ -95,12 +98,12 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
     }
 
     @Override
-    public ResponseChat onToolCall(Result result, EntityMaid maid) {
+    public ToolResponse onToolCall(Result result, EntityMaid maid) {
         ResourceLocation taskId = result.taskId;
-        ResponseChat responseChat = new ResponseChat(result.chat, result.tts);
+        KeepToolResponse response = new KeepToolResponse("干得不错，摸摸你的头");
         Optional<IMaidTask> optional = TaskManager.findTask(taskId);
         if (optional.isEmpty()) {
-            return responseChat;
+            return response;
         }
 
         // 空闲模式额外判断
@@ -109,17 +112,17 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
         if (task == TaskManager.getIdleTask()) {
             putItemBack(maid, backpack);
             maid.setTask(task);
-            return responseChat;
+            return response;
         }
 
         // 攻击模式判断
         if (!(task instanceof IAttackTask attackTask)) {
-            return responseChat;
+            return response;
         }
         // 如果不需要拿武器并切换模式，那么不用执行后面的逻辑
         IMaidTask currentTask = maid.getTask();
         if (attackTask == currentTask && attackTask.isWeapon(maid, maid.getMainHandItem())) {
-            return responseChat;
+            return response;
         }
 
         maid.setTask(task);
@@ -135,7 +138,7 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
             }
             maid.setItemInHand(InteractionHand.MAIN_HAND, output);
         }
-        return responseChat;
+        return response;
     }
 
     private void putItemBack(EntityMaid maid, RangedWrapper backpack) {

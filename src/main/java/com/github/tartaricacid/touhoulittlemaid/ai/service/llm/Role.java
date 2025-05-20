@@ -6,8 +6,7 @@ public enum Role {
     SYSTEM("system"),
     USER("user"),
     ASSISTANT("assistant"),
-    TOOL("tool"),
-    FUNCTION("function");
+    TOOL("tool");
 
     public static final Codec<Role> CODEC = Codec.STRING.xmap(Role::byId, Role::getId);
 

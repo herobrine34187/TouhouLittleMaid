@@ -1,16 +1,30 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.service.llm.openai.response;
 
 import com.google.gson.annotations.SerializedName;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+
+import java.util.Optional;
 
 public class ToolCall {
+    public static Codec<ToolCall> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.STRING.optionalFieldOf("id").forGetter(s -> Optional.ofNullable(s.id)),
+            FunctionToolCall.CODEC.fieldOf("function").forGetter(ToolCall::getFunction)
+    ).apply(instance, (id, call) -> new ToolCall(id.orElse(null), call)));
+
     @SerializedName("id")
     private String id;
 
     @SerializedName("type")
-    private String type;
+    private String type = "function";
 
     @SerializedName("function")
     private FunctionToolCall functionToolCall;
+
+    public ToolCall(String id, FunctionToolCall functionToolCall) {
+        this.id = id;
+        this.functionToolCall = functionToolCall;
+    }
 
     public String getId() {
         return id;

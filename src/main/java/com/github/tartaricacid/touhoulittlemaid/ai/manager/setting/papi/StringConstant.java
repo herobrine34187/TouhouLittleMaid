@@ -20,10 +20,6 @@ public class StringConstant {
     public static final String TIME_FORMAT = "%02d:%02d";
     public static final String LIST_SEPARATORS = ", ";
 
-    public static final String SECONDARY_EMPHASIS_LANGUAGE = """
-            请用%s语言回复 chat_text 部分！并用%s语言回复 tts_text 部分！
-            """;
-
     public static final String FULL_SETTING = """
             ## 人物设定
             ${main_setting}

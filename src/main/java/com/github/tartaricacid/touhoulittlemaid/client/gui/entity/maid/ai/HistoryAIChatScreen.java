@@ -25,6 +25,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Deque;
 import java.util.List;
@@ -162,9 +163,9 @@ public class HistoryAIChatScreen extends Screen {
         deque.descendingIterator().forEachRemaining(message -> {
             if (message.role() == Role.USER) {
                 this.history.add(message);
-            } else if (message.role() == Role.ASSISTANT) {
+            } else if (message.role() == Role.ASSISTANT && StringUtils.isNotBlank(message.message())) {
                 ResponseChat responseChat = Client.GSON.fromJson(message.message(), ResponseChat.class);
-                this.history.add(new LLMMessage(Role.ASSISTANT, responseChat.getChatText(), message.gameTime()));
+                this.history.add(new LLMMessage(Role.ASSISTANT, responseChat.getChatText(), message.gameTime(), null, null));
             }
         });
     }
