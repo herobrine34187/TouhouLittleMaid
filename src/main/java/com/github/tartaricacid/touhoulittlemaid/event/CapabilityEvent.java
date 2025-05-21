@@ -25,6 +25,7 @@ public final class CapabilityEvent {
     private static final ResourceLocation POWER_CAP = new ResourceLocation(TouhouLittleMaid.MOD_ID, "power");
     private static final ResourceLocation MAID_NUM_CAP = new ResourceLocation(TouhouLittleMaid.MOD_ID, "maid_num");
     private static final ResourceLocation GECKO_MAID_CAP = new ResourceLocation(TouhouLittleMaid.MOD_ID, "gecko_maid");
+    private static final ResourceLocation CHAT_TOKENS_CAP = new ResourceLocation(TouhouLittleMaid.MOD_ID, "chat_tokens");
 
     @SubscribeEvent
     public static void onAttachCapabilityEvent(AttachCapabilitiesEvent<Entity> event) {
@@ -32,6 +33,7 @@ public final class CapabilityEvent {
         if (entity instanceof Player) {
             event.addCapability(POWER_CAP, new PowerCapabilityProvider());
             event.addCapability(MAID_NUM_CAP, new MaidNumCapabilityProvider());
+            event.addCapability(CHAT_TOKENS_CAP, new ChatTokensCapabilityProvider());
         } else if (entity.level.isClientSide() && entity instanceof Mob mob) {
             var maid = IMaid.convert(mob);
             if (maid != null) {
@@ -45,6 +47,7 @@ public final class CapabilityEvent {
         Player original = event.getOriginal();
         Player newPlayer = event.getEntity();
         original.reviveCaps();
+
         LazyOptional<PowerCapability> oldPowerCap = getPowerCap(original);
         LazyOptional<PowerCapability> newPowerCap = getPowerCap(newPlayer);
         newPowerCap.ifPresent((newPower) -> oldPowerCap.ifPresent((oldPower) -> {
@@ -55,9 +58,16 @@ public final class CapabilityEvent {
                 newPower.set(oldPower.get());
             }
         }));
+
         LazyOptional<MaidNumCapability> oldMaidNumCap = getMaidNumCap(original);
         LazyOptional<MaidNumCapability> newMaidNumCap = getMaidNumCap(newPlayer);
         newMaidNumCap.ifPresent((newMaidNum) -> oldMaidNumCap.ifPresent((oldMaidNum) -> newMaidNum.set(oldMaidNum.get())));
+
+        LazyOptional<ChatTokensCapability> oldChatTokensCap = getChatTokensCap(original);
+        LazyOptional<ChatTokensCapability> newChatTokensCap = getChatTokensCap(newPlayer);
+        newChatTokensCap.ifPresent((newChatTokens) -> oldChatTokensCap.ifPresent((oldChatTokens)
+                -> newChatTokens.setCount(oldChatTokens.getCount())));
+
         original.invalidateCaps();
     }
 
@@ -93,5 +103,9 @@ public final class CapabilityEvent {
 
     private static LazyOptional<PowerCapability> getPowerCap(Player player) {
         return player.getCapability(PowerCapabilityProvider.POWER_CAP);
+    }
+
+    private static LazyOptional<ChatTokensCapability> getChatTokensCap(Player player) {
+        return player.getCapability(ChatTokensCapabilityProvider.CHAT_TOKENS_CAP);
     }
 }

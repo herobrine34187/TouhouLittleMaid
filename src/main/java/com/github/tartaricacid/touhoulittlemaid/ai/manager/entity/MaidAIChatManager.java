@@ -9,6 +9,7 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSClient;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSConfig;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSSystemServices;
+import com.github.tartaricacid.touhoulittlemaid.capability.ChatTokensCapabilityProvider;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
 import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleManger;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
@@ -17,6 +18,8 @@ import com.github.tartaricacid.touhoulittlemaid.network.message.TTSSystemAudioTo
 import com.github.tartaricacid.touhoulittlemaid.util.CappedQueue;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -34,22 +37,32 @@ public final class MaidAIChatManager extends MaidAIChatData {
         super(maid);
     }
 
-    public void chat(String message, ChatClientInfo clientInfo) {
+    public void chat(String message, ChatClientInfo clientInfo, ServerPlayer sender) {
         if (!AIConfig.LLM_ENABLED.get()) {
-            ChatBubbleManger.addInnerChatText(maid, "ai.touhou_little_maid.chat.disable");
-        }
-        @Nullable LLMSite site = this.getLLMSite();
-        if (site == null || !site.enabled()) {
-            ChatBubbleManger.addInnerChatText(maid, "ai.touhou_little_maid.chat.llm.empty");
+            sender.sendSystemMessage(Component.translatable("ai.touhou_little_maid.chat.disable")
+                    .withStyle(ChatFormatting.RED));
             return;
         }
-        LLMClient chatClient = site.client();
-        List<LLMMessage> chatCompletion = getChatCompletion(this, clientInfo.language());
-        if (chatCompletion.isEmpty()) {
-            this.onSettingIsEmpty(message, clientInfo, chatCompletion, chatClient);
-        } else {
-            this.normalChat(message, chatCompletion, chatClient);
-        }
+        sender.getCapability(ChatTokensCapabilityProvider.CHAT_TOKENS_CAP).ifPresent(chatTokens -> {
+            if (chatTokens.getCount() >= AIConfig.MAX_TOKENS_PER_PLAYER.get()) {
+                sender.sendSystemMessage(Component.translatable("message.touhou_little_maid.ai_chat.max_tokens_limit")
+                        .withStyle(ChatFormatting.RED));
+                return;
+            }
+            @Nullable LLMSite site = this.getLLMSite();
+            if (site == null || !site.enabled()) {
+                sender.sendSystemMessage(Component.translatable("ai.touhou_little_maid.chat.llm.empty")
+                        .withStyle(ChatFormatting.RED));
+                return;
+            }
+            LLMClient chatClient = site.client();
+            List<LLMMessage> chatCompletion = getChatCompletion(this, clientInfo.language());
+            if (chatCompletion.isEmpty()) {
+                this.onSettingIsEmpty(message, clientInfo, chatCompletion, chatClient);
+            } else {
+                this.normalChat(message, chatCompletion, chatClient);
+            }
+        });
     }
 
     private void normalChat(String message, List<LLMMessage> chatCompletion, LLMClient chatClient) {

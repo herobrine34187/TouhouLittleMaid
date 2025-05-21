@@ -14,7 +14,9 @@ public class AIChatCommand {
     public static LiteralArgumentBuilder<CommandSourceStack> get() {
         LiteralArgumentBuilder<CommandSourceStack> root = LiteralArgumentBuilder.literal(ROOT_NAME);
         LiteralArgumentBuilder<CommandSourceStack> reload = LiteralArgumentBuilder.literal(RELOAD_NAME);
+        LiteralArgumentBuilder<CommandSourceStack> tokens = ChatTokensCommand.get();
         root.then(reload.executes(AIChatCommand::reload));
+        root.then(tokens);
         return root;
     }
 

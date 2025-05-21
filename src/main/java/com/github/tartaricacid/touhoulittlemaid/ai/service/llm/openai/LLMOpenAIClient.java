@@ -16,6 +16,8 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.openai.request.Re
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.openai.request.Tool;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.openai.response.ChatCompletionResponse;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.openai.response.Message;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.openai.response.Usage;
+import com.github.tartaricacid.touhoulittlemaid.capability.ChatTokensCapabilityProvider;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.google.common.net.HttpHeaders;
@@ -24,6 +26,7 @@ import com.google.gson.JsonSyntaxException;
 import io.github.haibiiin.json.repair.JSONRepair;
 import io.github.haibiiin.json.repair.JSONRepairConfig;
 import io.github.haibiiin.json.repair.RepairFailureException;
+import net.minecraft.server.level.ServerPlayer;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -111,6 +114,20 @@ public final class LLMOpenAIClient implements LLMClient {
     private void handle(List<LLMMessage> messages, LLMConfig config, ResponseCallback<ResponseChat> callback,
                         HttpResponse<String> response, Throwable throwable, HttpRequest request) {
         this.<ChatCompletionResponse>handleResponse(callback, response, throwable, request, chat -> {
+//             GsonBuilder gsonBuilder = new GsonBuilder();
+//             gsonBuilder.setPrettyPrinting();
+//             System.out.println(gsonBuilder.create().toJson(chat));
+
+            Usage usage = chat.getUsage();
+            if (usage != null) {
+                // TOKEN 计数
+                int totalTokens = usage.getTotalTokens();
+                if (totalTokens > 0 && config.maid().getOwner() instanceof ServerPlayer serverPlayer) {
+                    serverPlayer.getCapability(ChatTokensCapabilityProvider.CHAT_TOKENS_CAP)
+                            .ifPresent(tokens -> tokens.addCount(totalTokens));
+                }
+            }
+
             Message firstChoice = chat.getFirstChoice();
             if (firstChoice == null) {
                 String message = "No Choice Found: %s".formatted(response);

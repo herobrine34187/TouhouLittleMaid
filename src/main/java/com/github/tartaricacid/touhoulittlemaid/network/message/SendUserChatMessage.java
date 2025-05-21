@@ -48,7 +48,7 @@ public class SendUserChatMessage {
         }
         Entity entity = sender.level.getEntity(message.maidId);
         if (entity instanceof EntityMaid maid && maid.isOwnedBy(sender) && maid.isAlive()) {
-            maid.getAiChatManager().chat(message.message, message.clientInfo);
+            maid.getAiChatManager().chat(message.message, message.clientInfo, sender);
         }
     }
 }

@@ -13,6 +13,7 @@ public class AIConfig {
     public static ForgeConfigSpec.ConfigValue<String> LLM_PROXY_ADDRESS;
     public static ForgeConfigSpec.IntValue LLM_MAX_TOKEN;
     public static ForgeConfigSpec.IntValue MAID_MAX_HISTORY_LLM_SIZE;
+    public static ForgeConfigSpec.IntValue MAX_TOKENS_PER_PLAYER;
 
     public static ForgeConfigSpec.BooleanValue TTS_ENABLED;
     public static ForgeConfigSpec.ConfigValue<String> TTS_LANGUAGE;
@@ -48,6 +49,9 @@ public class AIConfig {
 
         builder.comment("The maximum historical conversation length cached by the maid");
         MAID_MAX_HISTORY_LLM_SIZE = builder.defineInRange("MaidMaxHistoryLLMSize", 16, 1, 128);
+
+        builder.comment("The maximum tokens that a player can use");
+        MAX_TOKENS_PER_PLAYER = builder.defineInRange("MaxTokensPerPlayer", Integer.MAX_VALUE, 1, Integer.MAX_VALUE);
 
         builder.comment("Whether or not to enable the TTS feature");
         TTS_ENABLED = builder.define("TTSEnabled", true);

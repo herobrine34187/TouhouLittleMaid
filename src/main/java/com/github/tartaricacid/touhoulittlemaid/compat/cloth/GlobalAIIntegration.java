@@ -114,6 +114,11 @@ public class GlobalAIIntegration {
                 .setTooltip(Component.translatable("config.touhou_little_maid.global_ai.maid_max_history_llm_size.tooltip"))
                 .setSaveConsumer(AIConfig.MAID_MAX_HISTORY_LLM_SIZE::set).build());
 
+        builder.add(entryBuilder.startIntField(Component.translatable("config.touhou_little_maid.global_ai.max_tokens_per_player"), AIConfig.MAX_TOKENS_PER_PLAYER.get())
+                .setDefaultValue(Integer.MAX_VALUE)
+                .setTooltip(Component.translatable("config.touhou_little_maid.global_ai.max_tokens_per_player.tooltip"))
+                .setSaveConsumer(AIConfig.MAX_TOKENS_PER_PLAYER::set).build());
+
         aiChat.addEntry(builder.build());
     }
 
