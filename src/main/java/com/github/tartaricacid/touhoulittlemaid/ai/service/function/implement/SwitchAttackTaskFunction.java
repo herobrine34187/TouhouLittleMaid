@@ -3,7 +3,6 @@ package com.github.tartaricacid.touhoulittlemaid.ai.service.function.implement;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.response.ResponseChat;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.IFunctionCall;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.response.EndToolResponse;
-import com.github.tartaricacid.touhoulittlemaid.ai.service.function.response.KeepToolResponse;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.response.ToolResponse;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.schema.parameter.ObjectParameter;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.schema.parameter.Parameter;
@@ -29,8 +28,7 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
             当你需要切换与击杀怪物相关的工作模式时，可以调用此函数。
             参数需要给定一个工作模式的 ID，和一个此刻你打算说的话。
             根据对话记录自动选择工作模式的 ID
-            如果我提供的信息缺少工具所需要的必填参数，你需要进一步追问让我提供更多信息。
-            """;
+            如果我提供的信息缺少工具所需要的必填参数，你需要进一步追问让我提供更多信息。""";
     private static final String TASK_ID_PARAMETER_ID = "task_id";
     private static final String TASK_ID_PARAMETER_DESC = """
             你需要切换的工作模式 ID：
@@ -39,17 +37,14 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
             - touhou_little_maid:ranged_attack 表示弓箭攻击模式，你会主动用弓箭攻击周围的敌对生物
             - touhou_little_maid:crossbow_attack 表示弩箭攻击模式，你会主动用弩箭攻击周围的敌对生物
             - touhou_little_maid:danmaku_attack 表示弹幕攻击模式，你会主动用弹幕攻击周围的敌对生物
-            - touhou_little_maid:trident_attack 表示三叉戟攻击模式，你会主动用三叉戟攻击周围的敌对生物
-            """;
+            - touhou_little_maid:trident_attack 表示三叉戟攻击模式，你会主动用三叉戟攻击周围的敌对生物""";
     private static final String GUN_TASK_ID_PARAMETER_DESC = "- touhou_little_maid:gun_attack 表示枪械攻击，你会主动用 TACZ 的枪械攻击周围的敌对生物";
     private static final String CHAT_PARAMETER_ID = "chat_text";
     private static final String CHAT_PARAMETER_DESC = """
-            你此刻打算说的话，需要符合当前的工作模式切换
-            """;
+            你此刻打算说的话，需要符合当前的工作模式切换""";
     private static final String TTS_PARAMETER_ID = "tts_text";
     private static final String TTS_PARAMETER_DESC = """
-            将 chat_text 部分翻译成 %s 语言的文本
-            """;
+            将 chat_text 部分翻译成 %s 语言的文本""";
 
     @Override
     public String getId() {
@@ -100,7 +95,7 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
     @Override
     public ToolResponse onToolCall(Result result, EntityMaid maid) {
         ResourceLocation taskId = result.taskId;
-        KeepToolResponse response = new KeepToolResponse("干得不错，摸摸你的头");
+        EndToolResponse response = new EndToolResponse(new ResponseChat(result.chat, result.tts));
         Optional<IMaidTask> optional = TaskManager.findTask(taskId);
         if (optional.isEmpty()) {
             return response;

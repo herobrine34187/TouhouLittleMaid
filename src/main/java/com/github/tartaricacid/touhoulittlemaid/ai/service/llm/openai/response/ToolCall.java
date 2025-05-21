@@ -9,8 +9,8 @@ import java.util.Optional;
 public class ToolCall {
     public static Codec<ToolCall> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.optionalFieldOf("id").forGetter(s -> Optional.ofNullable(s.id)),
-            FunctionToolCall.CODEC.fieldOf("function").forGetter(ToolCall::getFunction)
-    ).apply(instance, (id, call) -> new ToolCall(id.orElse(null), call)));
+            FunctionToolCall.CODEC.optionalFieldOf("function").forGetter(s -> Optional.ofNullable(s.functionToolCall))
+    ).apply(instance, (id, call) -> new ToolCall(id.orElse(null), call.orElse(null))));
 
     @SerializedName("id")
     private String id;

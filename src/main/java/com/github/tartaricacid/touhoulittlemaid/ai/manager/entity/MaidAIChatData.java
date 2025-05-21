@@ -39,16 +39,19 @@ public abstract class MaidAIChatData extends MaidAIChatSerializable {
     @Override
     public CompoundTag readFromTag(CompoundTag tag) {
         if (tag.contains(MAID_HISTORY_CHAT_TAG)) {
-            this.history.getDeque().clear();
-
-            LLMMessage.CODEC.listOf().parse(NbtOps.INSTANCE, tag.get(MAID_HISTORY_CHAT_TAG))
-                    .resultOrPartial(TouhouLittleMaid.LOGGER::error)
-                    .ifPresent(list -> {
-                        ListIterator<LLMMessage> iterator = list.listIterator(list.size());
-                        while (iterator.hasPrevious()) {
-                            history.add(iterator.previous());
-                        }
-                    });
+            try {
+                this.history.getDeque().clear();
+                LLMMessage.CODEC.listOf().parse(NbtOps.INSTANCE, tag.get(MAID_HISTORY_CHAT_TAG))
+                        .resultOrPartial(TouhouLittleMaid.LOGGER::error)
+                        .ifPresent(list -> {
+                            ListIterator<LLMMessage> iterator = list.listIterator(list.size());
+                            while (iterator.hasPrevious()) {
+                                history.add(iterator.previous());
+                            }
+                        });
+            } catch (Exception e) {
+                TouhouLittleMaid.LOGGER.error("Failed to parse MaidHistoryChat", e);
+            }
         }
         return super.readFromTag(tag);
     }
@@ -56,10 +59,14 @@ public abstract class MaidAIChatData extends MaidAIChatSerializable {
     @Override
     public CompoundTag writeToTag(CompoundTag tag) {
         if (this.history.size() > 0) {
-            ArrayList<LLMMessage> llmMessages = Lists.newArrayList(this.history.getDeque());
-            LLMMessage.CODEC.listOf().encodeStart(NbtOps.INSTANCE, llmMessages)
-                    .resultOrPartial(TouhouLittleMaid.LOGGER::error)
-                    .ifPresent(t -> tag.put(MAID_HISTORY_CHAT_TAG, t));
+            try {
+                ArrayList<LLMMessage> llmMessages = Lists.newArrayList(this.history.getDeque());
+                LLMMessage.CODEC.listOf().encodeStart(NbtOps.INSTANCE, llmMessages)
+                        .resultOrPartial(TouhouLittleMaid.LOGGER::error)
+                        .ifPresent(t -> tag.put(MAID_HISTORY_CHAT_TAG, t));
+            } catch (Exception e) {
+                TouhouLittleMaid.LOGGER.error("Failed to parse MaidHistoryChat", e);
+            }
         }
         return super.writeToTag(tag);
     }

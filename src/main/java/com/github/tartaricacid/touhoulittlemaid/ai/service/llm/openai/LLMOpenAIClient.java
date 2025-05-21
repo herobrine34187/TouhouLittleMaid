@@ -83,7 +83,11 @@ public final class LLMOpenAIClient implements LLMClient {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(chatCompletion)))
                 .timeout(MAX_TIMEOUT).uri(url);
-        System.out.println(GSON.toJson(chatCompletion));
+
+//        GsonBuilder gsonBuilder = new GsonBuilder();
+//        gsonBuilder.setPrettyPrinting();
+//        System.out.println(gsonBuilder.create().toJson(chatCompletion));
+
         this.site.headers().forEach(builder::header);
         HttpRequest httpRequest = builder.build();
         httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString())
