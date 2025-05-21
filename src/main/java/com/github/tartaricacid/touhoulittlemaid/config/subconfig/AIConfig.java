@@ -36,7 +36,7 @@ public class AIConfig {
 
         builder.comment("Whether to enable the function call function?");
         builder.comment("The maid will be able to interact with the game after it is enabled, but it will increase the amount of token used");
-        FUNCTION_CALL_ENABLED = builder.define("FunctionCallEnable", true);
+        FUNCTION_CALL_ENABLED = builder.define("FunctionCallEnable", false);
 
         builder.comment("Whether to automatically generate the maid's settings");
         AUTO_GEN_SETTING_ENABLED = builder.define("AutoGenSettingEnabled", true);

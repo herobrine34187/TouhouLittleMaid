@@ -96,6 +96,9 @@ public final class LLMOpenAIClient implements LLMClient {
 
     private void addFunctionCalls(EntityMaid maid, ChatCompletion chatCompletion) {
         FunctionCallRegister.getFunctionCalls().forEach((key, value) -> {
+            if (!value.addToChatCompletion(maid, chatCompletion)) {
+                return;
+            }
             String id = value.getId();
             String description = value.getDescription(maid);
             ObjectParameter root = ObjectParameter.create();

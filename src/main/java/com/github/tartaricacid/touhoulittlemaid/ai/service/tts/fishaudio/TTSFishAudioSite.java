@@ -105,7 +105,7 @@ public final class TTSFishAudioSite implements TTSSite, SupportModelSelect {
         @Override
         public TTSFishAudioSite defaultSite() {
             return new TTSFishAudioSite(API_TYPE, SerializableSite.defaultIcon(API_TYPE),
-                    "https://api.fish.audio/v1/tts", true, StringUtils.EMPTY, Map.of(),
+                    "https://api.fish.audio/v1/tts", false, StringUtils.EMPTY, Map.of(),
                     Map.of("b2b2d0fa88ee44d789da28ebbd97421e", "Neuro-sama (EN)",
                             "4858e0be678c4449bf3a7646186edd42", "Nahida (EN)",
                             "1aacaeb1b840436391b835fd5513f4c4", "Furina (CN)",

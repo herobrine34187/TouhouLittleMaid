@@ -3,6 +3,7 @@ package com.github.tartaricacid.touhoulittlemaid.ai.service.function;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.response.ToolResponse;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.schema.parameter.ObjectParameter;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.schema.parameter.Parameter;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.openai.request.ChatCompletion;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.mojang.serialization.Codec;
 
@@ -37,6 +38,17 @@ public interface IFunctionCall<T> {
      * 当 AI 返回 function call 参数时，你解码这个 json 字符串的解码器
      */
     Codec<T> codec();
+
+    /**
+     * 是否添加进 AI 对话中，建议只在特定情况下添加，可以节省 token 数量
+     *
+     * @param maid           正在对话的女仆
+     * @param chatCompletion AI 对话对象
+     * @return 是否添加进 AI 对话中
+     */
+    default boolean addToChatCompletion(EntityMaid maid, ChatCompletion chatCompletion) {
+        return true;
+    }
 
     /**
      * 最终 function call 执行的游戏逻辑播放。

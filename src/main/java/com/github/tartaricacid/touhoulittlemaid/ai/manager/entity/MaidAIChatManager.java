@@ -1,9 +1,7 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.manager.entity;
 
-import com.github.tartaricacid.touhoulittlemaid.ai.manager.response.ResponseChat;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.papi.PapiReplacer;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.papi.StringConstant;
-import com.github.tartaricacid.touhoulittlemaid.ai.service.Client;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.*;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSClient;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSConfig;
