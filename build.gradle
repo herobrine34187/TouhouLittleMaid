@@ -159,7 +159,7 @@ dependencies {
 
     // JSON 修正库，可以用来修正 LLM 返回的不正确格式
     // https://github.com/HAibiiin/json-repair
-    jarJar(minecraftLibrary("libs:json-repair-0.3.0")) {
+    jarJar(minecraftLibrary("libs:json-repair:0.3.0")) {
         jarJar.ranged(it, "[0.3.0,)")
     }
 
