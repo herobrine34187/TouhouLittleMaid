@@ -127,12 +127,19 @@ public class LLMCallback implements ResponseCallback<ResponseChat> {
         if (functionCall == null) {
             return;
         }
-        JsonObject parse = GsonHelper.parse(arguments);
-        Optional optional = functionCall.codec().parse(JsonOps.INSTANCE, parse).resultOrPartial(TouhouLittleMaid.LOGGER::error);
-        if (optional.isEmpty()) {
+        Object result = null;
+        try {
+            JsonObject parse = GsonHelper.parse(arguments);
+            Optional optional = functionCall.codec().parse(JsonOps.INSTANCE, parse).resultOrPartial(TouhouLittleMaid.LOGGER::error);
+            if (optional.isEmpty()) {
+                return;
+            }
+            result = optional.get();
+        } catch (JsonSyntaxException exception) {
+            String message = "Exception %s, JSON is: %s".formatted(exception.getLocalizedMessage(), arguments);
+            this.onFailure(null, new Throwable(message), ErrorCode.JSON_DECODE_ERROR);
             return;
         }
-        Object result = optional.get();
         // 需要记录下工具调用，方便 debug
         TouhouLittleMaid.LOGGER.debug("Use function call: {}, arguments is {}", functionCall.getId(), arguments);
         // 因为获取网络流是在独立的线程上，所以需要推送到主线程执行
@@ -140,9 +147,10 @@ public class LLMCallback implements ResponseCallback<ResponseChat> {
         if (!(maid.level instanceof ServerLevel serverLevel)) {
             return;
         }
+        Object finalResult = result;
         serverLevel.getServer().submit(() -> {
             // 工具调用必须在主线程，否则可能会出奇怪的问题
-            ToolResponse toolResponse = functionCall.onToolCall(result, maid);
+            ToolResponse toolResponse = functionCall.onToolCall(finalResult, maid);
             // 结束 Function Call，那么正常触发 TTS 和聊天信息即可
             if (toolResponse instanceof EndToolResponse end) {
                 this.onSuccess(end.responseChat());
