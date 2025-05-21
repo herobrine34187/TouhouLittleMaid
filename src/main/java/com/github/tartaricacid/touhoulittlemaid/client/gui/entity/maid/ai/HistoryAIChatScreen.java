@@ -1,7 +1,6 @@
 package com.github.tartaricacid.touhoulittlemaid.client.gui.entity.maid.ai;
 
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.response.ResponseChat;
-import com.github.tartaricacid.touhoulittlemaid.ai.service.Client;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMMessage;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.Role;
 import com.github.tartaricacid.touhoulittlemaid.client.gui.widget.button.HistoryChatWidget;
@@ -164,7 +163,7 @@ public class HistoryAIChatScreen extends Screen {
             if (message.role() == Role.USER) {
                 this.history.add(message);
             } else if (message.role() == Role.ASSISTANT && StringUtils.isNotBlank(message.message())) {
-                ResponseChat responseChat = Client.GSON.fromJson(message.message(), ResponseChat.class);
+                ResponseChat responseChat = new ResponseChat(message.message());
                 this.history.add(new LLMMessage(Role.ASSISTANT, responseChat.getChatText(), message.gameTime(), null, null));
             }
         });

@@ -1,7 +1,5 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.papi;
 
-import com.github.tartaricacid.touhoulittlemaid.ai.manager.response.ResponseChat;
-import com.github.tartaricacid.touhoulittlemaid.ai.service.Client;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.google.common.collect.Maps;
 import net.minecraft.core.registries.Registries;
@@ -40,7 +38,6 @@ public class PapiReplacer {
         registerContext("mainhand_item", (maid, lang) -> getSlotItemName(EquipmentSlot.MAINHAND, maid));
         registerContext("offhand_item", (maid, lang) -> getSlotItemName(EquipmentSlot.OFFHAND, maid));
         registerContext("inventory_items", PapiReplacer::getInventoryItems);
-        registerContext("output_json_format", PapiReplacer::getOutputJsonFormat);
         registerContext("chat_language", (maid, lang) -> lang);
         registerContext("tts_language", PapiReplacer::ttsLanguage);
         registerContext("healthy", PapiReplacer::getHealthyInfo);
@@ -191,9 +188,5 @@ public class PapiReplacer {
             return EMPTY;
         }
         return StringUtils.join(names, LIST_SEPARATORS);
-    }
-
-    private static String getOutputJsonFormat(EntityMaid maid, String chatLanguage) {
-        return Client.GSON.toJson(new ResponseChat());
     }
 }

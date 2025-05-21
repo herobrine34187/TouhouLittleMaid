@@ -1,13 +1,24 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.manager.response;
 
-import com.google.gson.annotations.SerializedName;
+import org.apache.commons.lang3.StringUtils;
 
 public class ResponseChat {
-    @SerializedName("chat_text")
-    public String chatText = "";
+    public String chatText;
+    public String ttsText;
 
-    @SerializedName("tts_text")
-    public String ttsText = "";
+    public ResponseChat(String input) {
+        String[] split = input.trim().split("@@", 2);
+        this.chatText = split[0].trim();
+        this.ttsText = split.length > 1 ? split[1].trim() : this.chatText;
+        if (StringUtils.isBlank(ttsText)) {
+            this.ttsText = this.chatText;
+        }
+    }
+
+    public ResponseChat(String chatText, String ttsText) {
+        this.chatText = chatText;
+        this.ttsText = ttsText;
+    }
 
     public String getChatText() {
         return chatText;
@@ -17,17 +28,8 @@ public class ResponseChat {
         return ttsText;
     }
 
-    public ResponseChat() {
-    }
-
-    public ResponseChat(String chatText, String ttsText) {
-        this.chatText = chatText;
-        this.ttsText = ttsText;
-    }
-
     @Override
     public String toString() {
-        return "{\"chat_text\":\"%s\",\"tts_text\":\"%s\"}"
-                .formatted(chatText, ttsText);
+        return "%s@@%s".formatted(chatText, ttsText);
     }
 }

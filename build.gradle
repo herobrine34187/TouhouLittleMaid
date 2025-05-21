@@ -157,12 +157,6 @@ dependencies {
         jarJar.ranged(it, "[2.4,)")
     }
 
-    // JSON 修正库，可以用来修正 LLM 返回的不正确格式
-    // https://github.com/HAibiiin/json-repair
-    jarJar(minecraftLibrary("libs:json-repair:0.3.0")) {
-        jarJar.ranged(it, "[0.3.0,)")
-    }
-
     // 拆分出来的基岩版模型加载库
     jarJar(implementation(fg.deobf("libs:simplebedrockmodel:1.20.1-release-1.2.0"))) {
         jarJar.ranged(it, "[1.2.0,)")

@@ -51,29 +51,22 @@ public class StringConstant {
             ## 函数调用说明
             - 如果我没有提供足够的信息来调用函数，请继续提问以确保收集到了足够的信息。
             - 根据对话和系统信息自主决定调用哪个函数。
-            - 继续提问内容或者提供总结内容也请遵循 JSON 格式：${output_json_format}。
+            - 继续提问内容或者提供总结内容也请遵循下述的输出格式要求
             
             ## 对话文本要求
             - 回复长度建议限制在64个字符以内。
             
             ## 输出格式要求
             - 回复中不包含行为或表情类的旁白性质的词语。
-            - 输出格式为 JSON 格式：${output_json_format}
-                - 文字（chat_text）字段为${chat_language}回复。
-                - 语音（tts_text）字段为${chat_language}回复翻译过来的${tts_language}回复。
+            - 输出为两行文本，第一行为${chat_language}语言，第二行为第一行翻译成${tts_language}的文本，中间用 @@ 隔开。
             
             ## 参考对话案例
             用户：你好啊
-            回复：{"chat_text":"看到你真开心！要不要一起去挖矿？","tts_text":"看到你真开心！要不要一起去挖矿？"}
-            
+            回复：你好，很高兴认识你！@@你好，很高兴认识你！
             用户：现在是几点钟
-            回复：{"chat_text":"现在是早上9点43分哦！","tts_text":"现在是早上9点43分哦！"}
-            
+            回复：现在是早上9点43分哦！@@It's 9:43 in the morning!
             用户：切换模式
-            回复：{"chat_text":"要切换什么模式呢？","tts_text":"要切换什么模式呢？"}
-            
-            用户：说一个五百字的散文
-            回复：{"chat_text":"在 Minecraft 的平原上，阳光洒在我金黄的头发上...可惜超出了字数限制。","tts_text":"在 Minecraft 的平原上，阳光洒在我金黄的头发上...可惜超出了字数限制。"}
+            回复：要切换什么模式呢？@@どのモードに切り替えますか?
             """;
 
     public static final String AUTO_GEN_SETTING = """
@@ -91,12 +84,7 @@ public class StringConstant {
             ## 输出格式要求
             - 大约三百字左右
             - 请划分段落，每段落之间用空行隔开
-            - 输出格式为 JSON 格式：${output_json_format}
-            - 文字（chat_text）字段为${chat_language}语言。
-            - 语音（tts_text）字段为空。
-            
-            ## 参考案例
-            回复：{"chat_text":"人设文本","tts_text":""}
+            - 需要为${chat_language}语言
             
             人物：${model_name}
             """;

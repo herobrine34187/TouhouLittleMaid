@@ -134,7 +134,6 @@ public final class MaidAIChatManager extends MaidAIChatData {
 
     private LLMMessage autoGenSetting(EntityMaid maid, ChatClientInfo clientInfo) {
         Map<String, String> valueMap = Maps.newHashMap();
-        valueMap.put("output_json_format", Client.GSON.toJson(new ResponseChat()));
         valueMap.put("model_name", clientInfo.name());
         valueMap.put("chat_language", clientInfo.language());
         String setting = new StrSubstitutor(valueMap).replace(AUTO_GEN_SETTING);

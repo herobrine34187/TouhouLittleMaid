@@ -3,7 +3,6 @@ package com.github.tartaricacid.touhoulittlemaid.ai.service.llm.openai;
 
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.entity.LLMCallback;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.response.ResponseChat;
-import com.github.tartaricacid.touhoulittlemaid.ai.service.Client;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.ErrorCode;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.ResponseCallback;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.FunctionCallRegister;
@@ -22,11 +21,8 @@ import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
-import com.google.gson.JsonSyntaxException;
-import io.github.haibiiin.json.repair.JSONRepair;
-import io.github.haibiiin.json.repair.JSONRepairConfig;
-import io.github.haibiiin.json.repair.RepairFailureException;
 import net.minecraft.server.level.ServerPlayer;
+import org.apache.commons.lang3.StringUtils;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -58,7 +54,7 @@ public final class LLMOpenAIClient implements LLMClient {
 
         // 构建对话
         ChatCompletion chatCompletion = ChatCompletion.create().model(model).maxTokens(maxTokens)
-                .temperature(temperature).setResponseFormat(ResponseFormat.json());
+                .temperature(temperature).setResponseFormat(ResponseFormat.text());
         // 添加消息
         for (LLMMessage message : messages) {
             if (message.role() == Role.USER) {
@@ -137,25 +133,17 @@ public final class LLMOpenAIClient implements LLMClient {
             if (firstChoice.hasToolCall()) {
                 ((LLMCallback) callback).onFunctionCall(firstChoice, messages, config, this);
             } else {
-                this.onTextCall(callback, request, firstChoice);
+                this.onTextCall(callback, firstChoice);
             }
         }, ChatCompletionResponse.class);
     }
 
-    private void onTextCall(ResponseCallback<ResponseChat> callback, HttpRequest request, Message firstChoice) {
+    private void onTextCall(ResponseCallback<ResponseChat> callback, Message firstChoice) {
         String content = firstChoice.getContent();
-        ResponseChat chat;
-        try {
-            // 修正 JSON
-            JSONRepairConfig config = new JSONRepairConfig();
-            config.enableExtractJSON();
-            JSONRepair repair = new JSONRepair(config);
-            String correct = repair.handle(content);
-            chat = Client.GSON.fromJson(correct, ResponseChat.class);
-            callback.onSuccess(chat);
-        } catch (JsonSyntaxException | RepairFailureException error) {
-            String message = "Exception %s, JSON is: %s".formatted(error.getLocalizedMessage(), content);
-            callback.onFailure(request, new Throwable(message), ErrorCode.JSON_DECODE_ERROR);
+        if (StringUtils.isBlank(content)) {
+            callback.onSuccess(new ResponseChat(StringUtils.EMPTY, StringUtils.EMPTY));
+            return;
         }
+        callback.onSuccess(new ResponseChat(content));
     }
 }
