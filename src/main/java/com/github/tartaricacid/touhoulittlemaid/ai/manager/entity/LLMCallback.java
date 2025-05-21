@@ -135,7 +135,7 @@ public class LLMCallback implements ResponseCallback<ResponseChat> {
                 return;
             }
             result = optional.get();
-        } catch (JsonSyntaxException exception) {
+        } catch (Exception exception) {
             String message = "Exception %s, JSON is: %s".formatted(exception.getLocalizedMessage(), arguments);
             this.onFailure(null, new Throwable(message), ErrorCode.JSON_DECODE_ERROR);
             return;
