@@ -9,7 +9,8 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSSite;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSSystemServices;
 import com.github.tartaricacid.touhoulittlemaid.capability.ChatTokensCapabilityProvider;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
-import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleManger;
+import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleManager;
+import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.implement.TextChatBubbleData;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
 import com.github.tartaricacid.touhoulittlemaid.network.message.TTSSystemAudioToClientMessage;
@@ -64,27 +65,32 @@ public final class MaidAIChatManager extends MaidAIChatData {
     }
 
     private void normalChat(String message, List<LLMMessage> chatCompletion, LLMClient chatClient) {
+        ChatBubbleManager bubbleManager = this.maid.getChatBubbleManager();
         chatCompletion.add(LLMMessage.userChat(maid, message));
         LLMConfig config = LLMConfig.normalChat(this.getLLMModel(), this.maid);
-        LLMCallback callback = new LLMCallback(this, message);
+        Component thinkTip = Component.translatable("ai.touhou_little_maid.chat.chat_bubble_waiting")
+                .withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC);
+        long key = bubbleManager.addChatBubble(TextChatBubbleData.type2(thinkTip));
+        LLMCallback callback = new LLMCallback(this, message, key);
         chatClient.chat(chatCompletion, config, callback);
     }
 
     private void onSettingIsEmpty(String message, ChatClientInfo clientInfo, List<LLMMessage> chatCompletion, LLMClient chatClient) {
+        ChatBubbleManager bubbleManager = this.maid.getChatBubbleManager();
         if (AIConfig.AUTO_GEN_SETTING_ENABLED.get()) {
-            ChatBubbleManger.addInnerChatText(maid, "ai.touhou_little_maid.chat.llm.role_no_setting_and_gen_setting");
             LLMMessage llmMessage = autoGenSetting(maid, clientInfo);
             chatCompletion.add(llmMessage);
             LLMConfig config = new LLMConfig(this.getLLMModel(), this.maid, ChatType.AUTO_GEN_SETTING);
-            AutoGenSettingCallback callback = new AutoGenSettingCallback(this, message);
+            long key = bubbleManager.addTextChatBubble("ai.touhou_little_maid.chat.llm.role_no_setting_and_gen_setting");
+            AutoGenSettingCallback callback = new AutoGenSettingCallback(this, message, key);
             chatClient.chat(chatCompletion, config, callback);
         } else {
-            ChatBubbleManger.addInnerChatText(maid, "ai.touhou_little_maid.chat.llm.role_no_setting");
+            bubbleManager.addTextChatBubble("ai.touhou_little_maid.chat.llm.role_no_setting");
         }
     }
 
     @SuppressWarnings("all")
-    public void tts(TTSSite site, String chatText, String ttsText) {
+    public void tts(TTSSite site, String chatText, String ttsText, long waitingChatBubbleId) {
         // 调用系统 TTS，那么此时就只需要发送给指定的玩家即可
         TTSClient ttsClient = site.client();
         String ttsModel = getTTSModel();
@@ -97,9 +103,9 @@ public final class MaidAIChatManager extends MaidAIChatData {
         TTSConfig config = new TTSConfig(ttsModel, ttsLang);
 
         if (ttsClient instanceof TTSSystemServices services) {
-            onPlaySoundLocal(site.id(), chatText, ttsText, config, services);
+            onPlaySoundLocal(site.id(), chatText, ttsText, config, services, waitingChatBubbleId);
         } else {
-            TTSCallback callback = new TTSCallback(maid, chatText);
+            TTSCallback callback = new TTSCallback(maid, chatText, waitingChatBubbleId);
             ttsClient.play(ttsText, config, callback);
         }
     }
@@ -147,7 +153,7 @@ public final class MaidAIChatManager extends MaidAIChatData {
         return LLMMessage.userChat(maid, setting);
     }
 
-    private void onPlaySoundLocal(String name, String chatText, String ttsText, TTSConfig config, TTSSystemServices services) {
+    private void onPlaySoundLocal(String name, String chatText, String ttsText, TTSConfig config, TTSSystemServices services, long waitingChatBubbleId) {
         if (!(maid.level instanceof ServerLevel serverLevel)) {
             return;
         }
@@ -157,7 +163,7 @@ public final class MaidAIChatManager extends MaidAIChatData {
                 TTSSystemAudioToClientMessage message = new TTSSystemAudioToClientMessage(name, ttsText, config, services);
                 NetworkHandler.sendToClientPlayer(message, player);
             }
-            ChatBubbleManger.addAiChatText(maid, chatText);
+            maid.getChatBubbleManager().addLLMChatText(chatText, waitingChatBubbleId);
         });
     }
 }

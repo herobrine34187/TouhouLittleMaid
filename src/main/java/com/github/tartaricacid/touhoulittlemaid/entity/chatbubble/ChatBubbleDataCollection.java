@@ -4,8 +4,11 @@ import it.unimi.dsi.fastutil.longs.*;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 public record ChatBubbleDataCollection(Long2ObjectSortedMap<IChatBubbleData> chatBubbles) {
-    public static final ChatBubbleDataCollection EMPTY_COLLECTION = new ChatBubbleDataCollection(new Long2ObjectAVLTreeMap<>());
     public static final int MAX_SIZE = 5;
+
+    public static ChatBubbleDataCollection getEmptyCollection() {
+        return new ChatBubbleDataCollection(new Long2ObjectAVLTreeMap<>());
+    }
 
     public long add(IChatBubbleData chatBubbleData) {
         long existTime = System.currentTimeMillis() + chatBubbleData.existTick() * 50L;
@@ -62,6 +65,10 @@ public record ChatBubbleDataCollection(Long2ObjectSortedMap<IChatBubbleData> cha
 
     public IChatBubbleData get(long key) {
         return this.chatBubbles.get(key);
+    }
+
+    public boolean containsKey(long key) {
+        return this.chatBubbles.containsKey(key);
     }
 
     public void remove(long key) {

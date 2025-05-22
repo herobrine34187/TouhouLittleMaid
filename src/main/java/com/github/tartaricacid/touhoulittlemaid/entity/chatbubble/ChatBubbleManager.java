@@ -1,6 +1,12 @@
 package com.github.tartaricacid.touhoulittlemaid.entity.chatbubble;
 
+import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.implement.TextChatBubbleData;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerPlayer;
 
 import javax.annotation.Nullable;
 
@@ -38,6 +44,10 @@ public class ChatBubbleManager {
         this.forceUpdateChatBubble();
     }
 
+    public void forceUpdateChatBubble() {
+        maid.getEntityData().set(getChatBubbleKey(), this.getChatBubbleDataCollection(), true);
+    }
+
     /**
      * 返回存入的 key
      *
@@ -50,7 +60,34 @@ public class ChatBubbleManager {
         return key;
     }
 
-    public void forceUpdateChatBubble() {
-        maid.getEntityData().set(getChatBubbleKey(), this.getChatBubbleDataCollection(), true);
+    public long addTextChatBubble(String langKey) {
+        MutableComponent component = Component.translatable(langKey);
+        return this.addChatBubble(TextChatBubbleData.type2(component));
+    }
+
+    /**
+     * 只有在前一个聊天气泡超时后才会添加新的聊天气泡
+     */
+    public long addTextChatBubbleIfTimeout(String langKey, long previousChatBubbleId) {
+        ChatBubbleDataCollection collection = this.getChatBubbleDataCollection();
+        if (previousChatBubbleId < 0 || !collection.containsKey(previousChatBubbleId)) {
+            return addTextChatBubble(langKey);
+        }
+        return previousChatBubbleId;
+    }
+
+    public void addLLMChatText(String message, long waitingChatBubbleId) {
+        Component component = Component.literal(message);
+        TextChatBubbleData textChatBubble = TextChatBubbleData.type2(component);
+        this.getChatBubbleDataCollection().remove(waitingChatBubbleId);
+        this.getChatBubbleDataCollection().add(textChatBubble);
+        this.forceUpdateChatBubble();
+
+        // 给主人发送聊天栏信息
+        if (maid.getOwner() instanceof ServerPlayer player) {
+            Component name = maid.getName();
+            MutableComponent msg = Component.literal("<").append(name).append(">").append(CommonComponents.SPACE).append(message);
+            player.sendSystemMessage(msg.withStyle(ChatFormatting.GRAY));
+        }
     }
 }

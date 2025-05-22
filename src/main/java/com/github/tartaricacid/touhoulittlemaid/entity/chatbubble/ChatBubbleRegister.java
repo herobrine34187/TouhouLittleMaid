@@ -48,7 +48,9 @@ public class ChatBubbleRegister {
 
         @Override
         public ChatBubbleDataCollection copy(ChatBubbleDataCollection value) {
-            return value;
+            Long2ObjectAVLTreeMap<IChatBubbleData> data = new Long2ObjectAVLTreeMap<>();
+            data.putAll(value.chatBubbles());
+            return new ChatBubbleDataCollection(data);
         }
     };
 

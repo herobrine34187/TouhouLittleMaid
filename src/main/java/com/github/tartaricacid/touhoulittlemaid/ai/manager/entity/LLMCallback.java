@@ -19,7 +19,6 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.openai.response.M
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.openai.response.ToolCall;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSSite;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
-import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleManger;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
@@ -44,12 +43,17 @@ public class LLMCallback implements ResponseCallback<ResponseChat> {
      * 函数调用计数器，防止无限循环调用
      */
     protected int callCount = 0;
+    /**
+     * 等待气泡的 ID，在获取到 LLM 传递的信息后，需要移除它
+     */
+    protected long waitingChatBubbleId;
     protected String message;
 
-    public LLMCallback(MaidAIChatManager chatManager, String message) {
+    public LLMCallback(MaidAIChatManager chatManager, String message, long waitingChatBubbleId) {
         this.maid = chatManager.getMaid();
         this.chatManager = chatManager;
         this.message = message;
+        this.waitingChatBubbleId = waitingChatBubbleId;
     }
 
     @Override
@@ -62,6 +66,7 @@ public class LLMCallback implements ResponseCallback<ResponseChat> {
                     MutableComponent errorMessage = ErrorCode.getErrorMessage(ServiceType.LLM, errorCode, cause);
                     player.sendSystemMessage(errorMessage.withStyle(ChatFormatting.RED));
                 }
+                maid.getChatBubbleManager().removeChatBubble(waitingChatBubbleId);
             });
         }
         if (errorCode == ErrorCode.CHAT_TEXT_IS_EMPTY) {
@@ -91,9 +96,12 @@ public class LLMCallback implements ResponseCallback<ResponseChat> {
 
             TTSSite site = chatManager.getTTSSite();
             if (AIConfig.TTS_ENABLED.get() && site != null && site.enabled()) {
-                chatManager.tts(site, chatText, ttsText);
+                chatManager.tts(site, chatText, ttsText, waitingChatBubbleId);
             } else {
-                ChatBubbleManger.addAiChatTextSync(maid, chatText);
+                if (StringUtils.isNotBlank(message) && maid.level instanceof ServerLevel serverLevel) {
+                    MinecraftServer server = serverLevel.getServer();
+                    server.submit(() -> maid.getChatBubbleManager().addLLMChatText(message, waitingChatBubbleId));
+                }
             }
         }
     }

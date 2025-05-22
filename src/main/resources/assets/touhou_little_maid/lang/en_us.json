@@ -21,6 +21,7 @@
   "ai.touhou_little_maid.chat.input.tip": "Enter text and press the Enter key to send",
   "ai.touhou_little_maid.chat.config.tip": "Click to open the AI sites config",
   "ai.touhou_little_maid.chat.config.tip.under_construction": "The in-game site configuration feature is not yet complete, so please wait for a later update",
+  "ai.touhou_little_maid.chat.chat_bubble_waiting": "**The maid is thinking...**",
   "advancements.touhou_little_maid.base.craft_gohei.description": "Craft a gohei",
   "advancements.touhou_little_maid.base.craft_gohei.title": "The Key to Gensou?",
   "advancements.touhou_little_maid.base.build_altar.description": "Build an altar, and let the fun begin",

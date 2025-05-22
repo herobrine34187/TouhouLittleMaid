@@ -376,7 +376,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
         this.entityData.define(SCHEDULE_MODE, MaidSchedule.DAY);
         this.entityData.define(RESTRICT_CENTER, BlockPos.ZERO);
         this.entityData.define(RESTRICT_RADIUS, MaidConfig.MAID_NON_HOME_RANGE.get().floatValue());
-        this.entityData.define(CHAT_BUBBLE, ChatBubbleDataCollection.EMPTY_COLLECTION);
+        this.entityData.define(CHAT_BUBBLE, ChatBubbleDataCollection.getEmptyCollection());
         this.entityData.define(BACKPACK_TYPE, EmptyBackpack.ID.toString());
         this.entityData.define(BACKPACK_ITEM_SHOW, ItemStack.EMPTY);
         this.entityData.define(BACKPACK_FLUID, StringUtils.EMPTY);

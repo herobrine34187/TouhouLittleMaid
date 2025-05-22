@@ -4,7 +4,6 @@ import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.ErrorCode;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.ResponseCallback;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.ServiceType;
-import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleManger;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
 import com.github.tartaricacid.touhoulittlemaid.network.message.TTSAudioToClientMessage;
@@ -20,16 +19,17 @@ import java.net.http.HttpRequest;
 public class TTSCallback implements ResponseCallback<byte[]> {
     private final EntityMaid maid;
     private final String chatText;
+    private final long waitingChatBubbleId;
 
-    public TTSCallback(EntityMaid maid, String chatText) {
+    public TTSCallback(EntityMaid maid, String chatText, long waitingChatBubbleId) {
         this.maid = maid;
         this.chatText = chatText;
+        this.waitingChatBubbleId = waitingChatBubbleId;
     }
 
     @Override
     public void onFailure(HttpRequest request, Throwable throwable, int errorCode) {
         if (maid.level instanceof ServerLevel serverLevel) {
-            ChatBubbleManger.addAiChatText(maid, chatText);
             MinecraftServer server = serverLevel.getServer();
             server.submit(() -> {
                 if (maid.getOwner() instanceof ServerPlayer player) {
@@ -37,6 +37,7 @@ public class TTSCallback implements ResponseCallback<byte[]> {
                     MutableComponent errorMessage = ErrorCode.getErrorMessage(ServiceType.TTS, errorCode, cause);
                     player.sendSystemMessage(errorMessage.withStyle(ChatFormatting.RED));
                 }
+                maid.getChatBubbleManager().addLLMChatText(chatText, waitingChatBubbleId);
             });
         }
         TouhouLittleMaid.LOGGER.error("LLM request failed: {}, error is {}", request, throwable.getMessage());
@@ -54,7 +55,7 @@ public class TTSCallback implements ResponseCallback<byte[]> {
         MinecraftServer server = serverLevel.getServer();
         server.submit(() -> {
             NetworkHandler.sendToClientPlayer(new TTSAudioToClientMessage(this.maid.getId(), data), player);
-            ChatBubbleManger.addAiChatText(maid, chatText);
+            maid.getChatBubbleManager().addLLMChatText(chatText, waitingChatBubbleId);
         });
     }
 }
