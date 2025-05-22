@@ -45,7 +45,6 @@ public class MaidTipsOverlay implements IGuiOverlay {
         overlay.addTips("overlay.touhou_little_maid.golden_apple.tips", ENABLE_GOLDEN_APPLE_TIP, Items.GOLDEN_APPLE, Items.ENCHANTED_GOLDEN_APPLE);
         overlay.addTips("overlay.touhou_little_maid.potion.tips", ENABLE_POTION_TIP, Items.POTION);
         overlay.addTips("overlay.touhou_little_maid.milk_bucket.tips", ENABLE_MILK_BUCKET_TIP, Items.MILK_BUCKET);
-        overlay.addTips("overlay.touhou_little_maid.script_book.tips", ENABLE_SCRIPT_BOOK_TIP, Items.WRITABLE_BOOK, Items.WRITTEN_BOOK);
         overlay.addTips("overlay.touhou_little_maid.glass_bottle.tips", ENABLE_GLASS_BOTTLE_TIP, Items.GLASS_BOTTLE);
         overlay.addTips("overlay.touhou_little_maid.name_tag.tips", ENABLE_NAME_TAG_TIP, Items.NAME_TAG);
         overlay.addTips("overlay.touhou_little_maid.lead.tips", ENABLE_LEAD_TIP, Items.LEAD);

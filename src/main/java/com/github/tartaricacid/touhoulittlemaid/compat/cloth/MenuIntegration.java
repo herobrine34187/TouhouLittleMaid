@@ -310,9 +310,6 @@ public class MenuIntegration {
         render.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.touhou_little_maid.render.enable_milk_bucket_tip"), RenderConfig.ENABLE_MILK_BUCKET_TIP.get())
                 .setDefaultValue(true).setSaveConsumer(RenderConfig.ENABLE_MILK_BUCKET_TIP::set).build());
 
-        render.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.touhou_little_maid.render.enable_script_book_tip"), RenderConfig.ENABLE_SCRIPT_BOOK_TIP.get())
-                .setDefaultValue(true).setSaveConsumer(RenderConfig.ENABLE_SCRIPT_BOOK_TIP::set).build());
-
         render.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.touhou_little_maid.render.enable_glass_bottle_tip"), RenderConfig.ENABLE_GLASS_BOTTLE_TIP.get())
                 .setDefaultValue(true).setSaveConsumer(RenderConfig.ENABLE_GLASS_BOTTLE_TIP::set).build());
 

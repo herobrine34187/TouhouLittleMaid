@@ -30,10 +30,9 @@ import com.github.tartaricacid.touhoulittlemaid.entity.ai.brain.MaidSchedule;
 import com.github.tartaricacid.touhoulittlemaid.entity.ai.control.MaidMoveControl;
 import com.github.tartaricacid.touhoulittlemaid.entity.ai.navigation.MaidPathNavigation;
 import com.github.tartaricacid.touhoulittlemaid.entity.backpack.*;
-import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleManger;
-import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatText;
-import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.MaidChatBubbles;
-import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.MaidScriptBookManager;
+import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleDataCollection;
+import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleManager;
+import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleRegister;
 import com.github.tartaricacid.touhoulittlemaid.entity.data.MaidTaskDataMaps;
 import com.github.tartaricacid.touhoulittlemaid.entity.favorability.FavorabilityManager;
 import com.github.tartaricacid.touhoulittlemaid.entity.favorability.Type;
@@ -215,7 +214,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
     private static final EntityDataAccessor<MaidSchedule> SCHEDULE_MODE = SynchedEntityData.defineId(EntityMaid.class, MaidSchedule.DATA);
     private static final EntityDataAccessor<BlockPos> RESTRICT_CENTER = SynchedEntityData.defineId(EntityMaid.class, EntityDataSerializers.BLOCK_POS);
     private static final EntityDataAccessor<Float> RESTRICT_RADIUS = SynchedEntityData.defineId(EntityMaid.class, EntityDataSerializers.FLOAT);
-    private static final EntityDataAccessor<MaidChatBubbles> CHAT_BUBBLE = SynchedEntityData.defineId(EntityMaid.class, MaidChatBubbles.DATA);
+    private static final EntityDataAccessor<ChatBubbleDataCollection> CHAT_BUBBLE = SynchedEntityData.defineId(EntityMaid.class, ChatBubbleRegister.INSTANCE);
     private static final EntityDataAccessor<String> BACKPACK_TYPE = SynchedEntityData.defineId(EntityMaid.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<ItemStack> BACKPACK_ITEM_SHOW = SynchedEntityData.defineId(EntityMaid.class, EntityDataSerializers.ITEM_STACK);
     private static final EntityDataAccessor<String> BACKPACK_FLUID = SynchedEntityData.defineId(EntityMaid.class, EntityDataSerializers.STRING);
@@ -268,9 +267,9 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
     private final ItemStackHandler taskInv = new ItemStackHandler(9);
 
     private final MaidKillRecordManager killRecordManager = new MaidKillRecordManager();
+    private final ChatBubbleManager chatBubbleManager = new ChatBubbleManager(this);
     private final MaidTaskDataMaps taskDataMaps = new MaidTaskDataMaps();
     private final FavorabilityManager favorabilityManager;
-    private final MaidScriptBookManager scriptBookManager;
     private final MaidSwimManager swimManager;
     // 控制不同的 navigation 切换的条件以及切换后变更女仆相关的 AI 控制参数
     private final MaidNavigationManager navigationManager;
@@ -321,7 +320,6 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
     protected EntityMaid(EntityType<EntityMaid> type, Level world) {
         super(type, world);
         this.favorabilityManager = new FavorabilityManager(this);
-        this.scriptBookManager = new MaidScriptBookManager();
         this.aiChatManager = new MaidAIChatManager(this);
 
         // 尝试修复 https://github.com/TartaricAcid/TouhouLittleMaid/issues/631
@@ -351,6 +349,10 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
         return stack.getItem().canFitInsideContainerItems();
     }
 
+    public static EntityDataAccessor<ChatBubbleDataCollection> getChatBubbleKey() {
+        return CHAT_BUBBLE;
+    }
+
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
@@ -374,7 +376,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
         this.entityData.define(SCHEDULE_MODE, MaidSchedule.DAY);
         this.entityData.define(RESTRICT_CENTER, BlockPos.ZERO);
         this.entityData.define(RESTRICT_RADIUS, MaidConfig.MAID_NON_HOME_RANGE.get().floatValue());
-        this.entityData.define(CHAT_BUBBLE, MaidChatBubbles.DEFAULT);
+        this.entityData.define(CHAT_BUBBLE, ChatBubbleDataCollection.EMPTY_COLLECTION);
         this.entityData.define(BACKPACK_TYPE, EmptyBackpack.ID.toString());
         this.entityData.define(BACKPACK_ITEM_SHOW, ItemStack.EMPTY);
         this.entityData.define(BACKPACK_FLUID, StringUtils.EMPTY);
@@ -563,7 +565,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
         this.updateSwingTime();
         this.navigationManager.tick();
         if (!level.isClientSide) {
-            ChatBubbleManger.tick(this);
+            this.chatBubbleManager.tick();
             if (this.backpackData != null) {
                 this.level.getProfiler().push("maidBackpackData");
                 this.backpackData.serverTick(this);
@@ -1258,7 +1260,6 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
         this.configManager.addAdditionalSaveData(compound);
         this.gameRecordManager.addAdditionalSaveData(compound);
         this.favorabilityManager.addAdditionalSaveData(compound);
-        this.scriptBookManager.addAdditionalSaveData(compound);
         this.schedulePos.save(compound);
         if (this.backpackData != null) {
             CompoundTag tag = new CompoundTag();
@@ -1375,7 +1376,6 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
         this.configManager.readAdditionalSaveData(compound);
         this.gameRecordManager.readAdditionalSaveData(compound);
         this.favorabilityManager.readAdditionalSaveData(compound);
-        this.scriptBookManager.readAdditionalSaveData(compound);
         this.schedulePos.load(compound, this);
         this.setBackpackShowItem(maidInv.getStackInSlot(MaidBackpackHandler.BACKPACK_ITEM_SLOT));
         this.killRecordManager.readAdditionalSaveData(compound);
@@ -1972,26 +1972,6 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
 
     public boolean canBrainMoving() {
         return !this.isMaidInSittingPose() && !this.isPassenger() && !this.isSleeping() && !this.isLeashed();
-    }
-
-    public MaidChatBubbles getChatBubble() {
-        return this.entityData.get(CHAT_BUBBLE);
-    }
-
-    public void setChatBubble(MaidChatBubbles bubbles) {
-        this.entityData.set(CHAT_BUBBLE, bubbles);
-    }
-
-    public void addChatBubble(long endTime, ChatText text) {
-        ChatBubbleManger.addChatBubble(endTime, text, this);
-    }
-
-    public int getChatBubbleCount() {
-        return ChatBubbleManger.getChatBubbleCount(this);
-    }
-
-    public MaidScriptBookManager getScriptBookManager() {
-        return scriptBookManager;
     }
 
     public boolean isPickup() {
@@ -2607,5 +2587,9 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
 
     private int randomIntInclusive(RandomSource random, int min, int max) {
         return random.nextInt(max - min + 1) + min;
+    }
+
+    public ChatBubbleManager getChatBubbleManager() {
+        return chatBubbleManager;
     }
 }

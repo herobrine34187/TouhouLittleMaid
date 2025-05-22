@@ -5,7 +5,6 @@ import com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.SettingReader
 import com.github.tartaricacid.touhoulittlemaid.client.resource.pojo.ChairModelInfo;
 import com.github.tartaricacid.touhoulittlemaid.client.resource.pojo.CustomModelPack;
 import com.github.tartaricacid.touhoulittlemaid.client.resource.pojo.MaidModelInfo;
-import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatText;
 import com.github.tartaricacid.touhoulittlemaid.entity.info.models.ServerChairModels;
 import com.github.tartaricacid.touhoulittlemaid.entity.info.models.ServerMaidModels;
 import com.github.tartaricacid.touhoulittlemaid.util.ZipFileCheck;
@@ -39,7 +38,6 @@ import static com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid.LOGGER;
 public final class ServerCustomPackLoader {
     public static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(ResourceLocation.class, new ResourceLocation.Serializer())
-            .registerTypeAdapter(ChatText.class, new ChatText.Serializer())
             .create();
     public static final ServerMaidModels SERVER_MAID_MODELS = ServerMaidModels.getInstance();
     public static final ServerChairModels SERVER_CHAIR_MODELS = ServerChairModels.getInstance();

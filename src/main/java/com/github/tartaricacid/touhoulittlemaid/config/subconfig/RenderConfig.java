@@ -7,7 +7,6 @@ public class RenderConfig {
     public static ForgeConfigSpec.BooleanValue ENABLE_GOLDEN_APPLE_TIP;
     public static ForgeConfigSpec.BooleanValue ENABLE_POTION_TIP;
     public static ForgeConfigSpec.BooleanValue ENABLE_MILK_BUCKET_TIP;
-    public static ForgeConfigSpec.BooleanValue ENABLE_SCRIPT_BOOK_TIP;
     public static ForgeConfigSpec.BooleanValue ENABLE_GLASS_BOTTLE_TIP;
     public static ForgeConfigSpec.BooleanValue ENABLE_NAME_TAG_TIP;
     public static ForgeConfigSpec.BooleanValue ENABLE_LEAD_TIP;
@@ -21,7 +20,6 @@ public class RenderConfig {
         ENABLE_GOLDEN_APPLE_TIP = builder.define("EnableGoldenAppleTip", true);
         ENABLE_POTION_TIP = builder.define("EnablePotionTip", true);
         ENABLE_MILK_BUCKET_TIP = builder.define("EnableMilkBucketTip", true);
-        ENABLE_SCRIPT_BOOK_TIP = builder.define("EnableScriptBookTip", true);
         ENABLE_GLASS_BOTTLE_TIP = builder.define("EnableGlassBottleTip", true);
         ENABLE_NAME_TAG_TIP = builder.define("EnableNameTagTip", true);
         ENABLE_LEAD_TIP = builder.define("EnableLeadTip", true);

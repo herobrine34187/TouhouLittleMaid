@@ -9,6 +9,7 @@ import com.github.tartaricacid.touhoulittlemaid.debug.target.DebugMaidManager;
 import com.github.tartaricacid.touhoulittlemaid.entity.ai.brain.ExtraMaidBrainManager;
 import com.github.tartaricacid.touhoulittlemaid.entity.ai.fishing.FishingTypeManager;
 import com.github.tartaricacid.touhoulittlemaid.entity.backpack.BackpackManager;
+import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleRegister;
 import com.github.tartaricacid.touhoulittlemaid.entity.data.TaskDataRegister;
 import com.github.tartaricacid.touhoulittlemaid.entity.info.ServerCustomPackLoader;
 import com.github.tartaricacid.touhoulittlemaid.entity.task.TaskManager;
@@ -44,6 +45,7 @@ public final class CommonRegistry {
         FishingTypeManager.init();
         SerializerRegister.init();
         FunctionCallRegister.init();
+        ChatBubbleRegister.init();
         DebugMaidManager.init();
     }
 }

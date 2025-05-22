@@ -10,6 +10,7 @@ import com.github.tartaricacid.touhoulittlemaid.client.renderer.entity.GeckoEnti
 import com.github.tartaricacid.touhoulittlemaid.debug.target.DebugTarget;
 import com.github.tartaricacid.touhoulittlemaid.entity.ai.brain.ExtraMaidBrainManager;
 import com.github.tartaricacid.touhoulittlemaid.entity.backpack.BackpackManager;
+import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleRegister;
 import com.github.tartaricacid.touhoulittlemaid.entity.data.TaskDataRegister;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.entity.task.TaskManager;
@@ -89,6 +90,14 @@ public interface ILittleMaid {
      * @param manager 注册器
      */
     default void addExtraMaidBrain(ExtraMaidBrainManager manager) {
+    }
+
+    /**
+     * 注册女仆的聊天气泡类型
+     *
+     * @param register 注册器
+     */
+    default void registerChatBubble(ChatBubbleRegister register) {
     }
 
     /**
