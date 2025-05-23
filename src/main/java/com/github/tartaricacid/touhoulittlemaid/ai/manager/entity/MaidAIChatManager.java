@@ -26,6 +26,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.core.lookup.StrSubstitutor;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -56,14 +57,23 @@ public final class MaidAIChatManager extends MaidAIChatData {
                         .withStyle(ChatFormatting.RED));
                 return;
             }
-            LLMClient chatClient = site.client();
-            List<LLMMessage> chatCompletion = getChatCompletion(this, clientInfo.language());
-            if (chatCompletion.isEmpty()) {
-                this.onSettingIsEmpty(message, clientInfo, chatCompletion, chatClient);
+            // 如果检测到是 player2，那么大概率是新手玩家，给他提示下载 player2
+            if (site.id().equals(DefaultLLMSite.PLAYER2.id())) {
+                Player2AppCheck.checkPlayer2App(sender, () -> this.tryToChat(message, clientInfo, site));
             } else {
-                this.normalChat(message, chatCompletion, chatClient);
+                this.tryToChat(message, clientInfo, site);
             }
         });
+    }
+
+    private void tryToChat(String message, ChatClientInfo clientInfo, @NotNull LLMSite site) {
+        LLMClient chatClient = site.client();
+        List<LLMMessage> chatCompletion = getChatCompletion(this, clientInfo.language());
+        if (chatCompletion.isEmpty()) {
+            this.onSettingIsEmpty(message, clientInfo, chatCompletion, chatClient);
+        } else {
+            this.normalChat(message, chatCompletion, chatClient);
+        }
     }
 
     private void normalChat(String message, List<LLMMessage> chatCompletion, LLMClient chatClient) {
