@@ -1,11 +1,14 @@
 package com.github.tartaricacid.touhoulittlemaid.entity.chatbubble;
 
+import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.implement.TextChatBubbleData;
+import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.implement.WaitingChatBubbleData;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
 import javax.annotation.Nullable;
@@ -74,6 +77,12 @@ public class ChatBubbleManager {
             return addTextChatBubble(langKey);
         }
         return previousChatBubbleId;
+    }
+
+    public long addThinkingText(String langKey) {
+        MutableComponent component = Component.translatable(langKey).withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC);
+        ResourceLocation icon = new ResourceLocation(TouhouLittleMaid.MOD_ID, "textures/entity/chat_bubble/yinyang_orb.png");
+        return this.addChatBubble(WaitingChatBubbleData.create(component, icon));
     }
 
     public void addLLMChatText(String message, long waitingChatBubbleId) {

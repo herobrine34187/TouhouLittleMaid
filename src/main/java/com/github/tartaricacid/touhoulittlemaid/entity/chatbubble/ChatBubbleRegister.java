@@ -2,9 +2,13 @@ package com.github.tartaricacid.touhoulittlemaid.entity.chatbubble;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.api.ILittleMaid;
+import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.implement.ImageChatBubbleData;
+import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.implement.ProgressChatBubbleData;
 import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.implement.TextChatBubbleData;
+import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.implement.WaitingChatBubbleData;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.longs.Long2ObjectAVLTreeMap;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataSerializer;
@@ -48,15 +52,18 @@ public class ChatBubbleRegister {
 
         @Override
         public ChatBubbleDataCollection copy(ChatBubbleDataCollection value) {
-            Long2ObjectAVLTreeMap<IChatBubbleData> data = new Long2ObjectAVLTreeMap<>();
-            data.putAll(value.chatBubbles());
-            return new ChatBubbleDataCollection(data);
+            FriendlyByteBuf byteBuf = new FriendlyByteBuf(Unpooled.buffer());
+            this.write(byteBuf, value);
+            return this.read(byteBuf);
         }
     };
 
     public static void init() {
         ChatBubbleRegister register = new ChatBubbleRegister();
         register.register(TextChatBubbleData.ID, new TextChatBubbleData.TextChatSerializer());
+        register.register(ImageChatBubbleData.ID, new ImageChatBubbleData.ImageChatSerializer());
+        register.register(WaitingChatBubbleData.ID, new WaitingChatBubbleData.WaitingChatSerializer());
+        register.register(ProgressChatBubbleData.ID, new ProgressChatBubbleData.ProgressChatSerializer());
         for (ILittleMaid littleMaid : TouhouLittleMaid.EXTENSIONS) {
             littleMaid.registerChatBubble(register);
         }

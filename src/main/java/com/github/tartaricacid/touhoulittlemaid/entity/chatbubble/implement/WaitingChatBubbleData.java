@@ -2,7 +2,7 @@ package com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.implement;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.client.renderer.entity.chatbubble.IChatBubbleRenderer;
-import com.github.tartaricacid.touhoulittlemaid.client.renderer.entity.chatbubble.implement.TextChatBubbleRenderer;
+import com.github.tartaricacid.touhoulittlemaid.client.renderer.entity.chatbubble.implement.WaitingChatBubbleRenderer;
 import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.IChatBubbleData;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -10,38 +10,32 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class TextChatBubbleData implements IChatBubbleData {
-    public static final ResourceLocation ID = new ResourceLocation(TouhouLittleMaid.MOD_ID, "text");
+public class WaitingChatBubbleData implements IChatBubbleData {
+    public static final ResourceLocation ID = new ResourceLocation(TouhouLittleMaid.MOD_ID, "waiting");
 
     private final int existTick;
     private final ResourceLocation bg;
     private final int priority;
-    private Component text;
+    private final Component text;
+    private final ResourceLocation icon;
 
     @OnlyIn(Dist.CLIENT)
     private IChatBubbleRenderer renderer;
 
-    private TextChatBubbleData(int existTick, Component text, ResourceLocation bg, int priority) {
+    private WaitingChatBubbleData(int existTick, ResourceLocation bg, int priority, Component text, ResourceLocation icon) {
         this.existTick = existTick;
-        this.text = text;
         this.bg = bg;
         this.priority = priority;
+        this.text = text;
+        this.icon = icon;
     }
 
-    private TextChatBubbleData(int existTick, Component text, ResourceLocation bg) {
-        this(existTick, text, bg, DEFAULT_PRIORITY);
+    public static WaitingChatBubbleData create(int existTick, ResourceLocation bg, int priority, Component text, ResourceLocation icon) {
+        return new WaitingChatBubbleData(existTick, bg, priority, text, icon);
     }
 
-    public static TextChatBubbleData type1(Component text) {
-        return new TextChatBubbleData(DEFAULT_EXIST_TICK, text, TYPE_1);
-    }
-
-    public static TextChatBubbleData type2(Component text) {
-        return new TextChatBubbleData(DEFAULT_EXIST_TICK, text, TYPE_2);
-    }
-
-    public static TextChatBubbleData create(int existTick, Component text, ResourceLocation bg, int priority) {
-        return new TextChatBubbleData(existTick, text, bg, priority);
+    public static WaitingChatBubbleData create(Component text, ResourceLocation icon) {
+        return new WaitingChatBubbleData(DEFAULT_EXIST_TICK, TYPE_2, DEFAULT_PRIORITY, text, icon);
     }
 
     @Override
@@ -59,31 +53,27 @@ public class TextChatBubbleData implements IChatBubbleData {
         return this.priority;
     }
 
-    public void setText(Component text) {
-        this.text = text;
-    }
-
     @Override
-    @OnlyIn(Dist.CLIENT)
     public IChatBubbleRenderer getRenderer(IChatBubbleRenderer.Position position) {
         if (renderer == null) {
-            renderer = new TextChatBubbleRenderer(this.text, this.bg, position);
+            renderer = new WaitingChatBubbleRenderer(this.bg, this.text, this.icon);
         }
         return renderer;
     }
 
-    public static class TextChatSerializer implements IChatBubbleData.ChatSerializer {
+    public static class WaitingChatSerializer implements IChatBubbleData.ChatSerializer {
         @Override
         public IChatBubbleData readFromBuff(FriendlyByteBuf buf) {
             // 往客户端同步的数据里，不需要同步 existTick 和 priority，这两个数据仅在服务端有效
-            return new TextChatBubbleData(DEFAULT_EXIST_TICK, buf.readComponent(), buf.readResourceLocation());
+            return new WaitingChatBubbleData(DEFAULT_EXIST_TICK, buf.readResourceLocation(), DEFAULT_PRIORITY, buf.readComponent(), buf.readResourceLocation());
         }
 
         @Override
         public void writeToBuff(FriendlyByteBuf buf, IChatBubbleData data) {
-            TextChatBubbleData textChat = (TextChatBubbleData) data;
-            buf.writeComponent(textChat.text);
+            WaitingChatBubbleData textChat = (WaitingChatBubbleData) data;
             buf.writeResourceLocation(textChat.bg);
+            buf.writeComponent(textChat.text);
+            buf.writeResourceLocation(textChat.icon);
         }
     }
 }

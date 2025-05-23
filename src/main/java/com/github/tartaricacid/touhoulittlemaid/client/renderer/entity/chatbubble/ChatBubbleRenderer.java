@@ -9,6 +9,8 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.ForgeHooksClient;
 
+import java.util.WeakHashMap;
+
 public class ChatBubbleRenderer {
     private final EntityMaidRenderer renderer;
 

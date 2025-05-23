@@ -10,7 +10,6 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSSystemServices
 import com.github.tartaricacid.touhoulittlemaid.capability.ChatTokensCapabilityProvider;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
 import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleManager;
-import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.implement.TextChatBubbleData;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
 import com.github.tartaricacid.touhoulittlemaid.network.message.TTSSystemAudioToClientMessage;
@@ -68,9 +67,7 @@ public final class MaidAIChatManager extends MaidAIChatData {
         ChatBubbleManager bubbleManager = this.maid.getChatBubbleManager();
         chatCompletion.add(LLMMessage.userChat(maid, message));
         LLMConfig config = LLMConfig.normalChat(this.getLLMModel(), this.maid);
-        Component thinkTip = Component.translatable("ai.touhou_little_maid.chat.chat_bubble_waiting")
-                .withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC);
-        long key = bubbleManager.addChatBubble(TextChatBubbleData.type2(thinkTip));
+        long key = bubbleManager.addThinkingText("ai.touhou_little_maid.chat.chat_bubble_waiting");
         LLMCallback callback = new LLMCallback(this, message, key);
         chatClient.chat(chatCompletion, config, callback);
     }
