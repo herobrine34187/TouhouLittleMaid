@@ -1,8 +1,7 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.service.function.implement;
 
-import com.github.tartaricacid.touhoulittlemaid.ai.manager.response.ResponseChat;
+import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.IFunctionCall;
-import com.github.tartaricacid.touhoulittlemaid.ai.service.function.response.EndToolResponse;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.response.ToolResponse;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.schema.parameter.ObjectParameter;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.schema.parameter.Parameter;
@@ -25,26 +24,18 @@ import java.util.Optional;
 public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskFunction.Result> {
     private static final String FUNCTION_ID = "switch_maid_attack_task";
     private static final String FUNCTION_DESC = """
-            当你需要切换与击杀怪物相关的工作模式时，可以调用此函数。
-            参数需要给定一个工作模式的 ID，和一个此刻你打算说的话。
-            根据对话记录自动选择工作模式的 ID
-            如果我提供的信息缺少工具所需要的必填参数，你需要进一步追问让我提供更多信息。""";
+            Use this function to change the maid's current combat or behavior task.
+            Especially when the user asks to alter her fighting style, prepare for a battle, or stand down""";
     private static final String TASK_ID_PARAMETER_ID = "task_id";
     private static final String TASK_ID_PARAMETER_DESC = """
-            你需要切换的工作模式 ID：
-            - touhou_little_maid:idle 表示空闲模式，此工作模式下，你什么也不会做
-            - touhou_little_maid:attack 表示近战模式，你会主动攻击周围的敌对生物
-            - touhou_little_maid:ranged_attack 表示弓箭攻击模式，你会主动用弓箭攻击周围的敌对生物
-            - touhou_little_maid:crossbow_attack 表示弩箭攻击模式，你会主动用弩箭攻击周围的敌对生物
-            - touhou_little_maid:danmaku_attack 表示弹幕攻击模式，你会主动用弹幕攻击周围的敌对生物
-            - touhou_little_maid:trident_attack 表示三叉戟攻击模式，你会主动用三叉戟攻击周围的敌对生物""";
-    private static final String GUN_TASK_ID_PARAMETER_DESC = "- touhou_little_maid:gun_attack 表示枪械攻击，你会主动用 TACZ 的枪械攻击周围的敌对生物";
-    private static final String CHAT_PARAMETER_ID = "chat_text";
-    private static final String CHAT_PARAMETER_DESC = """
-            你此刻打算说的话，需要符合当前的工作模式切换""";
-    private static final String TTS_PARAMETER_ID = "tts_text";
-    private static final String TTS_PARAMETER_DESC = """
-            将 chat_text 部分翻译成 %s 语言的文本""";
+            task_id (string, required): The specific ID of the task you want the maid to switch to. Available tasks include:
+            idle (Stands idle), attack (Melee combat), ranged_attack (Bow combat)
+            crossbow_attack (Crossbow combat), danmaku_attack (Danmaku combat), trident_attack (Trident combat)""";
+    private static final String GUN_TASK_ID_PARAMETER_DESC = "gun_attack (Gun combat)";
+    private static final String SUCCESS = "Successfully switched to %s task";
+    private static final String MISSING = "Successfully switched to %s task, but the corresponding weapon is missing";
+    private static final String FAIL = "Switch failed and there is no task named %s";
+    private static final String NO_CHANGE = "You're currently in %s task and don't need to switch";
 
     @Override
     public String getId() {
@@ -60,45 +51,32 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
     public Parameter addParameters(ObjectParameter root, EntityMaid maid) {
         Parameter taskId = StringParameter.create()
                 .setDescription(TASK_ID_PARAMETER_DESC)
-                .addEnumValues(
-                        "touhou_little_maid:idle",
-                        "touhou_little_maid:attack",
-                        "touhou_little_maid:ranged_attack",
-                        "touhou_little_maid:crossbow_attack",
-                        "touhou_little_maid:danmaku_attack",
-                        "touhou_little_maid:trident_attack"
-                );
+                .addEnumValues("idle", "attack", "ranged_attack",
+                        "crossbow_attack", "danmaku_attack", "trident_attack");
         // 兼容 TACZ
         if (TacCompat.isInstalled()) {
             taskId.setDescription(TASK_ID_PARAMETER_DESC + "\n" + GUN_TASK_ID_PARAMETER_DESC);
-            taskId.addEnumValues("touhou_little_maid:gun_attack");
+            taskId.addEnumValues("gun_attack");
         }
-        Parameter chat = StringParameter.create().setDescription(CHAT_PARAMETER_DESC);
-        String ttsLanguage = maid.getAiChatManager().getTTSLanguage();
-        Parameter tts = StringParameter.create().setDescription(TTS_PARAMETER_DESC.formatted(ttsLanguage));
-
-        root.addProperties(TASK_ID_PARAMETER_ID, taskId)
-                .addProperties(CHAT_PARAMETER_ID, chat)
-                .addProperties(TTS_PARAMETER_ID, tts);
+        root.addProperties(TASK_ID_PARAMETER_ID, taskId);
         return root;
     }
 
     @Override
     public Codec<Result> codec() {
-        return RecordCodecBuilder.create(instance -> instance.group(
-                ResourceLocation.CODEC.fieldOf(TASK_ID_PARAMETER_ID).forGetter(Result::taskId),
-                Codec.STRING.fieldOf(CHAT_PARAMETER_ID).forGetter(Result::chat),
-                Codec.STRING.fieldOf(TTS_PARAMETER_ID).forGetter(Result::tts)
-        ).apply(instance, Result::new));
+        return RecordCodecBuilder.create(instance ->
+                instance.group(Codec.STRING.fieldOf(TASK_ID_PARAMETER_ID)
+                                .forGetter(Result::id))
+                        .apply(instance, Result::new));
     }
 
     @Override
     public ToolResponse onToolCall(Result result, EntityMaid maid) {
-        ResourceLocation taskId = result.taskId;
-        EndToolResponse response = new EndToolResponse(new ResponseChat(result.chat, result.tts));
+        String id = result.id;
+        ResourceLocation taskId = new ResourceLocation(TouhouLittleMaid.MOD_ID, id);
         Optional<IMaidTask> optional = TaskManager.findTask(taskId);
         if (optional.isEmpty()) {
-            return response;
+            return new ToolResponse(FAIL.formatted(id));
         }
 
         // 空闲模式额外判断
@@ -107,17 +85,17 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
         if (task == TaskManager.getIdleTask()) {
             putItemBack(maid, backpack);
             maid.setTask(task);
-            return response;
+            return new ToolResponse(SUCCESS.formatted(id));
         }
 
         // 攻击模式判断
         if (!(task instanceof IAttackTask attackTask)) {
-            return response;
+            return new ToolResponse(FAIL.formatted(id));
         }
         // 如果不需要拿武器并切换模式，那么不用执行后面的逻辑
         IMaidTask currentTask = maid.getTask();
         if (attackTask == currentTask && attackTask.isWeapon(maid, maid.getMainHandItem())) {
-            return response;
+            return new ToolResponse(NO_CHANGE.formatted(id));
         }
 
         maid.setTask(task);
@@ -132,8 +110,9 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
                 backpack.setStackInSlot(slot, mainhand);
             }
             maid.setItemInHand(InteractionHand.MAIN_HAND, output);
+            return new ToolResponse(SUCCESS.formatted(id));
         }
-        return response;
+        return new ToolResponse(MISSING.formatted(id));
     }
 
     private void putItemBack(EntityMaid maid, RangedWrapper backpack) {
@@ -151,6 +130,6 @@ public class SwitchAttackTaskFunction implements IFunctionCall<SwitchAttackTaskF
         }
     }
 
-    public record Result(ResourceLocation taskId, String chat, String tts) {
+    public record Result(String id) {
     }
 }

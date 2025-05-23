@@ -10,6 +10,8 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.TTSSystemServices
 import com.github.tartaricacid.touhoulittlemaid.capability.ChatTokensCapabilityProvider;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
 import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.ChatBubbleManager;
+import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.IChatBubbleData;
+import com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.implement.TextChatBubbleData;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
 import com.github.tartaricacid.touhoulittlemaid.network.message.TTSSystemAudioToClientMessage;
@@ -18,6 +20,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -78,7 +81,9 @@ public final class MaidAIChatManager extends MaidAIChatData {
             LLMMessage llmMessage = autoGenSetting(maid, clientInfo);
             chatCompletion.add(llmMessage);
             LLMConfig config = new LLMConfig(this.getLLMModel(), this.maid, ChatType.AUTO_GEN_SETTING);
-            long key = bubbleManager.addTextChatBubble("ai.touhou_little_maid.chat.llm.role_no_setting_and_gen_setting");
+            MutableComponent component = Component.translatable("ai.touhou_little_maid.chat.llm.role_no_setting_and_gen_setting");
+            TextChatBubbleData bubbleData = TextChatBubbleData.create(30 * 20, component, IChatBubbleData.TYPE_2, IChatBubbleData.DEFAULT_PRIORITY);
+            long key = bubbleManager.addChatBubble(bubbleData);
             AutoGenSettingCallback callback = new AutoGenSettingCallback(this, message, key);
             chatClient.chat(chatCompletion, config, callback);
         } else {

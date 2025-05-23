@@ -7,8 +7,6 @@ import com.github.tartaricacid.touhoulittlemaid.ai.service.ResponseCallback;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.ServiceType;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.FunctionCallRegister;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.IFunctionCall;
-import com.github.tartaricacid.touhoulittlemaid.ai.service.function.response.EndToolResponse;
-import com.github.tartaricacid.touhoulittlemaid.ai.service.function.response.KeepToolResponse;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.function.response.ToolResponse;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.ChatType;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.llm.LLMClient;
@@ -159,23 +157,17 @@ public class LLMCallback implements ResponseCallback<ResponseChat> {
         serverLevel.getServer().submit(() -> {
             // 工具调用必须在主线程，否则可能会出奇怪的问题
             ToolResponse toolResponse = functionCall.onToolCall(finalResult, maid);
-            // 结束 Function Call，那么正常触发 TTS 和聊天信息即可
-            if (toolResponse instanceof EndToolResponse end) {
-                this.onSuccess(end.responseChat());
-                return;
-            }
-            // 如果是 KeepToolResponse，那么就需要继续进行下一轮 AI 对话
-            if (toolResponse instanceof KeepToolResponse keep) {
-                // 计数增加，避免循环触发
-                this.callCount = this.callCount + 1;
-                chatManager.addToolHistory(keep.message(), toolCall.getId());
-                messages.add(LLMMessage.toolChat(maid, keep.message(), toolCall.getId()));
-                if (this.callCount >= MAX_CALL_COUNT) {
-                    TouhouLittleMaid.LOGGER.error("Function call count exceed max count: {}", MAX_CALL_COUNT);
-                } else {
-                    LLMConfig keepConfig = new LLMConfig(config.model(), config.maid(), ChatType.MULTI_FUNCTION_CALL);
-                    client.chat(messages, keepConfig, this);
-                }
+            // 继续进行下一轮 AI 对话
+            // 计数增加，避免循环触发
+            this.callCount = this.callCount + 1;
+            String response = toolResponse.message();
+            chatManager.addToolHistory(response, toolCall.getId());
+            messages.add(LLMMessage.toolChat(maid, response, toolCall.getId()));
+            if (this.callCount >= MAX_CALL_COUNT) {
+                TouhouLittleMaid.LOGGER.error("Function call count exceed max count: {}", MAX_CALL_COUNT);
+            } else {
+                LLMConfig keepConfig = new LLMConfig(config.model(), config.maid(), ChatType.MULTI_FUNCTION_CALL);
+                client.chat(messages, keepConfig, this);
             }
         });
     }

@@ -13,6 +13,8 @@ import net.minecraft.server.level.ServerPlayer;
 
 import javax.annotation.Nullable;
 
+import static com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.IChatBubbleData.DEFAULT_PRIORITY;
+import static com.github.tartaricacid.touhoulittlemaid.entity.chatbubble.IChatBubbleData.TYPE_2;
 import static com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid.getChatBubbleKey;
 
 public class ChatBubbleManager {
@@ -82,7 +84,7 @@ public class ChatBubbleManager {
     public long addThinkingText(String langKey) {
         MutableComponent component = Component.translatable(langKey).withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC);
         ResourceLocation icon = new ResourceLocation(TouhouLittleMaid.MOD_ID, "textures/entity/chat_bubble/yinyang_orb.png");
-        return this.addChatBubble(WaitingChatBubbleData.create(component, icon));
+        return this.addChatBubble(WaitingChatBubbleData.create(30 * 20, TYPE_2, DEFAULT_PRIORITY, component, icon));
     }
 
     public void addLLMChatText(String message, long waitingChatBubbleId) {
