@@ -5,6 +5,7 @@ import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.Event;
 
 public abstract class MaidPickupEvent extends Event {
@@ -52,15 +53,18 @@ public abstract class MaidPickupEvent extends Event {
     }
 
     public static class ItemResultPost extends MaidPickupEvent {
-        private final ItemEntity entityItem;
+        /**
+         * 女仆捡起的物品，复制的对象
+         */
+        private final ItemStack pickupItem;
 
-        public ItemResultPost(EntityMaid maid, ItemEntity entityItem) {
+        public ItemResultPost(EntityMaid maid, ItemStack pickupItem) {
             super(maid, false);
-            this.entityItem = entityItem;
+            this.pickupItem = pickupItem;
         }
 
-        public ItemEntity getEntityItem() {
-            return entityItem;
+        public ItemStack getPickupItem() {
+            return pickupItem;
         }
 
         @Override

@@ -708,6 +708,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
                         pickupSoundCount = 5;
                     }
                 }
+                ItemStack copy = new ItemStack(itemstack.getItem(), count - itemstack.getCount());
                 // 如果遍历塞完后发现为空了
                 if (itemstack.isEmpty()) {
                     // 清除这个实体
@@ -716,8 +717,8 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
                     // 将物品数量同步到客户端
                     entityItem.setItem(itemstack);
                 }
+                MinecraftForge.EVENT_BUS.post(new MaidPickupEvent.ItemResultPost(this, copy));
             }
-            MinecraftForge.EVENT_BUS.post(new MaidPickupEvent.ItemResultPost(this, entityItem));
             return true;
         }
         return false;
