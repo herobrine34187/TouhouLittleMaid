@@ -681,6 +681,10 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
     }
 
     public boolean pickupItem(ItemEntity entityItem, boolean simulate) {
+        MaidPickupEvent.ItemResultPre event = new MaidPickupEvent.ItemResultPre(this, entityItem, simulate);
+        if (MinecraftForge.EVENT_BUS.post(event)) {
+            return event.isCanPickup();
+        }
         if (!level.isClientSide && entityItem.isAlive() && !entityItem.hasPickUpDelay()) {
             // 获取实体的物品堆
             ItemStack itemstack = entityItem.getItem();
@@ -713,12 +717,17 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
                     entityItem.setItem(itemstack);
                 }
             }
+            MinecraftForge.EVENT_BUS.post(new MaidPickupEvent.ItemResultPost(this, entityItem));
             return true;
         }
         return false;
     }
 
     public void pickupXPOrb(ExperienceOrb entityXPOrb) {
+        MaidPickupEvent.ExperienceResult event = new MaidPickupEvent.ExperienceResult(this, entityXPOrb, false);
+        if (MinecraftForge.EVENT_BUS.post(event)) {
+            return;
+        }
         if (!this.level.isClientSide && entityXPOrb.isAlive() && entityXPOrb.tickCount > 2) {
             // 这是向客户端同步数据用的，如果加了这个方法，会有短暂的拾取动画和音效
             this.take(entityXPOrb, 1);
@@ -746,6 +755,10 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
     }
 
     public void pickupPowerPoint(EntityPowerPoint powerPoint) {
+        MaidPickupEvent.PowerPointResult event = new MaidPickupEvent.PowerPointResult(this, powerPoint, false);
+        if (MinecraftForge.EVENT_BUS.post(event)) {
+            return;
+        }
         if (!this.level.isClientSide && powerPoint.isAlive() && powerPoint.throwTime == 0) {
             // 这是向客户端同步数据用的，如果加了这个方法，会有短暂的拾取动画和音效
             powerPoint.take(this, 1);
@@ -790,6 +803,10 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
     }
 
     public boolean pickupArrow(AbstractArrow arrow, boolean simulate) {
+        MaidPickupEvent.ArrowResult event = new MaidPickupEvent.ArrowResult(this, arrow, simulate);
+        if (MinecraftForge.EVENT_BUS.post(event)) {
+            return event.isCanPickup();
+        }
         if (!this.level.isClientSide && arrow.isAlive() && arrow.shakeTime <= 0) {
             // 先判断箭是否处于可以拾起的状态
             if (arrow.pickup != AbstractArrow.Pickup.ALLOWED) {

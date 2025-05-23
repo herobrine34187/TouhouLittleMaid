@@ -540,7 +540,7 @@ public abstract class AbstractMaidContainerGui<T extends AbstractMaidContainer> 
         {
             graphics.blit(SIDE, leftPos + 53, topPos + 124, 9, 0, 9, 9);
             graphics.blit(SIDE, leftPos + 5, topPos + 124, 0, 9, 47, 9);
-            double armor = maid.getAttributeValue(Attributes.ARMOR) / 20;
+            double armor = Math.min(maid.getAttributeValue(Attributes.ARMOR) / 20, 1.0);
             graphics.blit(SIDE, leftPos + 7, topPos + 126, 2, 23, (int) (43 * armor), 5);
             drawNumberScale(graphics, maid.getArmorValue(), leftPos + 63, topPos + 125);
         }
