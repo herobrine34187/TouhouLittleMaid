@@ -4,7 +4,6 @@ import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -15,8 +14,8 @@ public class EntityGraphics extends GuiGraphics {
     private final int packedLight;
     private final float partialTicks;
 
-    public EntityGraphics(Minecraft minecraft, PoseStack pose, MultiBufferSource.BufferSource bufferSource, EntityMaid maid, int packedLight, float partialTicks) {
-        super(minecraft, pose, bufferSource);
+    public EntityGraphics(Minecraft minecraft, PoseStack pose, EntityMaid maid, int packedLight, float partialTicks) {
+        super(minecraft, pose, minecraft.renderBuffers().bufferSource());
         this.maid = maid;
         this.packedLight = packedLight;
         this.partialTicks = partialTicks;
@@ -45,6 +44,6 @@ public class EntityGraphics extends GuiGraphics {
      * 渲染物品目前有问题，暂时禁用
      */
     @Override
-    public void renderItem(@Nullable LivingEntity pEntity, @Nullable Level pLevel, ItemStack pStack, int pX, int pY, int pSeed, int pGuiOffset) {
+    public void renderItem(@Nullable LivingEntity pEntity, @Nullable Level pLevel, ItemStack stack, int pX, int pY, int pSeed, int pGuiOffset) {
     }
 }

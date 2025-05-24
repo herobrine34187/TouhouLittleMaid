@@ -123,20 +123,17 @@ public class EntityMaidRenderer extends MobRenderer<Mob, BedrockModel<Mob>> {
         EntityMaid maidEntity = maid.asStrictMaid();
         // 暂定只能女仆显示
         if (maidEntity != null && MaidConfig.GLOBAL_MAID_SHOW_CHAT_BUBBLE.get() && maidEntity.getConfigManager().isChatBubbleShow()) {
-            if (bufferIn instanceof MultiBufferSource.BufferSource bufferSource) {
-                poseStack.pushPose();
-                float offsetY = maidEntity.getNameTagOffsetY();
-                if (maidEntity.isMaidInSittingPose()) {
-                    offsetY -= 0.25f;
-                }
-                poseStack.translate(0.0F, offsetY, 0.0F);
-                poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-                poseStack.scale(-0.025F, -0.025F, 0.025F);
-                EntityGraphics graphics = new EntityGraphics(Minecraft.getInstance(), poseStack,
-                        bufferSource, maidEntity, packedLightIn, partialTicks);
-                this.chatBubbleRenderer2.render(graphics);
-                poseStack.popPose();
+            poseStack.pushPose();
+            float offsetY = maidEntity.getNameTagOffsetY();
+            if (maidEntity.isMaidInSittingPose()) {
+                offsetY -= 0.25f;
             }
+            poseStack.translate(0.0F, offsetY, 0.0F);
+            poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
+            poseStack.scale(-0.025F, -0.025F, 0.025F);
+            EntityGraphics graphics = new EntityGraphics(Minecraft.getInstance(), poseStack, maidEntity, packedLightIn, partialTicks);
+            this.chatBubbleRenderer2.render(graphics);
+            poseStack.popPose();
         }
 
         // YSM 接管渲染
