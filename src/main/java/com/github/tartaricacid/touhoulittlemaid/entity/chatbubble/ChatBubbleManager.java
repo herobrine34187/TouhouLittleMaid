@@ -25,6 +25,8 @@ public class ChatBubbleManager {
     }
 
     public void tick() {
+        // 随机添加表情
+        RandomEmoji.tick(maid);
         // 每 5 tick 检查一次
         if (this.maid.tickCount % 5 != 0) {
             return;

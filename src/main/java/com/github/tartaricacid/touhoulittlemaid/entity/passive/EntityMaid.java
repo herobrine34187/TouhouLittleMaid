@@ -24,6 +24,7 @@ import com.github.tartaricacid.touhoulittlemaid.compat.ysm.YsmCompat;
 import com.github.tartaricacid.touhoulittlemaid.compat.ysm.event.YsmMaidClientTickEvent;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.MaidConfig;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.MiscConfig;
+import com.github.tartaricacid.touhoulittlemaid.datagen.tag.EntityTypeGenerator;
 import com.github.tartaricacid.touhoulittlemaid.datagen.tag.TagItem;
 import com.github.tartaricacid.touhoulittlemaid.entity.ai.brain.MaidBrain;
 import com.github.tartaricacid.touhoulittlemaid.entity.ai.brain.MaidSchedule;
@@ -528,8 +529,8 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
     @Override
     public void rideTick() {
         super.rideTick();
-        if (this.getVehicle() != null) {
-            Entity vehicle = this.getVehicle();
+        Entity vehicle = this.getVehicle();
+        if (vehicle != null && !vehicle.getType().is(EntityTypeGenerator.MAID_VEHICLE_ROTATE_BLOCKLIST)) {
             this.setYHeadRot(vehicle.getYRot());
             this.setYBodyRot(vehicle.getYRot());
         }

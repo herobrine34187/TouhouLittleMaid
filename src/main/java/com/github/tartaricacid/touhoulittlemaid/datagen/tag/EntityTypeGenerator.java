@@ -16,6 +16,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class EntityTypeGenerator extends ForgeEntityTypeTagsProvider {
     public static TagKey<EntityType<?>> MAID_FAIRY_ATTACK_GOAL = TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation(TouhouLittleMaid.MOD_ID, "maid_fairy_attack_goal"));
+    public static TagKey<EntityType<?>> MAID_VEHICLE_ROTATE_BLOCKLIST = TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation(TouhouLittleMaid.MOD_ID, "maid_vehicle_rotate_blocklist"));
 
     public EntityTypeGenerator(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper existingFileHelper) {
         super(output, lookupProvider, existingFileHelper);
@@ -36,6 +37,8 @@ public class EntityTypeGenerator extends ForgeEntityTypeTagsProvider {
                 .addOptional(id("mutantmonsters:mutant_snow_golem"))
                 .addOptional(id("alexscaves:gingerbread_man"))
                 .addOptional(id("alexsmobs:bunfungus"));
+
+        tag(MAID_VEHICLE_ROTATE_BLOCKLIST).addOptional(id("create:carriage_contraption"));
     }
 
     private ResourceLocation id(String name) {

@@ -15,12 +15,15 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.VisibleForDebug;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.FarmBlock;
+import org.apache.commons.lang3.StringUtils;
 
 @VisibleForDebug
 public final class MaidDebugCommand {
@@ -84,12 +87,17 @@ public final class MaidDebugCommand {
                 BlockPos blockPos = serverPlayer.blockPosition();
                 int x = blockPos.getX() + i % 10 + 1;
                 int z = blockPos.getZ() + i / 10 + 1;
-                EntityMaid entityMaid = new EntityMaid(serverPlayer.level);
+                ServerLevel level = serverPlayer.serverLevel();
+                EntityMaid entityMaid = new EntityMaid(level);
                 entityMaid.setPos(x, blockPos.getY(), z);
                 entityMaid.tame(serverPlayer);
-                entityMaid.setModelId(modelId);
+                if (StringUtils.isNotBlank(modelId)) {
+                    entityMaid.setModelId(modelId);
+                } else {
+                    entityMaid.finalizeSpawn(level, level.getCurrentDifficultyAt(serverPlayer.blockPosition()), MobSpawnType.SPAWN_EGG, null, null);
+                }
                 entityMaid.setInSittingPose(true);
-                serverPlayer.level.addFreshEntity(entityMaid);
+                level.addFreshEntity(entityMaid);
             }
         }
         return Command.SINGLE_SUCCESS;

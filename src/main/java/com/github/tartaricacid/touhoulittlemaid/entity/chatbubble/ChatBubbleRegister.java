@@ -68,6 +68,8 @@ public class ChatBubbleRegister {
             littleMaid.registerChatBubble(register);
         }
         CODEC_MAP = ImmutableMap.copyOf(CODEC_MAP);
+        // 同时读取随机表情
+        RandomEmoji.init();
     }
 
     public void register(ResourceLocation id, IChatBubbleData.ChatSerializer serializer) {
