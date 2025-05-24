@@ -1135,7 +1135,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
 
     @Override
     public boolean canAttackType(EntityType<?> typeIn) {
-        return typeIn != EntityType.ARMOR_STAND && super.canAttackType(typeIn);
+        return typeIn != EntityType.ARMOR_STAND;
     }
 
     @Override
