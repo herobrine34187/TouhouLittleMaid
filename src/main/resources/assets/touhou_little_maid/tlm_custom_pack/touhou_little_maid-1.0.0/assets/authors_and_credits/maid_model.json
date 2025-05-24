@@ -119,16 +119,27 @@
 			"render_item_scale": 1.2
 		},
 		{
-			"model_id": "authors_and_credits:zhiban",
-			"is_gecko": true,
-			"description": ["{model.authors_and_credits.zhiban.desc}"],
-			"animation": ["authors_and_credits:animation/authors_and_credits.zhiban.main.json"],
-			"render_entity_scale": 0.6
-		},
-		{
 			"model_id": "authors_and_credits:mory_chan",
 			"description": ["{model.authors_and_credits.mory_chan.desc}"],
 			"render_entity_scale": 0.8
+		},
+		{
+			"model_id": "authors_and_credits:flower_candy",
+			"description": ["{model.authors_and_credits.flower_candy.desc}"],
+			"animation": [
+				"touhou_little_maid:animation/maid/default/head/default.js",
+				"touhou_little_maid:animation/maid/default/head/beg.js",
+				"touhou_little_maid:animation/maid/default/head/music_shake.js",
+				"touhou_little_maid:animation/maid/default/head/blink.js",
+				"touhou_little_maid:animation/maid/default/arm/default.js",
+				"touhou_little_maid:animation/maid/default/arm/swing.js",
+				"touhou_little_maid:animation/maid/default/leg/default.js",
+				"touhou_little_maid:animation/maid/default/sit/skirt_rotation_swing.js",
+				"touhou_little_maid:animation/maid/default/sit/default.js",
+				"touhou_little_maid:animation/maid/default/wing/default.js",
+				"touhou_little_maid:animation/maid/default/task/grass.js",
+				"touhou_little_maid:animation/base/float/default.js"
+			]
 		}
 	]
 }

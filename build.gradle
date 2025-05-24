@@ -195,7 +195,7 @@ dependencies {
 
     implementation fg.deobf("curse.maven:iron-chests-228756:${iron_chests_id}")
 
-    implementation fg.deobf("maven.modrinth:immersive-melodies:${immersive_melodies_version}")
+    compileOnly fg.deobf("maven.modrinth:immersive-melodies:${immersive_melodies_version}")
 
     runtimeOnly fg.deobf("curse.maven:carry-on-274259:${carry_on_id}")
 
@@ -230,6 +230,8 @@ dependencies {
     // runtimeOnly fg.deobf("maven.modrinth:better-advancements:0.4.2.10-forge")
     // runtimeOnly fg.deobf("maven.modrinth:ice-and-fire-dragons:2.1.13-1.20.1-beta-5")
     runtimeOnly fg.deobf('maven.modrinth:oculus:1.20.1-1.7.0')
+    runtimeOnly fg.deobf('curse.maven:hostile-neural-networks-552574:5895036')
+    runtimeOnly fg.deobf('curse.maven:placebo-283644:6274231')
     // runtimeOnly fg.deobf("curse.maven:maid-storage-manager-1210244:6315697")
     // runtimeOnly fg.deobf("curse.maven:lavafishing-1035887:5432767")
     // runtimeOnly fg.deobf("curse.maven:catalogue-459701:${catalogue_id}")

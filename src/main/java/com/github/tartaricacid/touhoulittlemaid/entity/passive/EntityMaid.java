@@ -548,7 +548,7 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
 
     private void onMaidSleep() {
         if (isSleeping()) {
-            getSleepingPos().ifPresent(pos -> setPos(pos.getX() + 0.5, pos.getY() + 0.8, pos.getZ() + 0.5));
+            getSleepingPos().ifPresent(pos -> setPos(pos.getX() + 0.5, pos.getY() + 0.5625, pos.getZ() + 0.5));
             setDeltaMovement(Vec3.ZERO);
             if (!isSilent()) {
                 this.setSilent(true);

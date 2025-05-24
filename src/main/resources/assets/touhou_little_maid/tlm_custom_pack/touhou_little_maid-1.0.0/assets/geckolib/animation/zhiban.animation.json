@@ -3402,7 +3402,7 @@
 				},
 				"AllBody": {
 					"rotation": [0, 0, 0],
-					"position": [0, 0, 0],
+					"position": [1.19975, -4.15738, -4.71983],
 					"scale": 1
 				},
 				"AllHead": {

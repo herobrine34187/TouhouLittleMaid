@@ -53,5 +53,6 @@ public final class TouhouLittleMaid {
         InitLootModifier.GLOBAL_LOOT_MODIFIER_SERIALIZER.register(eventBus);
         InitCommand.ARGUMENT_TYPE.register(eventBus);
         InitPoi.POI_TYPES.register(eventBus);
+        InitPainting.PAINTING_VARIANTS.register(eventBus);
     }
 }

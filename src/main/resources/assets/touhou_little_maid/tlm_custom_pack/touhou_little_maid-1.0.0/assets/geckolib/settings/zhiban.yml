@@ -7,8 +7,9 @@ meta:
   # Applicable model IDs in sequence
   # 适用于哪个模型，逐次输入模型 ID
   model_id:
-    - authors_and_credits:zhiban
+    - geckolib:zhiban
     - geckolib:zhiban_hanfu
+    - geckolib:zhiban_new_year
     - new_year_model_pack:zhiban
 
 # All lines starting with # are comments, ${xxx} will be replaced by the program

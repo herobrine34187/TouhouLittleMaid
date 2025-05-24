@@ -197,6 +197,18 @@
 			"render_item_scale": 1.2
 		},
 		{
+			"model_id": "touhou_little_maid:hourai_doll",
+			"description": ["{model.touhou_little_maid.hourai_doll.desc}"],
+			"render_entity_scale": 0.6,
+			"render_item_scale": 1.2
+		},
+		{
+			"model_id": "touhou_little_maid:goliath_doll",
+			"description": ["{model.touhou_little_maid.goliath_doll.desc}"],
+			"render_entity_scale": 1.5,
+			"render_item_scale": 0.8
+		},
+		{
 			"model_id": "touhou_little_maid:lily_white",
 			"description": ["{model.touhou_little_maid.lily_white.desc}"]
 		},
@@ -374,6 +386,11 @@
 		},
 		{
 			"model_id": "touhou_little_maid:komeiji_koishi",
+			"description": ["{model.touhou_little_maid.komeiji_koishi.desc}"]
+		},
+		{
+			"model_id": "touhou_little_maid:komeiji_koishi_2",
+			"name": "{model.touhou_little_maid.komeiji_koishi.name}",
 			"description": ["{model.touhou_little_maid.komeiji_koishi.desc}"]
 		},
 		{
@@ -801,6 +818,14 @@
 		{
 			"model_id": "touhou_little_maid:nippaku_zanmu",
 			"description": ["{model.touhou_little_maid.nippaku_zanmu.desc}"]
+		},
+		{
+			"model_id": "touhou_little_maid:nareko_michigami",
+			"description": ["{model.touhou_little_maid.nareko_michigami.desc}"]
+		},
+		{
+			"model_id": "touhou_little_maid:chimi_houjuu",
+			"description": ["{model.touhou_little_maid.chimi_houjuu.desc}"]
 		},
 		{
 			"model_id": "touhou_little_maid:morichika_rinnosuke",
