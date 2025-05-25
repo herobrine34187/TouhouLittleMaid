@@ -9,6 +9,7 @@ public final class ErrorCode {
     public static final int JSON_DECODE_ERROR = 2;
     public static final int CHAT_CHOICE_IS_EMPTY = 3;
     public static final int CHAT_TEXT_IS_EMPTY = 4;
+    public static final int MICROPHONE_NOT_FOUND = 5;
 
     public static MutableComponent getErrorMessage(ServiceType serviceType, int errorCode, String message) {
         if (serviceType == ServiceType.LLM) {
@@ -52,6 +53,9 @@ public final class ErrorCode {
                 }
                 case ErrorCode.JSON_DECODE_ERROR -> {
                     return Component.translatable("ai.touhou_little_maid.chat.stt.json_decode_error", message);
+                }
+                case ErrorCode.MICROPHONE_NOT_FOUND -> {
+                    return Component.translatable("ai.touhou_little_maid.chat.stt.no_microphone");
                 }
             }
         }

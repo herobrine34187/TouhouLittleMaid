@@ -20,7 +20,7 @@ public class ChatCompletion {
     private ResponseFormat responseFormat = ResponseFormat.text();
 
     @SerializedName("max_tokens")
-    private int maxTokens = 256;
+    private int maxTokens = 4096;
 
     @SerializedName("temperature")
     private double temperature = 0.5;

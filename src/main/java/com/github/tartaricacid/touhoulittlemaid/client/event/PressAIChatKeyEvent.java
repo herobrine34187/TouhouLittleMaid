@@ -1,6 +1,7 @@
 package com.github.tartaricacid.touhoulittlemaid.client.event;
 
 import com.github.tartaricacid.touhoulittlemaid.client.gui.entity.maid.ai.AIChatScreen;
+import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -21,7 +22,7 @@ import org.lwjgl.glfw.GLFW;
 public class PressAIChatKeyEvent {
     @SubscribeEvent
     public static void onOpenConfig(InputEvent.Key event) {
-        if (isInGame() && keyIsMatch(event)) {
+        if (isInGame() && AIConfig.LLM_ENABLED.get() && keyIsMatch(event)) {
             EntityMaid maid = maidCheck();
             if (maid == null) {
                 return;

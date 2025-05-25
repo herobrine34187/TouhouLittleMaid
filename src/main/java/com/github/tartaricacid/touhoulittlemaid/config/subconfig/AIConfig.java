@@ -45,7 +45,7 @@ public class AIConfig {
         LLM_PROXY_ADDRESS = builder.define("LLMProxyAddress", "");
 
         builder.comment("The maximum token supported by the LLM AI");
-        LLM_MAX_TOKEN = builder.defineInRange("LLMMaxToken", 2048, 1, Integer.MAX_VALUE);
+        LLM_MAX_TOKEN = builder.defineInRange("LLMMaxToken", 4096, 1, Integer.MAX_VALUE);
 
         builder.comment("The maximum historical conversation length cached by the maid");
         MAID_MAX_HISTORY_LLM_SIZE = builder.defineInRange("MaidMaxHistoryLLMSize", 16, 1, 128);

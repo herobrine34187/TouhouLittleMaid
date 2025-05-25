@@ -3,6 +3,7 @@ package com.github.tartaricacid.touhoulittlemaid.client.sound.record;
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
 import com.google.common.collect.Lists;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.VisibleForDebug;
 import org.apache.commons.io.FileUtils;
 
@@ -27,8 +28,12 @@ public class MicrophoneManager {
     private static final AtomicBoolean IS_RECORDING = new AtomicBoolean();
     private static CompletableFuture<?> TASK = null;
 
+    @Nullable
     public static Mixer.Info getMicrophoneInfo(AudioFormat audioFormat) {
         List<Mixer.Info> allMicrophoneInfo = getAllMicrophoneInfo(audioFormat);
+        if (allMicrophoneInfo.isEmpty()) {
+            return null;
+        }
         String name = AIConfig.STT_MICROPHONE.get();
         if (name.isBlank()) {
             return allMicrophoneInfo.get(0);
@@ -51,10 +56,14 @@ public class MicrophoneManager {
                 names.add(info.getName());
             }
         }
-        return names.toArray(new String[0]);
+        String[] result = names.toArray(new String[0]);
+        if (result.length == 0) {
+            return new String[]{Component.translatable("mco.configure.world.slot.empty").getString()};
+        }
+        return result;
     }
 
-    public static List<Mixer.Info> getAllMicrophoneInfo(AudioFormat format) {
+    private static List<Mixer.Info> getAllMicrophoneInfo(AudioFormat format) {
         List<Mixer.Info> output = Lists.newArrayList();
         Mixer.Info[] allInfos = AudioSystem.getMixerInfo();
         for (Mixer.Info info : allInfos) {
@@ -68,7 +77,7 @@ public class MicrophoneManager {
     }
 
     @Nullable
-    public static TargetDataLine getMicrophone(String deviceName, AudioFormat format) throws LineUnavailableException {
+    private static TargetDataLine getMicrophone(String deviceName, AudioFormat format) throws LineUnavailableException {
         Mixer.Info[] allInfos = AudioSystem.getMixerInfo();
         for (Mixer.Info info : allInfos) {
             Mixer mixer = AudioSystem.getMixer(info);

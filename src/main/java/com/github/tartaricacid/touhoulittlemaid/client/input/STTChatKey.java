@@ -42,7 +42,7 @@ public class STTChatKey {
 
     @SubscribeEvent
     public static void onSttChatPress(InputEvent.Key event) {
-        if (STT_CHAT_KEY.matches(event.getKey(), event.getScanCode())) {
+        if (keyIsMatch(event)) {
             if (!AIConfig.LLM_ENABLED.get()) {
                 return;
             }
@@ -56,6 +56,7 @@ public class STTChatKey {
             if (!isInGame()) {
                 return;
             }
+            STT_CHAT_KEY.consumeClick();
             if (event.getAction() == GLFW.GLFW_PRESS) {
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(InitSounds.RECORDING_START.get(), 1f));
                 getNearestMaid(player, STTChatKey::sttStart, true);
@@ -66,6 +67,11 @@ public class STTChatKey {
                 getNearestMaid(player, STTChatKey::sttStop, false);
             }
         }
+    }
+
+    private static boolean keyIsMatch(InputEvent.Key event) {
+        return STT_CHAT_KEY.matches(event.getKey(), event.getScanCode())
+               && STT_CHAT_KEY.getKeyModifier().equals(KeyModifier.getActiveModifier());
     }
 
     private static void getNearestMaid(LocalPlayer player, Consumer<EntityMaid> consumer, boolean isStart) {

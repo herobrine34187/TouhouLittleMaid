@@ -105,7 +105,7 @@ public class GlobalAIIntegration {
                 .setSaveConsumer(AIConfig.LLM_PROXY_ADDRESS::set).build());
 
         builder.add(entryBuilder.startIntField(Component.translatable("config.touhou_little_maid.global_ai.llm_max_token"), AIConfig.LLM_MAX_TOKEN.get())
-                .setDefaultValue(256)
+                .setDefaultValue(4096)
                 .setTooltip(Component.translatable("config.touhou_little_maid.global_ai.llm_max_token.tooltip"))
                 .setSaveConsumer(AIConfig.LLM_MAX_TOKEN::set).build());
 

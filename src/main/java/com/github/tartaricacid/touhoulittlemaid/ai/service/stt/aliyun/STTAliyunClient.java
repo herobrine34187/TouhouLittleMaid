@@ -33,6 +33,10 @@ public class STTAliyunClient implements STTClient {
     @Override
     public void startRecord(STTConfig config, ResponseCallback<String> callback) {
         Mixer.Info info = MicrophoneManager.getMicrophoneInfo(FORMAT);
+        if (info == null) {
+            callback.onFailure(null, new Throwable("No suitable microphone found"), ErrorCode.MICROPHONE_NOT_FOUND);
+            return;
+        }
         URI uri = URI.create(this.site.url());
 
         MicrophoneManager.startRecord(info.getName(), FORMAT, data -> {

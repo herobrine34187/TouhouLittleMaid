@@ -17,6 +17,7 @@
   "ai.touhou_little_maid.chat.stt.request_received_error": "Error in STT Request Received: %s",
   "ai.touhou_little_maid.chat.stt.content_is_empty": "You don't seem to say anything......",
   "ai.touhou_little_maid.chat.stt.no_maid_found": "There are no maids within %s blocks of you that you can talk to",
+  "ai.touhou_little_maid.chat.stt.no_microphone": "No microphone devices found!",
   "ai.touhou_little_maid.chat.disable": "The AI chat feature has been disabled",
   "ai.touhou_little_maid.chat.input.tip": "Enter text and press the Enter key to send",
   "ai.touhou_little_maid.chat.config.tip": "Click to open the AI sites config",
