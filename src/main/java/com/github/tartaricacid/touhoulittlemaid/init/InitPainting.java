@@ -9,5 +9,5 @@ import net.minecraftforge.registries.RegistryObject;
 public final class InitPainting {
     public static final DeferredRegister<PaintingVariant> PAINTING_VARIANTS = DeferredRegister.create(Registries.PAINTING_VARIANT, TouhouLittleMaid.MOD_ID);
 
-    public static final RegistryObject<PaintingVariant> WINE_FOX = PAINTING_VARIANTS.register("wine_fox", () -> new PaintingVariant(16, 16));
+    public static final RegistryObject<PaintingVariant> WINE_FOX = PAINTING_VARIANTS.register("wine_fox", () -> new PaintingVariant(32, 48));
 }
