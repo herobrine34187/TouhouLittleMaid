@@ -209,12 +209,4 @@ public class MaidSoundPackGui extends Screen {
         }
         this.renderables.stream().filter(b -> b instanceof FlatColorButton).forEach(b -> ((FlatColorButton) b).renderToolTip(graphics, this, pMouseX, pMouseY));
     }
-
-    @Override
-    public void onClose() {
-        super.onClose();
-        if (this.maid != null) {
-            NetworkHandler.CHANNEL.sendToServer(new OpenMaidGuiMessage(this.maid.getId()));
-        }
-    }
 }

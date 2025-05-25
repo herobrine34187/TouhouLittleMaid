@@ -312,9 +312,6 @@ public class ModelDownloadGui extends Screen {
             this.getMinecraft().player.sendSystemMessage(Component.translatable("gui.touhou_little_maid.resources_download.need_reload.subtitle"));
         }
         super.onClose();
-        if (this.maid != null) {
-            NetworkHandler.CHANNEL.sendToServer(new OpenMaidGuiMessage(this.maid.getId()));
-        }
     }
 
     private void getCrc32Infos() {

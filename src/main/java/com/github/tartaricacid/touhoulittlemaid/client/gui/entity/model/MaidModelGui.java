@@ -143,14 +143,6 @@ public class MaidModelGui extends AbstractModelGui<EntityMaid, MaidModelInfo> {
     }
 
     @Override
-    public void onClose() {
-        super.onClose();
-        if (this.entity != null) {
-            NetworkHandler.CHANNEL.sendToServer(new OpenMaidGuiMessage(this.entity.getId()));
-        }
-    }
-
-    @Override
     protected void onClickCloseButton() {
         if (this.entity != null) {
             NetworkHandler.CHANNEL.sendToServer(new OpenMaidGuiMessage(this.entity.getId()));

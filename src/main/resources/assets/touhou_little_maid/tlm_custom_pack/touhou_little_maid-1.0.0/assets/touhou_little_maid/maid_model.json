@@ -820,12 +820,16 @@
 			"description": ["{model.touhou_little_maid.nippaku_zanmu.desc}"]
 		},
 		{
-			"model_id": "touhou_little_maid:nareko_michigami",
-			"description": ["{model.touhou_little_maid.nareko_michigami.desc}"]
+			"model_id": "touhou_little_maid:ubame_chirizuka",
+			"description": ["{model.touhou_little_maid.ubame_chirizuka.desc}"]
 		},
 		{
 			"model_id": "touhou_little_maid:chimi_houjuu",
 			"description": ["{model.touhou_little_maid.chimi_houjuu.desc}"]
+		},
+		{
+			"model_id": "touhou_little_maid:nareko_michigami",
+			"description": ["{model.touhou_little_maid.nareko_michigami.desc}"]
 		},
 		{
 			"model_id": "touhou_little_maid:morichika_rinnosuke",
