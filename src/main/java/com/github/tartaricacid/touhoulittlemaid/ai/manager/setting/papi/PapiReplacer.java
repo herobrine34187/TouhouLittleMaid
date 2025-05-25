@@ -1,6 +1,7 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.manager.setting.papi;
 
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -11,7 +12,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.items.wrapper.RangedWrapper;
-import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.core.lookup.StrSubstitutor;
 

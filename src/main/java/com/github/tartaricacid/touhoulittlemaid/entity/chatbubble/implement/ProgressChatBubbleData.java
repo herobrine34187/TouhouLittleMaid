@@ -65,6 +65,7 @@ public class ProgressChatBubbleData implements IChatBubbleData {
     }
 
     @Override
+    @OnlyIn(Dist.CLIENT)
     public IChatBubbleRenderer getRenderer(IChatBubbleRenderer.Position position) {
         if (renderer == null) {
             renderer = new ProgressChatBubbleRenderer(this.bg, this.text, this.barBackgroundColor, this.barForegroundColor, this.progress, this.alignCenter);

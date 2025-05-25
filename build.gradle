@@ -229,7 +229,7 @@ dependencies {
     // runtimeOnly fg.deobf("maven.modrinth:farmers-delight:1.20.1-1.2.6-forge")
     // runtimeOnly fg.deobf("maven.modrinth:better-advancements:0.4.2.10-forge")
     // runtimeOnly fg.deobf("maven.modrinth:ice-and-fire-dragons:2.1.13-1.20.1-beta-5")
-    runtimeOnly fg.deobf('maven.modrinth:oculus:1.20.1-1.7.0')
+    // runtimeOnly fg.deobf('maven.modrinth:oculus:1.20.1-1.7.0')
     runtimeOnly fg.deobf('curse.maven:hostile-neural-networks-552574:5895036')
     runtimeOnly fg.deobf('curse.maven:placebo-283644:6274231')
     // runtimeOnly fg.deobf("curse.maven:maid-storage-manager-1210244:6315697")

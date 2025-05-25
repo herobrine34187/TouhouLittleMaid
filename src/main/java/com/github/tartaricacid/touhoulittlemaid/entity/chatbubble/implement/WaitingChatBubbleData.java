@@ -54,6 +54,7 @@ public class WaitingChatBubbleData implements IChatBubbleData {
     }
 
     @Override
+    @OnlyIn(Dist.CLIENT)
     public IChatBubbleRenderer getRenderer(IChatBubbleRenderer.Position position) {
         if (renderer == null) {
             renderer = new WaitingChatBubbleRenderer(this.bg, this.text, this.icon);
