@@ -96,9 +96,9 @@ public class LLMCallback implements ResponseCallback<ResponseChat> {
             if (AIConfig.TTS_ENABLED.get() && site != null && site.enabled()) {
                 chatManager.tts(site, chatText, ttsText, waitingChatBubbleId);
             } else {
-                if (StringUtils.isNotBlank(message) && maid.level instanceof ServerLevel serverLevel) {
+                if (StringUtils.isNotBlank(chatText) && maid.level instanceof ServerLevel serverLevel) {
                     MinecraftServer server = serverLevel.getServer();
-                    server.submit(() -> maid.getChatBubbleManager().addLLMChatText(message, waitingChatBubbleId));
+                    server.submit(() -> maid.getChatBubbleManager().addLLMChatText(chatText, waitingChatBubbleId));
                 }
             }
         }
