@@ -33,7 +33,7 @@ import java.time.Duration;
 import java.util.List;
 
 public final class LLMOpenAIClient implements LLMClient {
-    private static final Duration MAX_TIMEOUT = Duration.ofSeconds(15);
+    private static final Duration MAX_TIMEOUT = Duration.ofSeconds(60);
 
     private final HttpClient httpClient;
     private final LLMOpenAISite site;

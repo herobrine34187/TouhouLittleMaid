@@ -23,7 +23,7 @@ import java.time.Duration;
  * 因为默认推荐的 AI 对话工具是 Player2，所以需要对其做额外判断，提示玩家安装使用
  */
 public class Player2AppCheck {
-    private static final Duration MAX_TIMEOUT = Duration.ofSeconds(5);
+    private static final Duration MAX_TIMEOUT = Duration.ofSeconds(15);
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
             .connectTimeout(MAX_TIMEOUT).build();
     private static final HttpRequest REQUEST = HttpRequest.newBuilder()
