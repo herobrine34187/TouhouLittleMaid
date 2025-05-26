@@ -1,6 +1,7 @@
 package com.github.tartaricacid.touhoulittlemaid.ai.service.llm.openai;
 
 
+import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.entity.LLMCallback;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.response.ResponseChat;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.ErrorCode;
@@ -83,9 +84,9 @@ public final class LLMOpenAIClient implements LLMClient {
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(chatCompletion)))
                 .timeout(MAX_TIMEOUT).uri(url);
 
-//        GsonBuilder gsonBuilder = new GsonBuilder();
-//        gsonBuilder.setPrettyPrinting();
-//        System.out.println(gsonBuilder.create().toJson(chatCompletion));
+        if (TouhouLittleMaid.DEBUG) {
+            TouhouLittleMaid.LOGGER.debug(GSON.toJson(chatCompletion));
+        }
 
         this.site.headers().forEach(builder::header);
         HttpRequest httpRequest = builder.build();
@@ -113,9 +114,9 @@ public final class LLMOpenAIClient implements LLMClient {
     private void handle(List<LLMMessage> messages, LLMConfig config, ResponseCallback<ResponseChat> callback,
                         HttpResponse<String> response, Throwable throwable, HttpRequest request) {
         this.<ChatCompletionResponse>handleResponse(callback, response, throwable, request, chat -> {
-//             GsonBuilder gsonBuilder = new GsonBuilder();
-//             gsonBuilder.setPrettyPrinting();
-//             System.out.println(gsonBuilder.create().toJson(chat));
+            if (TouhouLittleMaid.DEBUG) {
+                TouhouLittleMaid.LOGGER.debug(GSON.toJson(chat));
+            }
 
             Usage usage = chat.getUsage();
             if (usage != null) {

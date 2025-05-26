@@ -2,11 +2,14 @@ package com.github.tartaricacid.touhoulittlemaid.client.gui.entity.maid.config;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.ai.manager.entity.MaidAIChatManager;
+import com.github.tartaricacid.touhoulittlemaid.ai.manager.site.AvailableSites;
+import com.github.tartaricacid.touhoulittlemaid.ai.service.stt.STTApiType;
 import com.github.tartaricacid.touhoulittlemaid.ai.service.tts.SupportLanguage;
 import com.github.tartaricacid.touhoulittlemaid.client.gui.entity.maid.AbstractMaidContainerGui;
 import com.github.tartaricacid.touhoulittlemaid.client.gui.entity.maid.ai.HistoryAIChatScreen;
 import com.github.tartaricacid.touhoulittlemaid.client.gui.entity.maid.ai.SettingEditScreen;
 import com.github.tartaricacid.touhoulittlemaid.client.gui.widget.button.MaidAIChatConfigButton;
+import com.github.tartaricacid.touhoulittlemaid.config.subconfig.AIConfig;
 import com.github.tartaricacid.touhoulittlemaid.inventory.container.config.MaidAIChatConfigContainer;
 import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
 import com.github.tartaricacid.touhoulittlemaid.network.message.SaveMaidAIDataMessage;
@@ -38,6 +41,7 @@ public class MaidAIChatConfigContainerGui extends AbstractMaidContainerGui<MaidA
     private final MaidAIChatManager manager;
     private final Map<String, Map<String, String>> llmSites;
     private final Map<String, Map<String, String>> ttsSites;
+    private final List<String> sttSites = Lists.newArrayList(AvailableSites.STT_SITES.keySet());
 
     public MaidAIChatConfigContainerGui(MaidAIChatConfigContainer screenContainer, Inventory inv, Component titleIn) {
         super(screenContainer, inv, titleIn);
@@ -56,15 +60,9 @@ public class MaidAIChatConfigContainerGui extends AbstractMaidContainerGui<MaidA
     @Override
     protected void initAdditionWidgets() {
         int buttonLeft = leftPos + 86;
-        int buttonTop = topPos + 52;
+        int buttonTop = topPos + 38;
         this.addConfigButtons(buttonLeft, buttonTop);
         this.addOtherButtons(buttonLeft);
-    }
-
-    @Override
-    protected void renderAddition(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-        graphics.drawCenteredString(font, Component.translatable("gui.touhou_little_maid.button.maid_ai_chat_config"),
-                leftPos + 167, topPos + 41, 0xFFFFFF);
     }
 
     private void addOtherButtons(int buttonLeft) {
@@ -180,6 +178,57 @@ public class MaidAIChatConfigContainerGui extends AbstractMaidContainerGui<MaidA
                     manager.ttsLanguage = SupportLanguage.findNext(manager.ttsLanguage);
                     button.setValue(SupportLanguage.getLanguageName(manager.ttsLanguage));
                     this.saveConfig();
+                }
+        ));
+        buttonTop += 13;
+
+        this.addSttButtons(buttonLeft, buttonTop);
+    }
+
+    private void addSttButtons(int buttonLeft, int buttonTop) {
+        String sttType = AIConfig.STT_TYPE.get().getName();
+        if (sttSites.isEmpty()) {
+            sttType = StringUtils.EMPTY;
+        } else if (!sttSites.contains(sttType)) {
+            sttType = sttSites.get(0);
+        }
+        String finalSttType = sttType;
+        this.addRenderableWidget(new MaidAIChatConfigButton(buttonLeft, buttonTop,
+                Component.translatable("config.touhou_little_maid.global_ai.stt_type"),
+                Component.literal(sttType),
+                button -> {
+                    if (sttSites.isEmpty()) {
+                        return;
+                    }
+                    int index = sttSites.indexOf(finalSttType);
+                    if (index != -1) {
+                        index--;
+                        if (index < 0) {
+                            index = sttSites.size() - 1;
+                        }
+                        AIConfig.STT_TYPE.set(STTApiType.getByName(sttSites.get(index)));
+                    } else {
+                        AIConfig.STT_TYPE.set(STTApiType.PLAYER2);
+                    }
+                    button.setValue(Component.literal(AIConfig.STT_TYPE.get().getName()));
+                    this.init();
+                },
+                button -> {
+                    if (sttSites.isEmpty()) {
+                        return;
+                    }
+                    int index = sttSites.indexOf(finalSttType);
+                    if (index != -1) {
+                        index++;
+                        if (index >= sttSites.size()) {
+                            index = 0;
+                        }
+                        AIConfig.STT_TYPE.set(STTApiType.getByName(sttSites.get(index)));
+                    } else {
+                        AIConfig.STT_TYPE.set(STTApiType.PLAYER2);
+                    }
+                    button.setValue(Component.literal(AIConfig.STT_TYPE.get().getName()));
+                    this.init();
                 }
         ));
     }

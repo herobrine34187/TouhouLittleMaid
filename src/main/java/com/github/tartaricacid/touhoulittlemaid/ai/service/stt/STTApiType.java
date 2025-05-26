@@ -14,4 +14,13 @@ public enum STTApiType {
     public String getName() {
         return name;
     }
+
+    public static STTApiType getByName(String name) {
+        for (STTApiType type : values()) {
+            if (type.getName().equalsIgnoreCase(name)) {
+                return type;
+            }
+        }
+        return PLAYER2;
+    }
 }
