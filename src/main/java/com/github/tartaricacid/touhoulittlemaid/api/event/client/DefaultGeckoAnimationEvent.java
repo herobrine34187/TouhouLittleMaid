@@ -4,8 +4,6 @@ import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.geckolib3.file.AnimationFile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.Event;
 
 import java.io.IOException;
@@ -16,7 +14,6 @@ import static com.github.tartaricacid.touhoulittlemaid.client.resource.GeckoMode
 /**
  * 在客户端加载额外的默认 Gecko 动画文件。
  */
-@OnlyIn(Dist.CLIENT)
 public class DefaultGeckoAnimationEvent extends Event {
     private final AnimationFile maidAnimationFile;
     private final AnimationFile tacAnimationFile;
