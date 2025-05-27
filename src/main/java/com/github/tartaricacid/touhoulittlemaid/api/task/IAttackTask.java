@@ -25,6 +25,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.util.Optional;
 
 public interface IAttackTask extends IMaidTask {
+    static String MAID_NO_ATTACK_TAG = "MaidNoAttack";
+
     /**
      * 寻找合适的第一个攻击目标
      *
@@ -57,6 +59,10 @@ public interface IAttackTask extends IMaidTask {
         }
         // 有主的宠物也不攻击
         if (target instanceof TamableAnimal tamableAnimal && tamableAnimal.getOwnerUUID() != null) {
+            return false;
+        }
+        // 特殊命名的怪物，因为有的玩家会使用怪物做刷怪塔，会被女仆误杀
+        if (target.getCustomName() != null && target.getCustomName().getString().startsWith(MAID_NO_ATTACK_TAG)) {
             return false;
         }
 
