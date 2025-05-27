@@ -85,7 +85,7 @@ public final class LLMOpenAIClient implements LLMClient {
                 .timeout(MAX_TIMEOUT).uri(url);
 
         if (TouhouLittleMaid.DEBUG) {
-            TouhouLittleMaid.LOGGER.debug(GSON.toJson(chatCompletion));
+            TouhouLittleMaid.LOGGER.info(GSON.toJson(chatCompletion));
         }
 
         this.site.headers().forEach(builder::header);
@@ -115,7 +115,7 @@ public final class LLMOpenAIClient implements LLMClient {
                         HttpResponse<String> response, Throwable throwable, HttpRequest request) {
         this.<ChatCompletionResponse>handleResponse(callback, response, throwable, request, chat -> {
             if (TouhouLittleMaid.DEBUG) {
-                TouhouLittleMaid.LOGGER.debug(GSON.toJson(chat));
+                TouhouLittleMaid.LOGGER.info(GSON.toJson(chat));
             }
 
             Usage usage = chat.getUsage();

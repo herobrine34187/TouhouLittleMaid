@@ -7,8 +7,6 @@ import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.util.ParseI18n;
 import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.language.LanguageInfo;
-import net.minecraft.client.resources.language.LanguageManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
@@ -48,13 +46,7 @@ public record ChatClientInfo(String language, String name, List<String> descript
 
     @OnlyIn(Dist.CLIENT)
     private static String getClientLanguage() {
-        LanguageManager languageManager = Minecraft.getInstance().getLanguageManager();
-        LanguageInfo info = languageManager.getLanguage(languageManager.getSelected());
-        if (info != null) {
-            return info.toComponent().getString();
-        } else {
-            return "English (US)";
-        }
+        return Minecraft.getInstance().getLanguageManager().getSelected();
     }
 
     @OnlyIn(Dist.CLIENT)

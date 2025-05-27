@@ -38,8 +38,8 @@ public class PapiReplacer {
         registerContext("mainhand_item", (maid, lang) -> getSlotItemName(EquipmentSlot.MAINHAND, maid));
         registerContext("offhand_item", (maid, lang) -> getSlotItemName(EquipmentSlot.OFFHAND, maid));
         registerContext("inventory_items", PapiReplacer::getInventoryItems);
-        registerContext("chat_language", (maid, lang) -> lang);
-        registerContext("tts_language", PapiReplacer::ttsLanguage);
+        registerContext("chat_language", (maid, lang) -> language(lang));
+        registerContext("tts_language", ((maid, lang) -> language(maid.getAiChatManager().getTTSLanguage())));
         registerContext("healthy", PapiReplacer::getHealthyInfo);
         registerContext("owner_healthy", PapiReplacer::getOwnerHealthyInfo);
         registerContext("armor_items", PapiReplacer::getArmorItems);
@@ -54,7 +54,13 @@ public class PapiReplacer {
         for (String key : PAPI_MAP.keySet()) {
             valueMap.put(key, PAPI_MAP.get(key).apply(maid, language));
         }
-        return new StrSubstitutor(valueMap).replace(FULL_SETTING);
+        String base = new StrSubstitutor(valueMap).replace(FULL_SETTING);
+        if (language.equals(maid.getAiChatManager().getTTSLanguage())) {
+            base += new StrSubstitutor(valueMap).replace(OUTPUT_FORMAT_REQUIREMENTS_SAME_LANGUAGES);
+        } else {
+            base += new StrSubstitutor(valueMap).replace(OUTPUT_FORMAT_REQUIREMENTS_DIFFERENT_LANGUAGES);
+        }
+        return base;
     }
 
     public static void registerContext(String key, BiFunction<EntityMaid, String, String> function) {
@@ -64,8 +70,7 @@ public class PapiReplacer {
     /**
      * 不能调用 LanguageManager，那个是客户端方法
      */
-    private static String ttsLanguage(EntityMaid maid, String chatLanguage) {
-        String languageTag = maid.getAiChatManager().getTTSLanguage();
+    private static String language(String languageTag) {
         // 将语言代码转换为 Locale 所需的格式，例如 zh_cn -> zh-CN
         String[] parts = languageTag.split("_");
         if (parts.length == 2) {
