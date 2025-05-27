@@ -28,7 +28,7 @@ public class CharacterSetting {
         this.rawSetting = rawSetting;
     }
 
-    public CharacterSetting(File settingFile) throws IOException {
+    public CharacterSetting(File settingFile) throws Exception {
         try (FileReader reader = new FileReader(settingFile, StandardCharsets.UTF_8)) {
             Setting setting = YAML.load(reader);
             if (setting == null) {
@@ -39,7 +39,7 @@ public class CharacterSetting {
         }
     }
 
-    public CharacterSetting(InputStream stream) throws IOException {
+    public CharacterSetting(InputStream stream) throws Exception {
         try (InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
             Setting setting = YAML.load(reader);
             if (setting == null) {

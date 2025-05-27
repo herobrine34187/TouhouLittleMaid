@@ -63,7 +63,7 @@ public class SettingReader {
                 try (InputStream inputStream = zipFile.getInputStream(entry)) {
                     CharacterSetting setting = new CharacterSetting(inputStream);
                     setting.getModelId().forEach(id -> SETTINGS.put(id, setting));
-                } catch (IOException e) {
+                } catch (Exception e) {
                     TouhouLittleMaid.LOGGER.error("Failed to read settings from {}", entryName, e);
                 }
             }
@@ -77,8 +77,12 @@ public class SettingReader {
             public FileVisitResult visitFile(@NotNull Path file, @NotNull BasicFileAttributes attributes) throws IOException {
                 String fileName = file.getFileName().toString();
                 if (fileName.endsWith(YAML)) {
-                    CharacterSetting setting = new CharacterSetting(file.toFile());
-                    setting.getModelId().forEach(id -> SETTINGS.put(id, setting));
+                    try {
+                        CharacterSetting setting = new CharacterSetting(file.toFile());
+                        setting.getModelId().forEach(id -> SETTINGS.put(id, setting));
+                    } catch (Exception e) {
+                        TouhouLittleMaid.LOGGER.error("Failed to read settings from {}", file, e);
+                    }
                 }
                 return super.visitFile(file, attributes);
             }
