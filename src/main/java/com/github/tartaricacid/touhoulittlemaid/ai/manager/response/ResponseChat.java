@@ -7,7 +7,7 @@ public class ResponseChat {
     public String ttsText;
 
     public ResponseChat(String input) {
-        String[] split = input.trim().split("@@", 2);
+        String[] split = input.trim().split("---", 2);
         this.chatText = split[0].trim();
         this.ttsText = split.length > 1 ? split[1].trim() : this.chatText;
         if (StringUtils.isBlank(ttsText)) {
@@ -30,6 +30,6 @@ public class ResponseChat {
 
     @Override
     public String toString() {
-        return "%s@@%s".formatted(chatText, ttsText);
+        return "%s---%s".formatted(chatText, ttsText);
     }
 }

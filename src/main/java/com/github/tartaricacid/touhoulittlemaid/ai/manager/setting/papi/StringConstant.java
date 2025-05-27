@@ -59,7 +59,7 @@ public class StringConstant {
             - The output should be two lines of text:
                 - The first line in ${chat_language}, if the previous prompt word is not in ${chat_language}, please also translate it into ${chat_language} and output it in this line
                 - The second line is the translation of the first line into ${tts_language}, but need to remove the behavior description and kaomoji
-                - The two lines are split by @@
+                - The two lines are split by ---
             """;
 
     public static final String OUTPUT_FORMAT_REQUIREMENTS_SAME_LANGUAGES = """
@@ -68,7 +68,7 @@ public class StringConstant {
             - The output should be two lines of text:
                 - The first line in ${chat_language}, if the previous prompt word is not in ${chat_language}, please also translate it into ${chat_language} and output it in this line
                 - The second line is a copy of the first line, but need to remove the behavior description and kaomoji
-                - The two lines are split by @@
+                - The two lines are split by ---
             """;
 
     public static final String AUTO_GEN_SETTING = """
