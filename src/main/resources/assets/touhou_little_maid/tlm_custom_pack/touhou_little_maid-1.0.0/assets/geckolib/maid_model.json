@@ -35,7 +35,7 @@
 			"model_id": "geckolib:winefox_new_year",
 			"description": ["{model.geckolib.winefox.desc}", "{model.geckolib.zhiban.desc}"],
 			"is_gecko": true,
-			"animation": ["geckolib:animation/winefox.animation.json", "geckolib:animation/foxmaid.tac.animation.json"],
+			"animation": ["geckolib:animation/winefox_hanfu.animation.json", "geckolib:animation/foxmaid.tac.animation.json"],
 			"render_entity_scale": 0.65
 		},
 		{

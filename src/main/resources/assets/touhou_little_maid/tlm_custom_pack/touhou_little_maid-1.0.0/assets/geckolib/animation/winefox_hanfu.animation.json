@@ -6383,12 +6383,6 @@
 		"parallel1": {
 			"loop": true,
 			"bones": {
-				"AllBody": {
-					"scale": "1-v.roaming.a"
-				},
-				"FOX": {
-					"scale": "v.roaming.a"
-				},
 				"RightEyePublic": {
 					"position": ["ysm.head_yaw/360", "ysm.head_pitch/360", 0]
 				},
