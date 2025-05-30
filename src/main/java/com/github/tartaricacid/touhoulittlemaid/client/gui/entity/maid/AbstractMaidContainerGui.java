@@ -2,6 +2,7 @@ package com.github.tartaricacid.touhoulittlemaid.client.gui.entity.maid;
 
 import com.github.tartaricacid.touhoulittlemaid.TouhouLittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.api.client.gui.ITooltipButton;
+import com.github.tartaricacid.touhoulittlemaid.api.event.client.MaidContainerGuiEvent;
 import com.github.tartaricacid.touhoulittlemaid.api.task.IMaidTask;
 import com.github.tartaricacid.touhoulittlemaid.client.gui.entity.cache.CacheIconManager;
 import com.github.tartaricacid.touhoulittlemaid.client.gui.sound.MaidSoundPackGui;
@@ -22,11 +23,13 @@ import com.github.tartaricacid.touhoulittlemaid.network.message.RequestEffectMes
 import com.github.tartaricacid.touhoulittlemaid.network.message.SendEffectMessage;
 import com.github.tartaricacid.touhoulittlemaid.util.ParseI18n;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.StateSwitchingButton;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -49,6 +52,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import static com.github.tartaricacid.touhoulittlemaid.util.GuiTools.NO_ACTION;
@@ -64,6 +68,10 @@ public abstract class AbstractMaidContainerGui<T extends AbstractMaidContainer> 
     private static boolean TASK_LIST_OPEN = false;
     protected final EntityMaid maid;
     protected final IMaidTask task;
+    /**
+     * 事件系统添加的额外按钮
+     */
+    private final Map<String, AbstractWidget> eventAddButtons = Maps.newHashMap();
     private StateSwitchingButton home;
     private StateSwitchingButton pick;
     private StateSwitchingButton ride;
@@ -88,6 +96,12 @@ public abstract class AbstractMaidContainerGui<T extends AbstractMaidContainer> 
     }
 
     @Override
+    protected void clearWidgets() {
+        super.clearWidgets();
+        this.eventAddButtons.clear();
+    }
+
+    @Override
     protected void init() {
         super.init();
         // fixme: https://github.com/TartaricAcid/TouhouLittleMaid/issues/416
@@ -105,6 +119,9 @@ public abstract class AbstractMaidContainerGui<T extends AbstractMaidContainer> 
         this.initBaseWidgets();
         // 初始化额外 Widgets
         this.initAdditionWidgets();
+        // 事件系统，用于其他模型添加额外的按钮
+        MinecraftForge.EVENT_BUS.post(new MaidContainerGuiEvent.Init(this, leftPos, topPos, this.eventAddButtons));
+        this.eventAddButtons.values().forEach(this::addRenderableWidget);
     }
 
     protected void initBaseData() {
@@ -143,8 +160,12 @@ public abstract class AbstractMaidContainerGui<T extends AbstractMaidContainer> 
         this.drawEffectInfo(graphics);
         this.drawCurrentTaskText(graphics);
         this.renderAddition(graphics, mouseX, mouseY, partialTicks);
+        MinecraftForge.EVENT_BUS.post(new MaidContainerGuiEvent.Render(this, leftPos, topPos,
+                this.eventAddButtons, graphics, mouseX, mouseY, partialTicks));
         // 确保 Tooltip 是最后渲染的
         this.renderTooltip(graphics, mouseX, mouseY);
+        MinecraftForge.EVENT_BUS.post(new MaidContainerGuiEvent.Tooltip(this, leftPos, topPos,
+                this.eventAddButtons, graphics, mouseX, mouseY, partialTicks));
     }
 
     // 其他的渲染
