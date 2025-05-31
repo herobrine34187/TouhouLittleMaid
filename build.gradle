@@ -137,6 +137,12 @@ repositories {
             includeGroup "vazkii.patchouli"
         }
     }
+    maven {
+        url 'https://jitpack.io'
+        content {
+            includeGroup "com.github.TartaricAcid"
+        }
+    }
 }
 
 jarJar.enable()
@@ -158,8 +164,8 @@ dependencies {
     }
 
     // 拆分出来的基岩版模型加载库
-    jarJar(implementation(fg.deobf("libs:simplebedrockmodel:1.20.1-release-1.2.0"))) {
-        jarJar.ranged(it, "[1.2.0,)")
+    jarJar(implementation(fg.deobf('com.github.TartaricAcid:SimpleBedrockModel:forge-1.20.1-1.2.1-release'))) {
+        jarJar.ranged(it, "[1.2.1,)")
     }
 
     // 单元测试
