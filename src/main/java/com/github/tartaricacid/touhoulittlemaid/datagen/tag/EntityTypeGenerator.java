@@ -17,6 +17,7 @@ import java.util.concurrent.CompletableFuture;
 public class EntityTypeGenerator extends ForgeEntityTypeTagsProvider {
     public static TagKey<EntityType<?>> MAID_FAIRY_ATTACK_GOAL = TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation(TouhouLittleMaid.MOD_ID, "maid_fairy_attack_goal"));
     public static TagKey<EntityType<?>> MAID_VEHICLE_ROTATE_BLOCKLIST = TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation(TouhouLittleMaid.MOD_ID, "maid_vehicle_rotate_blocklist"));
+    public static final TagKey<EntityType<?>> MOB_IMPRISONMENT_TOOL_BLACKLIST = TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation("industrialforegoing:mob_imprisonment_tool_blacklist"));
 
     public EntityTypeGenerator(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper existingFileHelper) {
         super(output, lookupProvider, existingFileHelper);
@@ -39,6 +40,9 @@ public class EntityTypeGenerator extends ForgeEntityTypeTagsProvider {
                 .addOptional(id("alexsmobs:bunfungus"));
 
         tag(MAID_VEHICLE_ROTATE_BLOCKLIST).addOptional(id("create:carriage_contraption"));
+
+        // 仅 1.20.1 需要修正的问题，生物捕捉工具复制女仆问题
+        tag(MOB_IMPRISONMENT_TOOL_BLACKLIST).add(InitEntities.MAID.get());
     }
 
     private ResourceLocation id(String name) {
