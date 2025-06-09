@@ -14,6 +14,9 @@
     <a href="https://crowdin.com/project/touhoulittlemaid116">
         <img src="https://badges.crowdin.net/touhoulittlemaid116/localized.svg" alt="translate on Crowdin">
     </a>
+    <a href="https://deepwiki.com/TartaricAcid/TouhouLittleMaid">
+        <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki">
+    </a>
 </p>
 <p align="center">
     <a href="https://discord.gg/ysm-team">Discord</a>    ·
