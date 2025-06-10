@@ -638,6 +638,8 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
                             InitTrigger.MAID_EVENT.trigger(serverPlayer, TriggerType.TAMED_MAID_FROM_STRUCTURE);
                         }
                     }
+                    // 触发事件
+                    MinecraftForge.EVENT_BUS.post(new MaidTamedEvent(this, player, isNtr));
                     return InteractionResult.SUCCESS;
                 }
             } else {
