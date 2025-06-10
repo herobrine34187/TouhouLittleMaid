@@ -54,6 +54,22 @@ public final class EntityCraftingHelper {
         }
     }
 
+    public static JsonObject writeEntityData(Output output) {
+        JsonObject json = new JsonObject();
+        json.addProperty(TYPE_TAG, output.getType().toString());
+        json.add(NBT_TAG, GSON.toJsonTree(output.getData()));
+
+        if (!output.getCopyInput().isEmpty()) {
+            JsonObject copyObject = new JsonObject();
+            copyObject.add(INGREDIENT_TAG, output.getCopyInput().toJson());
+            if (StringUtils.isNotBlank(output.getCopyTag())) {
+                copyObject.addProperty(TAG_TAG, output.getCopyTag());
+            }
+            json.add(COPY_TAG, copyObject);
+        }
+        return json;
+    }
+
     public static class Output {
         private final EntityType<?> type;
         private final CompoundTag data;

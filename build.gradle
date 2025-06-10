@@ -137,6 +137,19 @@ repositories {
             includeGroup "vazkii.patchouli"
         }
     }
+    maven {
+        url "https://maven.latvian.dev/releases"
+        content {
+            includeGroup "dev.latvian.mods"
+            includeGroup "dev.latvian.apps"
+        }
+    }
+    maven {
+        url = "https://maven.architectury.dev"
+        content {
+            includeGroup "dev.architectury"
+        }
+    }
 }
 
 jarJar.enable()
@@ -164,6 +177,11 @@ dependencies {
 
     // 单元测试
     testImplementation 'junit:junit:4.13.2'
+
+    // KubeJS
+    implementation fg.deobf("dev.latvian.mods:kubejs-forge:2001.6.5-build.16")
+    implementation fg.deobf("dev.latvian.mods:rhino-forge:2001.2.3-build.10")
+    runtimeOnly fg.deobf("dev.architectury:architectury-forge:9.2.14")
 
     // compile against the JEI API but do not include it at runtime
     compileOnly(fg.deobf("mezz.jei:jei-1.20.1-common-api:${jei_version}"))
