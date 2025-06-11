@@ -46,7 +46,7 @@ public class ClientSetupEvent {
     }
 
     @SubscribeEvent
-    public static void onClientSetup(RegisterKeyMappingsEvent event) {
+    public static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
         event.register(STTChatKey.STT_CHAT_KEY);
     }
 

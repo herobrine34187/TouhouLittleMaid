@@ -11,7 +11,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public final class AltarInput {
+public final class AltarInputJS {
     @Info("Converting KubeJS' Item object to the altar's' output item object")
     public static EntityCraftingHelper.Output itemstack(ItemStack stack) {
         EntityType<ItemEntity> item = EntityType.ITEM;

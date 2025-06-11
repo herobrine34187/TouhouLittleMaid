@@ -4,8 +4,9 @@ import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.event.common.*;
 import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventHandler;
 
-public interface MaidEvents {
+public interface MaidEventsJS {
     EventGroup GROUP = EventGroup.of("MaidEvents");
+
     EventHandler ADD_JADE_INFO = GROUP.common("addJadeInfo", () -> AddJadeInfoEventJS.class);
     EventHandler ADD_TOP_INFO = GROUP.common("addTopInfo", () -> AddTopInfoEventJS.class);
     EventHandler INTERACT_MAID = GROUP.common("interactMaid", () -> InteractMaidEventJS.class).hasResult();
