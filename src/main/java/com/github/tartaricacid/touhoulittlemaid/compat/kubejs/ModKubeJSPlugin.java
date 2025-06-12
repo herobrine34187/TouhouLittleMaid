@@ -5,6 +5,8 @@ import com.github.tartaricacid.touhoulittlemaid.api.event.RegisterKubeJSEvent;
 import com.github.tartaricacid.touhoulittlemaid.client.overlay.MaidTipsOverlay;
 import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.event.CommonEventsPostJS;
 import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.event.MaidEventsJS;
+import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.event.compat.JadeEventsPostJS;
+import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.event.compat.TopEventsPostJS;
 import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.recipe.AltarOutputJS;
 import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.recipe.AltarRecipeSchema;
 import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.MaidRegisterJS;
@@ -18,6 +20,7 @@ import dev.latvian.mods.kubejs.recipe.schema.RegisterRecipeSchemasEvent;
 import dev.latvian.mods.kubejs.script.BindingsEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
 public class ModKubeJSPlugin extends KubeJSPlugin {
@@ -25,6 +28,12 @@ public class ModKubeJSPlugin extends KubeJSPlugin {
     public void init() {
         ModKubeJSCompat.ENABLE = true;
         MinecraftForge.EVENT_BUS.register(new CommonEventsPostJS());
+        if (ModList.get().isLoaded("jade")) {
+            MinecraftForge.EVENT_BUS.register(new JadeEventsPostJS());
+        }
+        if (ModList.get().isLoaded("theoneprobe")) {
+            MinecraftForge.EVENT_BUS.register(new TopEventsPostJS());
+        }
     }
 
     @Override

@@ -12,22 +12,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class CommonEventsPostJS {
     @SubscribeEvent(priority = EventPriority.LOW)
-    public void addJadeInfo(AddJadeInfoEvent event) {
-        if (MaidEventsJS.ADD_JADE_INFO.hasListeners()) {
-            ScriptType scriptType = event.getMaid().level.isClientSide ? ScriptType.CLIENT : ScriptType.SERVER;
-            MaidEventsJS.ADD_JADE_INFO.post(scriptType, new AddJadeInfoEventJS(event));
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOW)
-    public void addTopInfo(AddTopInfoEvent event) {
-        if (MaidEventsJS.ADD_TOP_INFO.hasListeners()) {
-            ScriptType scriptType = event.getMaid().level.isClientSide ? ScriptType.CLIENT : ScriptType.SERVER;
-            MaidEventsJS.ADD_TOP_INFO.post(scriptType, new AddTopInfoEventJS(event));
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOW)
     public void interactMaid(InteractMaidEvent event) {
         if (MaidEventsJS.INTERACT_MAID.hasListeners()) {
             ScriptType scriptType = event.getMaid().level.isClientSide ? ScriptType.CLIENT : ScriptType.SERVER;
