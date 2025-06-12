@@ -42,12 +42,20 @@ public class CustomKubeJSAttackTask implements IAttackTask {
 
     @Override
     public List<Pair<Integer, BehaviorControl<? super EntityMaid>>> createBrainTasks(EntityMaid maid) {
-        return this.builder.brains;
+        List<Pair<Integer, BehaviorControl<? super EntityMaid>>> tasks = Lists.newArrayList();
+        for (var pair : this.builder.brains) {
+            tasks.add(Pair.of(pair.getFirst(), pair.getSecond().apply(this, maid)));
+        }
+        return tasks;
     }
 
     @Override
     public List<Pair<Integer, BehaviorControl<? super EntityMaid>>> createRideBrainTasks(EntityMaid maid) {
-        return this.builder.rideBrains;
+        List<Pair<Integer, BehaviorControl<? super EntityMaid>>> tasks = Lists.newArrayList();
+        for (var pair : this.builder.rideBrains) {
+            tasks.add(Pair.of(pair.getFirst(), pair.getSecond().apply(this, maid)));
+        }
+        return tasks;
     }
 
     @Override
@@ -144,8 +152,8 @@ public class CustomKubeJSAttackTask implements IAttackTask {
         private final ResourceLocation id;
         private final ItemStack icon;
 
-        private final List<Pair<Integer, BehaviorControl<? super EntityMaid>>> brains = Lists.newArrayList();
-        private final List<Pair<Integer, BehaviorControl<? super EntityMaid>>> rideBrains = Lists.newArrayList();
+        private final List<Pair<Integer, BiFunction<CustomKubeJSAttackTask, EntityMaid, BehaviorControl<? super EntityMaid>>>> brains = Lists.newArrayList();
+        private final List<Pair<Integer, BiFunction<CustomKubeJSAttackTask, EntityMaid, BehaviorControl<? super EntityMaid>>>> rideBrains = Lists.newArrayList();
 
         private final List<Pair<String, Predicate<EntityMaid>>> enableConditionDesc = Lists.newArrayList();
         private final List<Pair<String, Predicate<EntityMaid>>> conditionDesc = Lists.newArrayList();
@@ -169,12 +177,12 @@ public class CustomKubeJSAttackTask implements IAttackTask {
             this.icon = icon;
         }
 
-        public Builder addBrain(int priority, BehaviorControl<? super EntityMaid> control) {
+        public Builder addBrain(int priority, BiFunction<CustomKubeJSAttackTask, EntityMaid, BehaviorControl<? super EntityMaid>> control) {
             this.brains.add(Pair.of(priority, control));
             return this;
         }
 
-        public Builder addRideBrain(int priority, BehaviorControl<? super EntityMaid> control) {
+        public Builder addRideBrain(int priority, BiFunction<CustomKubeJSAttackTask, EntityMaid, BehaviorControl<? super EntityMaid>> control) {
             this.rideBrains.add(Pair.of(priority, control));
             return this;
         }
