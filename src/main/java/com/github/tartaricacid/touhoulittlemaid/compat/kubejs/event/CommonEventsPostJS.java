@@ -4,6 +4,9 @@ import com.github.tartaricacid.touhoulittlemaid.api.event.*;
 import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.event.common.*;
 import dev.latvian.mods.kubejs.event.EventResult;
 import dev.latvian.mods.kubejs.script.ScriptType;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -28,7 +31,8 @@ public class CommonEventsPostJS {
     public void interactMaid(InteractMaidEvent event) {
         if (MaidEventsJS.INTERACT_MAID.hasListeners()) {
             ScriptType scriptType = event.getMaid().level.isClientSide ? ScriptType.CLIENT : ScriptType.SERVER;
-            EventResult result = MaidEventsJS.INTERACT_MAID.post(scriptType, new InteractMaidEventJS(event));
+            Item item = event.getStack().getItem();
+            EventResult result = MaidEventsJS.INTERACT_MAID.post(scriptType, item, new InteractMaidEventJS(event));
             if (result.interruptFalse()) {
                 event.setCanceled(true);
             }
@@ -39,7 +43,8 @@ public class CommonEventsPostJS {
     public void maidAfterEat(MaidAfterEatEvent event) {
         if (MaidEventsJS.MAID_AFTER_EAT.hasListeners()) {
             ScriptType scriptType = event.getMaid().level.isClientSide ? ScriptType.CLIENT : ScriptType.SERVER;
-            MaidEventsJS.MAID_AFTER_EAT.post(scriptType, new MaidAfterEatEventJS(event));
+            Item item = event.getFoodAfterEat().getItem();
+            MaidEventsJS.MAID_AFTER_EAT.post(scriptType, item, new MaidAfterEatEventJS(event));
         }
     }
 
@@ -47,7 +52,8 @@ public class CommonEventsPostJS {
     public void maidAttack(MaidAttackEvent event) {
         if (MaidEventsJS.MAID_ATTACK.hasListeners()) {
             ScriptType scriptType = event.getMaid().level.isClientSide ? ScriptType.CLIENT : ScriptType.SERVER;
-            EventResult result = MaidEventsJS.MAID_ATTACK.post(scriptType, new MaidAttackEventJS(event));
+            ResourceLocation id = event.getSource().typeHolder().unwrapKey().map(ResourceKey::location).orElse(null);
+            EventResult result = MaidEventsJS.MAID_ATTACK.post(scriptType, id, new MaidAttackEventJS(event));
             if (result.interruptFalse()) {
                 event.setCanceled(true);
             }
@@ -58,7 +64,8 @@ public class CommonEventsPostJS {
     public void maidDamage(MaidDamageEvent event) {
         if (MaidEventsJS.MAID_DAMAGE.hasListeners()) {
             ScriptType scriptType = event.getMaid().level.isClientSide ? ScriptType.CLIENT : ScriptType.SERVER;
-            EventResult result = MaidEventsJS.MAID_DAMAGE.post(scriptType, new MaidDamageEventJS(event));
+            ResourceLocation id = event.getSource().typeHolder().unwrapKey().map(ResourceKey::location).orElse(null);
+            EventResult result = MaidEventsJS.MAID_DAMAGE.post(scriptType, id, new MaidDamageEventJS(event));
             if (result.interruptFalse()) {
                 event.setCanceled(true);
             }
@@ -69,7 +76,8 @@ public class CommonEventsPostJS {
     public void maidDeath(MaidDeathEvent event) {
         if (MaidEventsJS.MAID_DEATH.hasListeners()) {
             ScriptType scriptType = event.getMaid().level.isClientSide ? ScriptType.CLIENT : ScriptType.SERVER;
-            EventResult result = MaidEventsJS.MAID_DEATH.post(scriptType, new MaidDeathEventJS(event));
+            ResourceLocation id = event.getSource().typeHolder().unwrapKey().map(ResourceKey::location).orElse(null);
+            EventResult result = MaidEventsJS.MAID_DEATH.post(scriptType, id, new MaidDeathEventJS(event));
             if (result.interruptFalse()) {
                 event.setCanceled(true);
             }
@@ -80,7 +88,8 @@ public class CommonEventsPostJS {
     public void maidEquip(MaidEquipEvent event) {
         if (MaidEventsJS.MAID_EQUIP.hasListeners()) {
             ScriptType scriptType = event.getMaid().level.isClientSide ? ScriptType.CLIENT : ScriptType.SERVER;
-            MaidEventsJS.MAID_EQUIP.post(scriptType, new MaidEquipEventJS(event));
+            Item item = event.getStack().getItem();
+            MaidEventsJS.MAID_EQUIP.post(scriptType, item, new MaidEquipEventJS(event));
         }
     }
 
@@ -96,7 +105,8 @@ public class CommonEventsPostJS {
     public void maidHurt(MaidHurtEvent event) {
         if (MaidEventsJS.MAID_HURT.hasListeners()) {
             ScriptType scriptType = event.getMaid().level.isClientSide ? ScriptType.CLIENT : ScriptType.SERVER;
-            EventResult result = MaidEventsJS.MAID_HURT.post(scriptType, new MaidHurtEventJS(event));
+            ResourceLocation id = event.getSource().typeHolder().unwrapKey().map(ResourceKey::location).orElse(null);
+            EventResult result = MaidEventsJS.MAID_HURT.post(scriptType, id, new MaidHurtEventJS(event));
             if (result.interruptFalse()) {
                 event.setCanceled(true);
             }
@@ -181,7 +191,8 @@ public class CommonEventsPostJS {
     public void maidTaskEnable(MaidTaskEnableEvent event) {
         if (MaidEventsJS.MAID_TASK_ENABLE.hasListeners()) {
             ScriptType scriptType = event.getEntityMaid().level.isClientSide ? ScriptType.CLIENT : ScriptType.SERVER;
-            EventResult result = MaidEventsJS.MAID_TASK_ENABLE.post(scriptType, new MaidTaskEnableEventJS(event));
+            ResourceLocation uid = event.getTargetTask().getUid();
+            EventResult result = MaidEventsJS.MAID_TASK_ENABLE.post(scriptType, uid, new MaidTaskEnableEventJS(event));
             if (result.interruptFalse()) {
                 event.setCanceled(true);
             }

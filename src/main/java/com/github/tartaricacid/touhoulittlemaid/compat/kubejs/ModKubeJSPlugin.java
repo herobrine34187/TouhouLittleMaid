@@ -5,7 +5,7 @@ import com.github.tartaricacid.touhoulittlemaid.api.event.RegisterKubeJSEvent;
 import com.github.tartaricacid.touhoulittlemaid.client.overlay.MaidTipsOverlay;
 import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.event.CommonEventsPostJS;
 import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.event.MaidEventsJS;
-import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.recipe.AltarInputJS;
+import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.recipe.AltarOutputJS;
 import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.recipe.AltarRecipeSchema;
 import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.MaidRegisterJS;
 import com.github.tartaricacid.touhoulittlemaid.entity.task.TaskManager;
@@ -52,7 +52,7 @@ public class ModKubeJSPlugin extends KubeJSPlugin {
 
     @Override
     public void registerBindings(BindingsEvent event) {
-        event.add("MaidAltarInput", AltarInputJS.class);
+        event.add("MaidAltarOutput", AltarOutputJS.class);
         event.add("MaidRegister", MaidRegisterJS.class);
         event.add("MaidItemsUtil", ItemsUtil.class);
     }
