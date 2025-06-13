@@ -1,4 +1,4 @@
-package com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.builder.task;
+package com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.builder.task.presets;
 
 import com.github.tartaricacid.touhoulittlemaid.api.task.IMaidTask;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
@@ -15,10 +15,10 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class CustomKubeJSTask implements IMaidTask {
+public class BaseTaskJS implements IMaidTask {
     private final Builder builder;
 
-    public CustomKubeJSTask(Builder builder) {
+    public BaseTaskJS(Builder builder) {
         this.builder = builder;
     }
 
@@ -118,8 +118,8 @@ public class CustomKubeJSTask implements IMaidTask {
         private final ResourceLocation id;
         private final ItemStack icon;
 
-        private final List<Pair<Integer, BiFunction<CustomKubeJSTask, EntityMaid, BehaviorControl<? super EntityMaid>>>> brains = Lists.newArrayList();
-        private final List<Pair<Integer, BiFunction<CustomKubeJSTask, EntityMaid, BehaviorControl<? super EntityMaid>>>> rideBrains = Lists.newArrayList();
+        private final List<Pair<Integer, BiFunction<BaseTaskJS, EntityMaid, BehaviorControl<? super EntityMaid>>>> brains = Lists.newArrayList();
+        private final List<Pair<Integer, BiFunction<BaseTaskJS, EntityMaid, BehaviorControl<? super EntityMaid>>>> rideBrains = Lists.newArrayList();
 
         private final List<Pair<String, Predicate<EntityMaid>>> enableConditionDesc = Lists.newArrayList();
         private final List<Pair<String, Predicate<EntityMaid>>> conditionDesc = Lists.newArrayList();
@@ -138,12 +138,12 @@ public class CustomKubeJSTask implements IMaidTask {
             this.icon = icon;
         }
 
-        public Builder addBrain(int priority, BiFunction<CustomKubeJSTask, EntityMaid, BehaviorControl<? super EntityMaid>> control) {
+        public Builder addBrain(int priority, BiFunction<BaseTaskJS, EntityMaid, BehaviorControl<? super EntityMaid>> control) {
             this.brains.add(Pair.of(priority, control));
             return this;
         }
 
-        public Builder addRideBrain(int priority, BiFunction<CustomKubeJSTask, EntityMaid, BehaviorControl<? super EntityMaid>> control) {
+        public Builder addRideBrain(int priority, BiFunction<BaseTaskJS, EntityMaid, BehaviorControl<? super EntityMaid>> control) {
             this.rideBrains.add(Pair.of(priority, control));
             return this;
         }

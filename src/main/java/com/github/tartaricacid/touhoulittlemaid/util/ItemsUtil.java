@@ -83,6 +83,10 @@ public final class ItemsUtil {
         return findStackSlot(handler, filter) >= 0;
     }
 
+    public static boolean isStackIn(EntityMaid maid, Predicate<ItemStack> filter) {
+        return findStackSlot(maid.getAvailableInv(false), filter) >= 0;
+    }
+
     /**
      * 获取符合 filter 添加的 ItemStack
      *
@@ -95,6 +99,10 @@ public final class ItemsUtil {
         } else {
             return ItemStack.EMPTY;
         }
+    }
+
+    public static ItemStack getStack(EntityMaid maid, Predicate<ItemStack> filter) {
+        return getStack(maid.getAvailableInv(false), filter);
     }
 
     /**

@@ -1,14 +1,18 @@
-package com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.builder.task;
+package com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.builder.task.presets;
 
 import com.github.tartaricacid.touhoulittlemaid.api.task.IAttackTask;
+import com.github.tartaricacid.touhoulittlemaid.entity.ai.brain.task.MaidUseShieldTask;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
+import com.github.tartaricacid.touhoulittlemaid.init.InitSounds;
+import com.github.tartaricacid.touhoulittlemaid.util.SoundUtil;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.behavior.BehaviorControl;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.behavior.*;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,10 +21,10 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class CustomKubeJSAttackTask implements IAttackTask {
+public class MeleeTaskJS implements IAttackTask {
     private final Builder builder;
 
-    public CustomKubeJSAttackTask(Builder builder) {
+    public MeleeTaskJS(Builder builder) {
         this.builder = builder;
     }
 
@@ -37,12 +41,29 @@ public class CustomKubeJSAttackTask implements IAttackTask {
     @Override
     @Nullable
     public SoundEvent getAmbientSound(EntityMaid maid) {
+        if (this.builder.sound == null) {
+            return SoundUtil.attackSound(maid, InitSounds.MAID_ATTACK.get(), 0.5f);
+        }
         return this.builder.sound;
     }
 
     @Override
     public List<Pair<Integer, BehaviorControl<? super EntityMaid>>> createBrainTasks(EntityMaid maid) {
-        List<Pair<Integer, BehaviorControl<? super EntityMaid>>> tasks = Lists.newArrayList();
+        BehaviorControl<EntityMaid> supplementedTask = StartAttacking.create(m ->
+                isWeapon(m, m.getMainHandItem()), IAttackTask::findFirstValidAttackTarget);
+        BehaviorControl<EntityMaid> findTargetTask = StopAttackingIfTargetInvalid.create(target ->
+                !isWeapon(maid, maid.getMainHandItem()) || maid.distanceTo(target) > maid.getRestrictRadius());
+        BehaviorControl<Mob> moveToTargetTask = SetWalkTargetFromAttackTargetIfTargetOutOfReach.create(0.6f);
+        BehaviorControl<Mob> attackTargetTask = MeleeAttack.create(20);
+        MaidUseShieldTask maidUseShieldTask = new MaidUseShieldTask();
+
+        List<Pair<Integer, BehaviorControl<? super EntityMaid>>> tasks = Lists.newArrayList(
+                Pair.of(5, supplementedTask),
+                Pair.of(5, findTargetTask),
+                Pair.of(5, moveToTargetTask),
+                Pair.of(5, attackTargetTask),
+                Pair.of(5, maidUseShieldTask));
+
         for (var pair : this.builder.brains) {
             tasks.add(Pair.of(pair.getFirst(), pair.getSecond().apply(this, maid)));
         }
@@ -51,7 +72,19 @@ public class CustomKubeJSAttackTask implements IAttackTask {
 
     @Override
     public List<Pair<Integer, BehaviorControl<? super EntityMaid>>> createRideBrainTasks(EntityMaid maid) {
-        List<Pair<Integer, BehaviorControl<? super EntityMaid>>> tasks = Lists.newArrayList();
+        BehaviorControl<EntityMaid> supplementedTask = StartAttacking.create(m ->
+                isWeapon(m, m.getMainHandItem()), IAttackTask::findFirstValidAttackTarget);
+        BehaviorControl<EntityMaid> findTargetTask = StopAttackingIfTargetInvalid.create(target ->
+                !isWeapon(maid, maid.getMainHandItem()) || maid.distanceTo(target) > maid.getRestrictRadius());
+        BehaviorControl<Mob> attackTargetTask = MeleeAttack.create(20);
+        MaidUseShieldTask maidUseShieldTask = new MaidUseShieldTask();
+
+        List<Pair<Integer, BehaviorControl<? super EntityMaid>>> tasks = Lists.newArrayList(
+                Pair.of(5, supplementedTask),
+                Pair.of(5, findTargetTask),
+                Pair.of(5, attackTargetTask),
+                Pair.of(5, maidUseShieldTask));
+
         for (var pair : this.builder.rideBrains) {
             tasks.add(Pair.of(pair.getFirst(), pair.getSecond().apply(this, maid)));
         }
@@ -61,7 +94,7 @@ public class CustomKubeJSAttackTask implements IAttackTask {
     @Override
     public boolean isEnable(EntityMaid maid) {
         if (this.builder.enable == null) {
-            return IAttackTask.super.isEnable(maid);
+            return true;
         }
         return this.builder.enable.apply(maid);
     }
@@ -69,33 +102,9 @@ public class CustomKubeJSAttackTask implements IAttackTask {
     @Override
     public boolean enableLookAndRandomWalk(EntityMaid maid) {
         if (this.builder.enableLookAndRandomWalk == null) {
-            return IAttackTask.super.enableLookAndRandomWalk(maid);
+            return true;
         }
         return this.builder.enableLookAndRandomWalk.apply(maid);
-    }
-
-    @Override
-    public boolean enablePanic(EntityMaid maid) {
-        if (this.builder.enablePanic == null) {
-            return IAttackTask.super.enablePanic(maid);
-        }
-        return this.builder.enablePanic.apply(maid);
-    }
-
-    @Override
-    public boolean enableEating(EntityMaid maid) {
-        if (this.builder.enableEating == null) {
-            return IAttackTask.super.enableEating(maid);
-        }
-        return this.builder.enableEating.apply(maid);
-    }
-
-    @Override
-    public boolean workPointTask(EntityMaid maid) {
-        if (this.builder.workPointTask == null) {
-            return IAttackTask.super.workPointTask(maid);
-        }
-        return this.builder.workPointTask.apply(maid);
     }
 
     @Override
@@ -109,14 +118,6 @@ public class CustomKubeJSAttackTask implements IAttackTask {
     }
 
     @Override
-    public float searchRadius(EntityMaid maid) {
-        if (this.builder.searchRadius < 0) {
-            return IAttackTask.super.searchRadius(maid);
-        }
-        return this.builder.searchRadius;
-    }
-
-    @Override
     public boolean canAttack(EntityMaid maid, LivingEntity target) {
         if (this.builder.canAttack == null) {
             return IAttackTask.super.canAttack(maid, target);
@@ -127,7 +128,7 @@ public class CustomKubeJSAttackTask implements IAttackTask {
     @Override
     public boolean hasExtraAttack(EntityMaid maid, Entity target) {
         if (this.builder.hasExtraAttack == null) {
-            return IAttackTask.super.hasExtraAttack(maid, target);
+            return false;
         }
         return this.builder.hasExtraAttack.apply(maid, target);
     }
@@ -135,7 +136,7 @@ public class CustomKubeJSAttackTask implements IAttackTask {
     @Override
     public boolean doExtraAttack(EntityMaid maid, Entity target) {
         if (this.builder.doExtraAttack == null) {
-            return IAttackTask.super.doExtraAttack(maid, target);
+            return false;
         }
         return this.builder.doExtraAttack.apply(maid, target);
     }
@@ -143,7 +144,7 @@ public class CustomKubeJSAttackTask implements IAttackTask {
     @Override
     public boolean isWeapon(EntityMaid maid, ItemStack stack) {
         if (this.builder.isWeapon == null) {
-            return IAttackTask.super.isWeapon(maid, stack);
+            return false;
         }
         return this.builder.isWeapon.apply(maid, stack);
     }
@@ -152,17 +153,14 @@ public class CustomKubeJSAttackTask implements IAttackTask {
         private final ResourceLocation id;
         private final ItemStack icon;
 
-        private final List<Pair<Integer, BiFunction<CustomKubeJSAttackTask, EntityMaid, BehaviorControl<? super EntityMaid>>>> brains = Lists.newArrayList();
-        private final List<Pair<Integer, BiFunction<CustomKubeJSAttackTask, EntityMaid, BehaviorControl<? super EntityMaid>>>> rideBrains = Lists.newArrayList();
+        private final List<Pair<Integer, BiFunction<MeleeTaskJS, EntityMaid, BehaviorControl<? super EntityMaid>>>> brains = Lists.newArrayList();
+        private final List<Pair<Integer, BiFunction<MeleeTaskJS, EntityMaid, BehaviorControl<? super EntityMaid>>>> rideBrains = Lists.newArrayList();
 
         private final List<Pair<String, Predicate<EntityMaid>>> enableConditionDesc = Lists.newArrayList();
         private final List<Pair<String, Predicate<EntityMaid>>> conditionDesc = Lists.newArrayList();
 
         private @Nullable Function<EntityMaid, Boolean> enable = null;
         private @Nullable Function<EntityMaid, Boolean> enableLookAndRandomWalk = null;
-        private @Nullable Function<EntityMaid, Boolean> enablePanic = null;
-        private @Nullable Function<EntityMaid, Boolean> enableEating = null;
-        private @Nullable Function<EntityMaid, Boolean> workPointTask = null;
 
         private @Nullable BiFunction<EntityMaid, LivingEntity, Boolean> canAttack = null;
         private @Nullable BiFunction<EntityMaid, Entity, Boolean> hasExtraAttack = null;
@@ -170,19 +168,18 @@ public class CustomKubeJSAttackTask implements IAttackTask {
         private @Nullable BiFunction<EntityMaid, ItemStack, Boolean> isWeapon = null;
 
         private @Nullable SoundEvent sound;
-        private float searchRadius = -1;
 
         public Builder(ResourceLocation id, ItemStack icon) {
             this.id = id;
             this.icon = icon;
         }
 
-        public Builder addBrain(int priority, BiFunction<CustomKubeJSAttackTask, EntityMaid, BehaviorControl<? super EntityMaid>> control) {
+        public Builder addBrain(int priority, BiFunction<MeleeTaskJS, EntityMaid, BehaviorControl<? super EntityMaid>> control) {
             this.brains.add(Pair.of(priority, control));
             return this;
         }
 
-        public Builder addRideBrain(int priority, BiFunction<CustomKubeJSAttackTask, EntityMaid, BehaviorControl<? super EntityMaid>> control) {
+        public Builder addRideBrain(int priority, BiFunction<MeleeTaskJS, EntityMaid, BehaviorControl<? super EntityMaid>> control) {
             this.rideBrains.add(Pair.of(priority, control));
             return this;
         }
@@ -207,28 +204,8 @@ public class CustomKubeJSAttackTask implements IAttackTask {
             return this;
         }
 
-        public Builder enablePanic(Function<EntityMaid, Boolean> enablePanic) {
-            this.enablePanic = enablePanic;
-            return this;
-        }
-
-        public Builder enableEating(Function<EntityMaid, Boolean> enableEating) {
-            this.enableEating = enableEating;
-            return this;
-        }
-
-        public Builder workPoint(Function<EntityMaid, Boolean> workPointTask) {
-            this.workPointTask = workPointTask;
-            return this;
-        }
-
         public Builder sound(SoundEvent sound) {
             this.sound = sound;
-            return this;
-        }
-
-        public Builder searchRadius(float searchRadius) {
-            this.searchRadius = searchRadius;
             return this;
         }
 

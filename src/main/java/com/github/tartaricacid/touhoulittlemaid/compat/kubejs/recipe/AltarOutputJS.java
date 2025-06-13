@@ -5,6 +5,7 @@ import com.github.tartaricacid.touhoulittlemaid.init.InitItems;
 import com.github.tartaricacid.touhoulittlemaid.util.EntityCraftingHelper;
 import com.google.gson.JsonParseException;
 import dev.latvian.mods.kubejs.typings.Info;
+import dev.latvian.mods.kubejs.typings.Param;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
@@ -15,7 +16,9 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public final class AltarOutputJS {
-    @Info("Converting KubeJS' Item object to the altar's' output item object")
+    @Info(value = "Converting KubeJS' Item object to the altar's' output item object", params = {
+            @Param(name = "stack", value = "The ItemStack to convert to an altar output item.")
+    })
     public static EntityCraftingHelper.Output item(ItemStack stack) {
         EntityType<ItemEntity> item = EntityType.ITEM;
         CompoundTag data = new CompoundTag();
@@ -23,7 +26,10 @@ public final class AltarOutputJS {
         return new EntityCraftingHelper.Output(item, data);
     }
 
-    @Info("Directly converting an entity ID and extra NBT data to the altar's output entity object")
+    @Info(value = "Directly converting an entity ID and extra NBT data to the altar's output entity object", params = {
+            @Param(name = "entityId", value = "The ID of the entity type to output."),
+            @Param(name = "data", value = "Additional NBT data to attach to the entity.")
+    })
     public static EntityCraftingHelper.Output entity(String entityId, CompoundTag data) {
         EntityType<?> value = ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(entityId));
         if (value == null) {
@@ -32,7 +38,9 @@ public final class AltarOutputJS {
         return new EntityCraftingHelper.Output(value, data);
     }
 
-    @Info("Directly converting an entity ID to the altar's output entity object with empty NBT data")
+    @Info(value = "Directly converting an entity ID to the altar's output entity object with empty NBT data", params = {
+            @Param(name = "entityId", value = "The ID of the entity type to output.")
+    })
     public static EntityCraftingHelper.Output entity(String entityId) {
         return entity(entityId, new CompoundTag());
     }
