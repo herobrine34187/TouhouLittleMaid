@@ -23,6 +23,7 @@ public class MaidShootTargetAnyItemTask extends Behavior<EntityMaid> {
     private final Predicate<ItemStack> weaponTest;
     private int attackTime = -1;
     private int seeTime;
+    private int swingTime;
 
     public MaidShootTargetAnyItemTask(int attackCooldown, int chargeDurationTick, Predicate<ItemStack> weaponTest) {
         super(ImmutableMap.of(MemoryModuleType.LOOK_TARGET, MemoryStatus.REGISTERED,
@@ -71,32 +72,63 @@ public class MaidShootTargetAnyItemTask extends Behavior<EntityMaid> {
                 --this.seeTime;
             }
 
-            // 如果实体手部处于激活状态
-            if (owner.isUsingItem()) {
-                // 如果看不见对方超时 60，重置激活状态
-                if (!canSee && this.seeTime < -60) {
-                    owner.stopUsingItem();
-                } else if (canSee) {
-                    // 否则开始进行远程攻击
-                    int ticksUsingItem = owner.getTicksUsingItem();
-                    if (ticksUsingItem >= this.chargeDurationTick) {
-                        owner.stopUsingItem();
-                        int powerTime = Math.max(ticksUsingItem, 20);
-                        owner.performRangedAttack(target, BowItem.getPowerForTime(powerTime));
-                        this.attackTime = this.attackCooldown;
-                    }
-                }
-            } else if (--this.attackTime <= 0 && this.seeTime >= -60) {
-                // 非激活状态，但是时长合适，开始激活手部
-                owner.startUsingItem(InteractionHand.MAIN_HAND);
+            // 依据是否可以 use 物品，分别判断
+            boolean itemCanNotUse = owner.getMainHandItem().getUseDuration() <= 0;
+            if (itemCanNotUse) {
+                tickItemCanNotUse(owner, target, canSee);
+            } else {
+                // 如果实体手部处于激活状态
+                tickItemCanUse(owner, target, canSee);
             }
         });
+    }
+
+    private void tickItemCanUse(EntityMaid owner, LivingEntity target, boolean canSee) {
+        if (owner.isUsingItem()) {
+            // 如果看不见对方超时 60，重置激活状态
+            if (!canSee && this.seeTime < -60) {
+                owner.stopUsingItem();
+            } else if (canSee) {
+                // 否则开始进行远程攻击
+                int ticksUsingItem = owner.getTicksUsingItem();
+                if (ticksUsingItem >= this.chargeDurationTick) {
+                    owner.stopUsingItem();
+                    int powerTime = Math.max(ticksUsingItem, 20);
+                    owner.performRangedAttack(target, BowItem.getPowerForTime(powerTime));
+                    this.attackTime = this.attackCooldown;
+                }
+            }
+        } else if (--this.attackTime <= 0 && this.seeTime >= -60) {
+            // 非激活状态，但是时长合适，开始激活手部
+            owner.startUsingItem(InteractionHand.MAIN_HAND);
+        }
+    }
+
+    private void tickItemCanNotUse(EntityMaid owner, LivingEntity target, boolean canSee) {
+        if (owner.isSwingingArms()) {
+            if (!canSee && this.seeTime < -60) {
+                owner.setSwingingArms(false);
+                swingTime = 0;
+            } else if (canSee) {
+                if (swingTime >= this.chargeDurationTick) {
+                    int powerTime = Math.max(swingTime, 20);
+                    owner.performRangedAttack(target, BowItem.getPowerForTime(powerTime));
+                    this.attackTime = this.attackCooldown;
+                    owner.setSwingingArms(false);
+                    swingTime = 0;
+                }
+            }
+            swingTime++;
+        } else if (--this.attackTime <= 0 && this.seeTime >= -60) {
+            owner.setSwingingArms(true);
+        }
     }
 
     @Override
     protected void stop(ServerLevel worldIn, EntityMaid entityIn, long gameTimeIn) {
         this.seeTime = 0;
         this.attackTime = -1;
+        this.swingTime = 0;
         entityIn.stopUsingItem();
     }
 }
