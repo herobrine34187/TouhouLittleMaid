@@ -53,8 +53,8 @@ public class MeleeTaskJS implements IAttackTask {
                 isWeapon(m, m.getMainHandItem()), IAttackTask::findFirstValidAttackTarget);
         BehaviorControl<EntityMaid> findTargetTask = StopAttackingIfTargetInvalid.create(target ->
                 !isWeapon(maid, maid.getMainHandItem()) || maid.distanceTo(target) > maid.getRestrictRadius());
-        BehaviorControl<Mob> moveToTargetTask = SetWalkTargetFromAttackTargetIfTargetOutOfReach.create(0.6f);
-        BehaviorControl<Mob> attackTargetTask = MeleeAttack.create(20);
+        BehaviorControl<Mob> moveToTargetTask = SetWalkTargetFromAttackTargetIfTargetOutOfReach.create(builder.walkSpeed);
+        BehaviorControl<Mob> attackTargetTask = MeleeAttack.create(builder.meleeCooldownTick);
         MaidUseShieldTask maidUseShieldTask = new MaidUseShieldTask();
 
         List<Pair<Integer, BehaviorControl<? super EntityMaid>>> tasks = Lists.newArrayList(
@@ -76,7 +76,7 @@ public class MeleeTaskJS implements IAttackTask {
                 isWeapon(m, m.getMainHandItem()), IAttackTask::findFirstValidAttackTarget);
         BehaviorControl<EntityMaid> findTargetTask = StopAttackingIfTargetInvalid.create(target ->
                 !isWeapon(maid, maid.getMainHandItem()) || maid.distanceTo(target) > maid.getRestrictRadius());
-        BehaviorControl<Mob> attackTargetTask = MeleeAttack.create(20);
+        BehaviorControl<Mob> attackTargetTask = MeleeAttack.create(builder.meleeCooldownTick);
         MaidUseShieldTask maidUseShieldTask = new MaidUseShieldTask();
 
         List<Pair<Integer, BehaviorControl<? super EntityMaid>>> tasks = Lists.newArrayList(
@@ -168,6 +168,8 @@ public class MeleeTaskJS implements IAttackTask {
         private @Nullable BiFunction<EntityMaid, ItemStack, Boolean> isWeapon = null;
 
         private @Nullable SoundEvent sound;
+        private float walkSpeed = 0.6f;
+        private int meleeCooldownTick = 20;
 
         public Builder(ResourceLocation id, ItemStack icon) {
             this.id = id;
@@ -226,6 +228,16 @@ public class MeleeTaskJS implements IAttackTask {
 
         public Builder isWeapon(BiFunction<EntityMaid, ItemStack, Boolean> isWeapon) {
             this.isWeapon = isWeapon;
+            return this;
+        }
+
+        public Builder walkSpeed(float walkSpeed) {
+            this.walkSpeed = walkSpeed;
+            return this;
+        }
+
+        public Builder meleeCooldownTick(int meleeCooldownTick) {
+            this.meleeCooldownTick = meleeCooldownTick;
             return this;
         }
     }

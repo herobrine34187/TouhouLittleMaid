@@ -19,11 +19,12 @@ import java.util.function.Predicate;
 public class MaidAttackStrafingAnyItemTask extends Behavior<EntityMaid> {
     private final Predicate<ItemStack> weaponTest;
     private final float projectileRange;
+    private final float strafeSpeed;
     private boolean strafingClockwise;
     private boolean strafingBackwards;
     private int strafingTime = -1;
 
-    public MaidAttackStrafingAnyItemTask(Predicate<ItemStack> weaponTest, float projectileRange) {
+    public MaidAttackStrafingAnyItemTask(Predicate<ItemStack> weaponTest, float projectileRange, float strafeSpeed) {
         super(ImmutableMap.of(MemoryModuleType.WALK_TARGET, MemoryStatus.VALUE_ABSENT,
                         MemoryModuleType.LOOK_TARGET, MemoryStatus.REGISTERED,
                         MemoryModuleType.ATTACK_TARGET, MemoryStatus.VALUE_PRESENT,
@@ -31,6 +32,7 @@ public class MaidAttackStrafingAnyItemTask extends Behavior<EntityMaid> {
                 1200);
         this.weaponTest = weaponTest;
         this.projectileRange = projectileRange;
+        this.strafeSpeed = strafeSpeed;
     }
 
     @Override
@@ -43,7 +45,6 @@ public class MaidAttackStrafingAnyItemTask extends Behavior<EntityMaid> {
 
     @Override
     protected void tick(ServerLevel worldIn, EntityMaid owner, long gameTime) {
-        ItemStack stack = owner.getMainHandItem();
         if (!weaponTest.test(owner.getMainHandItem())) {
             return;
         }
@@ -78,7 +79,7 @@ public class MaidAttackStrafingAnyItemTask extends Behavior<EntityMaid> {
                 }
 
                 // 应用走位
-                owner.getMoveControl().strafe(this.strafingBackwards ? -0.5F : 0.5F, this.strafingClockwise ? 0.5F : -0.5F);
+                owner.getMoveControl().strafe(this.strafingBackwards ? -strafeSpeed : strafeSpeed, this.strafingClockwise ? strafeSpeed : -strafeSpeed);
                 owner.setYRot(Mth.rotateIfNecessary(owner.getYRot(), owner.yHeadRot, 0.0F));
                 BehaviorUtils.lookAtEntity(owner, target);
             } else {

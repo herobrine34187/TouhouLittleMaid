@@ -57,9 +57,9 @@ public class RangedAttackTaskJS implements IRangedAttackTask {
                 isWeapon(m, m.getMainHandItem()), IAttackTask::findFirstValidAttackTarget);
         BehaviorControl<EntityMaid> findTargetTask = StopAttackingIfTargetInvalid.create(target ->
                 !isWeapon(maid, maid.getMainHandItem()) || maid.distanceTo(target) > this.searchRadius(maid));
-        BehaviorControl<EntityMaid> moveToTargetTask = MaidRangedWalkToTarget.create(0.6f);
+        BehaviorControl<EntityMaid> moveToTargetTask = MaidRangedWalkToTarget.create(builder.walkSpeed);
         BehaviorControl<EntityMaid> maidAttackStrafingTask = new MaidAttackStrafingAnyItemTask(stack ->
-                isWeapon(maid, stack), builder.projectileRange);
+                isWeapon(maid, stack), builder.projectileRange, builder.walkSpeed);
         BehaviorControl<EntityMaid> shootTargetTask = new MaidShootTargetAnyItemTask(2, builder.chargeDurationTick, stack ->
                 isWeapon(maid, stack));
 
@@ -199,6 +199,8 @@ public class RangedAttackTaskJS implements IRangedAttackTask {
         private float projectileRange = 16f;
         // 默认充能时间为 20 tick
         private int chargeDurationTick = 20;
+        // 默认步行速度
+        private float walkSpeed = 0.5f;
 
         public Builder(ResourceLocation id, ItemStack icon) {
             this.id = id;
@@ -262,6 +264,11 @@ public class RangedAttackTaskJS implements IRangedAttackTask {
 
         public Builder chargeDurationTick(int chargeDurationTick) {
             this.chargeDurationTick = chargeDurationTick;
+            return this;
+        }
+
+        public Builder walkSpeed(float walkSpeed) {
+            this.walkSpeed = walkSpeed;
             return this;
         }
 
