@@ -1,10 +1,7 @@
 package com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.builder;
 
 import com.github.tartaricacid.touhoulittlemaid.api.task.IMaidTask;
-import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.task.presets.BaseTaskJS;
-import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.task.presets.FarmTaskJS;
-import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.task.presets.MeleeTaskJS;
-import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.task.presets.RangedAttackTaskJS;
+import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.task.presets.*;
 import com.github.tartaricacid.touhoulittlemaid.entity.task.TaskManager;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -39,6 +36,12 @@ public class MaidTaskBuilder {
     public FarmTaskJS.Builder farmTask(ResourceLocation id, ItemStack icon) {
         FarmTaskJS.Builder builder = new FarmTaskJS.Builder(id, icon);
         tasks.add(new FarmTaskJS(builder));
+        return builder;
+    }
+
+    public WalkToBlockTaskJS.Builder walkToBlockTask(ResourceLocation id, ItemStack icon) {
+        WalkToBlockTaskJS.Builder builder = new WalkToBlockTaskJS.Builder(id, icon);
+        tasks.add(new WalkToBlockTaskJS(builder));
         return builder;
     }
 
