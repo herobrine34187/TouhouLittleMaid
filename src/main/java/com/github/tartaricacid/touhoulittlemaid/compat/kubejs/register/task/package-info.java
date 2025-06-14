@@ -1,6 +1,6 @@
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-package com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.builder.task;
+package com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.task;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 

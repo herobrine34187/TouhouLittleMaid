@@ -1,4 +1,4 @@
-package com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.builder.task;
+package com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.task;
 
 import com.github.tartaricacid.touhoulittlemaid.entity.ai.brain.task.MaidAttackStrafingTask;
 import com.github.tartaricacid.touhoulittlemaid.entity.ai.brain.task.MaidRangedWalkToTarget;

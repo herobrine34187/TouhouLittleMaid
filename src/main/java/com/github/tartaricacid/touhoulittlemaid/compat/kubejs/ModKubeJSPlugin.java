@@ -10,7 +10,7 @@ import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.event.compat.TopEv
 import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.recipe.AltarOutputJS;
 import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.recipe.AltarRecipeSchema;
 import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.MaidRegisterJS;
-import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.builder.task.MaidBrainsToolJS;
+import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.task.MaidBrainsToolJS;
 import com.github.tartaricacid.touhoulittlemaid.entity.task.TaskManager;
 import com.github.tartaricacid.touhoulittlemaid.init.InitRecipes;
 import com.github.tartaricacid.touhoulittlemaid.item.bauble.BaubleManager;

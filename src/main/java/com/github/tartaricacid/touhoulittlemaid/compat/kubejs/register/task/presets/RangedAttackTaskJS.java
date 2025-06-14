@@ -1,4 +1,4 @@
-package com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.builder.task.presets;
+package com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.task.presets;
 
 import com.github.tartaricacid.touhoulittlemaid.api.task.IAttackTask;
 import com.github.tartaricacid.touhoulittlemaid.api.task.IRangedAttackTask;
@@ -8,6 +8,7 @@ import com.github.tartaricacid.touhoulittlemaid.entity.ai.brain.task.MaidShootTa
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.init.InitSounds;
 import com.github.tartaricacid.touhoulittlemaid.util.SoundUtil;
+import com.github.tartaricacid.touhoulittlemaid.util.functional.TriConsumer;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.resources.ResourceLocation;
@@ -22,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.Function;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 public class RangedAttackTaskJS implements IRangedAttackTask {
@@ -101,7 +102,7 @@ public class RangedAttackTaskJS implements IRangedAttackTask {
         if (this.builder.enable == null) {
             return true;
         }
-        return this.builder.enable.apply(maid);
+        return this.builder.enable.test(maid);
     }
 
     @Override
@@ -109,7 +110,7 @@ public class RangedAttackTaskJS implements IRangedAttackTask {
         if (this.builder.enableLookAndRandomWalk == null) {
             return true;
         }
-        return this.builder.enableLookAndRandomWalk.apply(maid);
+        return this.builder.enableLookAndRandomWalk.test(maid);
     }
 
     @Override
@@ -127,7 +128,7 @@ public class RangedAttackTaskJS implements IRangedAttackTask {
         if (this.builder.canAttack == null) {
             return IRangedAttackTask.super.canAttack(maid, target);
         }
-        return this.builder.canAttack.apply(maid, target);
+        return this.builder.canAttack.test(maid, target);
     }
 
     @Override
@@ -135,7 +136,7 @@ public class RangedAttackTaskJS implements IRangedAttackTask {
         if (this.builder.isWeapon == null) {
             return false;
         }
-        return this.builder.isWeapon.apply(maid, stack);
+        return this.builder.isWeapon.test(maid, stack);
     }
 
     @Override
@@ -171,11 +172,6 @@ public class RangedAttackTaskJS implements IRangedAttackTask {
         return IRangedAttackTask.super.searchRadius(maid);
     }
 
-    @FunctionalInterface
-    public interface TriConsumer {
-        void accept(EntityMaid shooter, LivingEntity target, float distanceFactor);
-    }
-
     public static class Builder {
         private final ResourceLocation id;
         private final ItemStack icon;
@@ -186,12 +182,12 @@ public class RangedAttackTaskJS implements IRangedAttackTask {
         private final List<Pair<String, Predicate<EntityMaid>>> enableConditionDesc = Lists.newArrayList();
         private final List<Pair<String, Predicate<EntityMaid>>> conditionDesc = Lists.newArrayList();
 
-        private @Nullable Function<EntityMaid, Boolean> enable = null;
-        private @Nullable Function<EntityMaid, Boolean> enableLookAndRandomWalk = null;
-        private @Nullable BiFunction<EntityMaid, LivingEntity, Boolean> canAttack = null;
-        private @Nullable BiFunction<EntityMaid, ItemStack, Boolean> isWeapon = null;
+        private @Nullable Predicate<EntityMaid> enable = null;
+        private @Nullable Predicate<EntityMaid> enableLookAndRandomWalk = null;
+        private @Nullable BiPredicate<EntityMaid, LivingEntity> canAttack = null;
+        private @Nullable BiPredicate<EntityMaid, ItemStack> isWeapon = null;
 
-        private @Nullable TriConsumer performRangedAttack = null;
+        private @Nullable TriConsumer<EntityMaid, LivingEntity, Float> performRangedAttack = null;
 
         private @Nullable SoundEvent sound;
         private float searchRadius = -1f;
@@ -227,12 +223,12 @@ public class RangedAttackTaskJS implements IRangedAttackTask {
             return this;
         }
 
-        public Builder enable(Function<EntityMaid, Boolean> enable) {
+        public Builder enable(Predicate<EntityMaid> enable) {
             this.enable = enable;
             return this;
         }
 
-        public Builder enableLookAndRandomWalk(Function<EntityMaid, Boolean> enableLookAndRandomWalk) {
+        public Builder enableLookAndRandomWalk(Predicate<EntityMaid> enableLookAndRandomWalk) {
             this.enableLookAndRandomWalk = enableLookAndRandomWalk;
             return this;
         }
@@ -242,12 +238,12 @@ public class RangedAttackTaskJS implements IRangedAttackTask {
             return this;
         }
 
-        public Builder canAttack(BiFunction<EntityMaid, LivingEntity, Boolean> canAttack) {
+        public Builder canAttack(BiPredicate<EntityMaid, LivingEntity> canAttack) {
             this.canAttack = canAttack;
             return this;
         }
 
-        public Builder isWeapon(BiFunction<EntityMaid, ItemStack, Boolean> isWeapon) {
+        public Builder isWeapon(BiPredicate<EntityMaid, ItemStack> isWeapon) {
             this.isWeapon = isWeapon;
             return this;
         }
@@ -272,7 +268,7 @@ public class RangedAttackTaskJS implements IRangedAttackTask {
             return this;
         }
 
-        public Builder performRangedAttack(TriConsumer performRangedAttack) {
+        public Builder performRangedAttack(TriConsumer<EntityMaid, LivingEntity, Float> performRangedAttack) {
             this.performRangedAttack = performRangedAttack;
             return this;
         }

@@ -1,4 +1,4 @@
-package com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.builder.task.presets;
+package com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.task.presets;
 
 import com.github.tartaricacid.touhoulittlemaid.api.task.IAttackTask;
 import com.github.tartaricacid.touhoulittlemaid.entity.ai.brain.task.MaidUseShieldTask;
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.Function;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 public class MeleeTaskJS implements IAttackTask {
@@ -96,7 +96,7 @@ public class MeleeTaskJS implements IAttackTask {
         if (this.builder.enable == null) {
             return true;
         }
-        return this.builder.enable.apply(maid);
+        return this.builder.enable.test(maid);
     }
 
     @Override
@@ -104,7 +104,7 @@ public class MeleeTaskJS implements IAttackTask {
         if (this.builder.enableLookAndRandomWalk == null) {
             return true;
         }
-        return this.builder.enableLookAndRandomWalk.apply(maid);
+        return this.builder.enableLookAndRandomWalk.test(maid);
     }
 
     @Override
@@ -122,7 +122,7 @@ public class MeleeTaskJS implements IAttackTask {
         if (this.builder.canAttack == null) {
             return IAttackTask.super.canAttack(maid, target);
         }
-        return this.builder.canAttack.apply(maid, target);
+        return this.builder.canAttack.test(maid, target);
     }
 
     @Override
@@ -130,7 +130,7 @@ public class MeleeTaskJS implements IAttackTask {
         if (this.builder.hasExtraAttack == null) {
             return false;
         }
-        return this.builder.hasExtraAttack.apply(maid, target);
+        return this.builder.hasExtraAttack.test(maid, target);
     }
 
     @Override
@@ -138,7 +138,7 @@ public class MeleeTaskJS implements IAttackTask {
         if (this.builder.doExtraAttack == null) {
             return false;
         }
-        return this.builder.doExtraAttack.apply(maid, target);
+        return this.builder.doExtraAttack.test(maid, target);
     }
 
     @Override
@@ -146,7 +146,7 @@ public class MeleeTaskJS implements IAttackTask {
         if (this.builder.isWeapon == null) {
             return false;
         }
-        return this.builder.isWeapon.apply(maid, stack);
+        return this.builder.isWeapon.test(maid, stack);
     }
 
     public static class Builder {
@@ -159,13 +159,13 @@ public class MeleeTaskJS implements IAttackTask {
         private final List<Pair<String, Predicate<EntityMaid>>> enableConditionDesc = Lists.newArrayList();
         private final List<Pair<String, Predicate<EntityMaid>>> conditionDesc = Lists.newArrayList();
 
-        private @Nullable Function<EntityMaid, Boolean> enable = null;
-        private @Nullable Function<EntityMaid, Boolean> enableLookAndRandomWalk = null;
+        private @Nullable Predicate<EntityMaid> enable = null;
+        private @Nullable Predicate<EntityMaid> enableLookAndRandomWalk = null;
 
-        private @Nullable BiFunction<EntityMaid, LivingEntity, Boolean> canAttack = null;
-        private @Nullable BiFunction<EntityMaid, Entity, Boolean> hasExtraAttack = null;
-        private @Nullable BiFunction<EntityMaid, Entity, Boolean> doExtraAttack = null;
-        private @Nullable BiFunction<EntityMaid, ItemStack, Boolean> isWeapon = null;
+        private @Nullable BiPredicate<EntityMaid, LivingEntity> canAttack = null;
+        private @Nullable BiPredicate<EntityMaid, Entity> hasExtraAttack = null;
+        private @Nullable BiPredicate<EntityMaid, Entity> doExtraAttack = null;
+        private @Nullable BiPredicate<EntityMaid, ItemStack> isWeapon = null;
 
         private @Nullable SoundEvent sound;
         private float walkSpeed = 0.6f;
@@ -196,12 +196,12 @@ public class MeleeTaskJS implements IAttackTask {
             return this;
         }
 
-        public Builder enable(Function<EntityMaid, Boolean> enable) {
+        public Builder enable(Predicate<EntityMaid> enable) {
             this.enable = enable;
             return this;
         }
 
-        public Builder enableLookAndRandomWalk(Function<EntityMaid, Boolean> enableLookAndRandomWalk) {
+        public Builder enableLookAndRandomWalk(Predicate<EntityMaid> enableLookAndRandomWalk) {
             this.enableLookAndRandomWalk = enableLookAndRandomWalk;
             return this;
         }
@@ -211,22 +211,22 @@ public class MeleeTaskJS implements IAttackTask {
             return this;
         }
 
-        public Builder canAttack(BiFunction<EntityMaid, LivingEntity, Boolean> canAttack) {
+        public Builder canAttack(BiPredicate<EntityMaid, LivingEntity> canAttack) {
             this.canAttack = canAttack;
             return this;
         }
 
-        public Builder hasExtraAttack(BiFunction<EntityMaid, Entity, Boolean> hasExtraAttack) {
+        public Builder hasExtraAttack(BiPredicate<EntityMaid, Entity> hasExtraAttack) {
             this.hasExtraAttack = hasExtraAttack;
             return this;
         }
 
-        public Builder doExtraAttack(BiFunction<EntityMaid, Entity, Boolean> doExtraAttack) {
+        public Builder doExtraAttack(BiPredicate<EntityMaid, Entity> doExtraAttack) {
             this.doExtraAttack = doExtraAttack;
             return this;
         }
 
-        public Builder isWeapon(BiFunction<EntityMaid, ItemStack, Boolean> isWeapon) {
+        public Builder isWeapon(BiPredicate<EntityMaid, ItemStack> isWeapon) {
             this.isWeapon = isWeapon;
             return this;
         }

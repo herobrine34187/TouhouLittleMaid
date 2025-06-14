@@ -1,4 +1,4 @@
-package com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.builder.task.presets;
+package com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.task.presets;
 
 import com.github.tartaricacid.touhoulittlemaid.api.task.IMaidTask;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class BaseTaskJS implements IMaidTask {
@@ -61,7 +60,7 @@ public class BaseTaskJS implements IMaidTask {
         if (this.builder.enable == null) {
             return IMaidTask.super.isEnable(maid);
         }
-        return this.builder.enable.apply(maid);
+        return this.builder.enable.test(maid);
     }
 
     @Override
@@ -69,7 +68,7 @@ public class BaseTaskJS implements IMaidTask {
         if (this.builder.enableLookAndRandomWalk == null) {
             return IMaidTask.super.enableLookAndRandomWalk(maid);
         }
-        return this.builder.enableLookAndRandomWalk.apply(maid);
+        return this.builder.enableLookAndRandomWalk.test(maid);
     }
 
     @Override
@@ -77,7 +76,7 @@ public class BaseTaskJS implements IMaidTask {
         if (this.builder.enablePanic == null) {
             return IMaidTask.super.enablePanic(maid);
         }
-        return this.builder.enablePanic.apply(maid);
+        return this.builder.enablePanic.test(maid);
     }
 
     @Override
@@ -85,7 +84,7 @@ public class BaseTaskJS implements IMaidTask {
         if (this.builder.enableEating == null) {
             return IMaidTask.super.enableEating(maid);
         }
-        return this.builder.enableEating.apply(maid);
+        return this.builder.enableEating.test(maid);
     }
 
     @Override
@@ -93,7 +92,7 @@ public class BaseTaskJS implements IMaidTask {
         if (this.builder.workPointTask == null) {
             return IMaidTask.super.workPointTask(maid);
         }
-        return this.builder.workPointTask.apply(maid);
+        return this.builder.workPointTask.test(maid);
     }
 
     @Override
@@ -124,11 +123,11 @@ public class BaseTaskJS implements IMaidTask {
         private final List<Pair<String, Predicate<EntityMaid>>> enableConditionDesc = Lists.newArrayList();
         private final List<Pair<String, Predicate<EntityMaid>>> conditionDesc = Lists.newArrayList();
 
-        private @Nullable Function<EntityMaid, Boolean> enable = null;
-        private @Nullable Function<EntityMaid, Boolean> enableLookAndRandomWalk = null;
-        private @Nullable Function<EntityMaid, Boolean> enablePanic = null;
-        private @Nullable Function<EntityMaid, Boolean> enableEating = null;
-        private @Nullable Function<EntityMaid, Boolean> workPointTask = null;
+        private @Nullable Predicate<EntityMaid> enable = null;
+        private @Nullable Predicate<EntityMaid> enableLookAndRandomWalk = null;
+        private @Nullable Predicate<EntityMaid> enablePanic = null;
+        private @Nullable Predicate<EntityMaid> enableEating = null;
+        private @Nullable Predicate<EntityMaid> workPointTask = null;
 
         private @Nullable SoundEvent sound;
         private float searchRadius = -1;
@@ -158,27 +157,27 @@ public class BaseTaskJS implements IMaidTask {
             return this;
         }
 
-        public Builder enable(Function<EntityMaid, Boolean> enable) {
+        public Builder enable(Predicate<EntityMaid> enable) {
             this.enable = enable;
             return this;
         }
 
-        public Builder enableLookAndRandomWalk(Function<EntityMaid, Boolean> enableLookAndRandomWalk) {
+        public Builder enableLookAndRandomWalk(Predicate<EntityMaid> enableLookAndRandomWalk) {
             this.enableLookAndRandomWalk = enableLookAndRandomWalk;
             return this;
         }
 
-        public Builder enablePanic(Function<EntityMaid, Boolean> enablePanic) {
+        public Builder enablePanic(Predicate<EntityMaid> enablePanic) {
             this.enablePanic = enablePanic;
             return this;
         }
 
-        public Builder enableEating(Function<EntityMaid, Boolean> enableEating) {
+        public Builder enableEating(Predicate<EntityMaid> enableEating) {
             this.enableEating = enableEating;
             return this;
         }
 
-        public Builder workPoint(Function<EntityMaid, Boolean> workPointTask) {
+        public Builder workPoint(Predicate<EntityMaid> workPointTask) {
             this.workPointTask = workPointTask;
             return this;
         }
