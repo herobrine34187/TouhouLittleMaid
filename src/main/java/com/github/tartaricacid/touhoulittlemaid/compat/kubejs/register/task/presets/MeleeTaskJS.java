@@ -7,6 +7,7 @@ import com.github.tartaricacid.touhoulittlemaid.init.InitSounds;
 import com.github.tartaricacid.touhoulittlemaid.util.SoundUtil;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
+import dev.latvian.mods.kubejs.typings.Info;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
@@ -17,7 +18,6 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
@@ -108,6 +108,14 @@ public class MeleeTaskJS implements IAttackTask {
     }
 
     @Override
+    public boolean enableEating(EntityMaid maid) {
+        if (this.builder.enableEating == null) {
+            return true;
+        }
+        return this.builder.enableEating.test(maid);
+    }
+
+    @Override
     public List<Pair<String, Predicate<EntityMaid>>> getEnableConditionDesc(EntityMaid maid) {
         return this.builder.enableConditionDesc;
     }
@@ -149,93 +157,67 @@ public class MeleeTaskJS implements IAttackTask {
         return this.builder.isWeapon.test(maid, stack);
     }
 
-    public static class Builder {
-        private final ResourceLocation id;
-        private final ItemStack icon;
-
-        private final List<Pair<Integer, BiFunction<MeleeTaskJS, EntityMaid, BehaviorControl<? super EntityMaid>>>> brains = Lists.newArrayList();
-        private final List<Pair<Integer, BiFunction<MeleeTaskJS, EntityMaid, BehaviorControl<? super EntityMaid>>>> rideBrains = Lists.newArrayList();
-
-        private final List<Pair<String, Predicate<EntityMaid>>> enableConditionDesc = Lists.newArrayList();
-        private final List<Pair<String, Predicate<EntityMaid>>> conditionDesc = Lists.newArrayList();
-
-        private @Nullable Predicate<EntityMaid> enable = null;
-        private @Nullable Predicate<EntityMaid> enableLookAndRandomWalk = null;
-
+    public static class Builder extends TaskBuilder<Builder, MeleeTaskJS> {
         private @Nullable BiPredicate<EntityMaid, LivingEntity> canAttack = null;
         private @Nullable BiPredicate<EntityMaid, Entity> hasExtraAttack = null;
         private @Nullable BiPredicate<EntityMaid, Entity> doExtraAttack = null;
         private @Nullable BiPredicate<EntityMaid, ItemStack> isWeapon = null;
-
-        private @Nullable SoundEvent sound;
         private float walkSpeed = 0.6f;
         private int meleeCooldownTick = 20;
 
         public Builder(ResourceLocation id, ItemStack icon) {
-            this.id = id;
-            this.icon = icon;
+            super(id, icon);
         }
 
-        public Builder addBrain(int priority, BiFunction<MeleeTaskJS, EntityMaid, BehaviorControl<? super EntityMaid>> control) {
-            this.brains.add(Pair.of(priority, control));
-            return this;
-        }
-
-        public Builder addRideBrain(int priority, BiFunction<MeleeTaskJS, EntityMaid, BehaviorControl<? super EntityMaid>> control) {
-            this.rideBrains.add(Pair.of(priority, control));
-            return this;
-        }
-
-        public Builder addEnableConditionDesc(String languageKey, Predicate<EntityMaid> condition) {
-            this.enableConditionDesc.add(Pair.of(languageKey, condition));
-            return this;
-        }
-
-        public Builder addConditionDesc(String languageKey, Predicate<EntityMaid> condition) {
-            this.conditionDesc.add(Pair.of(languageKey, condition));
-            return this;
-        }
-
-        public Builder enable(Predicate<EntityMaid> enable) {
-            this.enable = enable;
-            return this;
-        }
-
-        public Builder enableLookAndRandomWalk(Predicate<EntityMaid> enableLookAndRandomWalk) {
-            this.enableLookAndRandomWalk = enableLookAndRandomWalk;
-            return this;
-        }
-
-        public Builder sound(SoundEvent sound) {
-            this.sound = sound;
-            return this;
-        }
-
+        @Info(value = """
+                Sets the condition for whether the maid can attack a target. Default is all hostile entities. <br>
+                设置女仆是否可以攻击目标的条件。默认为所有敌对生物。
+                """)
         public Builder canAttack(BiPredicate<EntityMaid, LivingEntity> canAttack) {
             this.canAttack = canAttack;
             return this;
         }
 
+        @Info(value = """
+                Sets the condition for whether the maid has an extra attack against a target. Default is false. <br>
+                设置女仆是否对目标有额外攻击的条件。默认为 false。
+                """)
         public Builder hasExtraAttack(BiPredicate<EntityMaid, Entity> hasExtraAttack) {
             this.hasExtraAttack = hasExtraAttack;
             return this;
         }
 
+        @Info(value = """
+                Sets the action for the maid to perform an extra attack against a target. Default is empty. <br>
+                设置女仆对目标执行额外攻击的动作。默认为空。
+                """)
         public Builder doExtraAttack(BiPredicate<EntityMaid, Entity> doExtraAttack) {
             this.doExtraAttack = doExtraAttack;
             return this;
         }
 
+        @Info(value = """
+                Sets the condition for whether the maid considers an item as a weapon. Mandatory. <br>
+                设置女仆是否将当前物品视为武器的条件。必填项。
+                """)
         public Builder isWeapon(BiPredicate<EntityMaid, ItemStack> isWeapon) {
             this.isWeapon = isWeapon;
             return this;
         }
 
+        @Info(value = """
+                Sets the walk speed for the maid when moving towards a target. Default is 0.6. <br>
+                设置女仆在接近目标时的移动速度。默认为 0.6。
+                """)
         public Builder walkSpeed(float walkSpeed) {
             this.walkSpeed = walkSpeed;
             return this;
         }
 
+        @Info(value = """
+                Sets the cooldown tick for the attack. Default is 20 ticks. <br>
+                设置攻击的冷却时间（以 tick 为单位）。默认值为 20 ticks。
+                """)
         public Builder meleeCooldownTick(int meleeCooldownTick) {
             this.meleeCooldownTick = meleeCooldownTick;
             return this;

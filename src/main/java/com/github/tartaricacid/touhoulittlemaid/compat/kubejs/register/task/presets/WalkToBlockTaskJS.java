@@ -8,6 +8,7 @@ import com.github.tartaricacid.touhoulittlemaid.init.InitSounds;
 import com.github.tartaricacid.touhoulittlemaid.util.SoundUtil;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
+import dev.latvian.mods.kubejs.typings.Info;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -17,7 +18,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
@@ -77,6 +77,14 @@ public class WalkToBlockTaskJS implements IMaidTask {
     }
 
     @Override
+    public boolean enableEating(EntityMaid maid) {
+        if (this.builder.enableEating == null) {
+            return true;
+        }
+        return this.builder.enableEating.test(maid);
+    }
+
+    @Override
     public List<Pair<String, Predicate<EntityMaid>>> getEnableConditionDesc(EntityMaid maid) {
         return this.builder.enableConditionDesc;
     }
@@ -86,71 +94,61 @@ public class WalkToBlockTaskJS implements IMaidTask {
         return this.builder.conditionDesc;
     }
 
-    public static class Builder {
-        private final ResourceLocation id;
-        private final ItemStack icon;
-
-        private final List<Pair<Integer, BiFunction<WalkToBlockTaskJS, EntityMaid, BehaviorControl<? super EntityMaid>>>> brains = Lists.newArrayList();
-
-        private final List<Pair<String, Predicate<EntityMaid>>> enableConditionDesc = Lists.newArrayList();
-        private final List<Pair<String, Predicate<EntityMaid>>> conditionDesc = Lists.newArrayList();
-
-        private @Nullable Predicate<EntityMaid> enable = null;
-        private @Nullable Predicate<EntityMaid> enableLookAndRandomWalk = null;
-
+    public static class Builder extends TaskBuilder<Builder, WalkToBlockTaskJS> {
         private @Nullable Predicate<EntityMaid> searchCondition = null;
         private @Nullable BiPredicate<EntityMaid, BlockPos> blockPredicate = null;
         private @Nullable BiConsumer<EntityMaid, BlockPos> arriveAction;
-
-        private @Nullable SoundEvent sound;
         private double closeEnoughDist = 2;
         private int verticalSearchRange = 2;
 
         public Builder(ResourceLocation id, ItemStack icon) {
-            this.id = id;
-            this.icon = icon;
+            super(id, icon);
         }
 
-        public Builder addBrain(int priority, BiFunction<WalkToBlockTaskJS, EntityMaid, BehaviorControl<? super EntityMaid>> brain) {
-            this.brains.add(Pair.of(priority, brain));
-            return this;
-        }
-
-        public Builder setEnableCondition(Predicate<EntityMaid> condition) {
-            this.enable = condition;
-            return this;
-        }
-
-        public Builder setEnableLookAndRandomWalk(Predicate<EntityMaid> condition) {
-            this.enableLookAndRandomWalk = condition;
-            return this;
-        }
-
+        @Info(value = """
+                Must be set before searching for blocks. If not set, the search will not be performed.
+                Please search only when necessary to reduce performance overhead. <br>
+                必填项目，否则不进行搜索。开始进行搜索之前的判断条件，请在必要时在进行搜索，减少性能消耗
+                """)
         public Builder setSearchCondition(Predicate<EntityMaid> condition) {
             this.searchCondition = condition;
             return this;
         }
 
+        @Info(value = """
+                Set the predicate for the block to be searched. If not set, the task will not search for blocks. <br>
+                设置搜索的方块的判断条件，如果不设置，则不会进行方块搜索。
+                """)
         public Builder setBlockPredicate(BiPredicate<EntityMaid, BlockPos> predicate) {
             this.blockPredicate = predicate;
             return this;
         }
 
+        @Info(value = """
+                Set the action to be performed when the maid arrives at the block. If not set, no action will be performed. <br>
+                设置当女仆到达方块时执行的动作，如果不设置，则不会执行任何动作。
+                """)
         public Builder setArriveAction(BiConsumer<EntityMaid, BlockPos> action) {
             this.arriveAction = action;
             return this;
         }
 
-        public Builder setSound(SoundEvent sound) {
-            this.sound = sound;
-            return this;
-        }
-
+        @Info(value = """
+                Set the distance at which the maid is considered close enough to the block. Default is 2 blocks. <br>
+                设置女仆到达方块时的距离，低于该距离则认为到达。默认为 2 格。
+                """)
         public Builder setCloseEnoughDist(double dist) {
             this.closeEnoughDist = dist;
             return this;
         }
 
+        @Info(value = """
+                Search range for the blocks. The search is limited to the maid's working area, so we can only customize the vertical height of the search. <br>
+                But this value should not be too large, otherwise traversing blocks will cause serious performance overhead. <br>
+                Default is 2, which means searching from -2 to 2 in the vertical direction. <br>
+                搜索范围为女仆的工作范围，我们只能自定义搜索的垂直高度。 <br>
+                此数值不宜过大，否则遍历方块会带来严重的性能消耗。默认为 2，也就是搜索 -2 ~ 2 的垂直范围。
+                """)
         public Builder setVerticalSearchRange(int range) {
             this.verticalSearchRange = range;
             return this;

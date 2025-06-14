@@ -8,9 +8,11 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
@@ -139,5 +141,14 @@ public final class ItemsUtil {
         Item value = ForgeRegistries.ITEMS.getValue(resourceLocation);
         Preconditions.checkNotNull(value);
         return new ItemStack(value);
+    }
+
+    public static void giveItemToMaid(EntityMaid maid, ItemStack itemStack) {
+        IItemHandler inv = maid.getAvailableInv(false);
+        ItemStack stack = ItemHandlerHelper.insertItemStacked(inv, itemStack, false);
+        if (!stack.isEmpty()) {
+            ItemEntity itemEntity = new ItemEntity(maid.level(), maid.getX(), maid.getY() + 0.5, maid.getZ(), stack);
+            maid.level.addFreshEntity(itemEntity);
+        }
     }
 }

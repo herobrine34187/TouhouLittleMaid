@@ -4,6 +4,7 @@ import com.github.tartaricacid.touhoulittlemaid.api.task.IMaidTask;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
+import dev.latvian.mods.kubejs.typings.Info;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.ai.behavior.BehaviorControl;
@@ -11,7 +12,6 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 public class BaseTaskJS implements IMaidTask {
@@ -113,80 +113,40 @@ public class BaseTaskJS implements IMaidTask {
         return this.builder.searchRadius;
     }
 
-    public static class Builder {
-        private final ResourceLocation id;
-        private final ItemStack icon;
-
-        private final List<Pair<Integer, BiFunction<BaseTaskJS, EntityMaid, BehaviorControl<? super EntityMaid>>>> brains = Lists.newArrayList();
-        private final List<Pair<Integer, BiFunction<BaseTaskJS, EntityMaid, BehaviorControl<? super EntityMaid>>>> rideBrains = Lists.newArrayList();
-
-        private final List<Pair<String, Predicate<EntityMaid>>> enableConditionDesc = Lists.newArrayList();
-        private final List<Pair<String, Predicate<EntityMaid>>> conditionDesc = Lists.newArrayList();
-
-        private @Nullable Predicate<EntityMaid> enable = null;
-        private @Nullable Predicate<EntityMaid> enableLookAndRandomWalk = null;
+    public static class Builder extends TaskBuilder<Builder, BaseTaskJS> {
         private @Nullable Predicate<EntityMaid> enablePanic = null;
-        private @Nullable Predicate<EntityMaid> enableEating = null;
         private @Nullable Predicate<EntityMaid> workPointTask = null;
-
-        private @Nullable SoundEvent sound;
         private float searchRadius = -1;
 
         public Builder(ResourceLocation id, ItemStack icon) {
-            this.id = id;
-            this.icon = icon;
+            super(id, icon);
         }
 
-        public Builder addBrain(int priority, BiFunction<BaseTaskJS, EntityMaid, BehaviorControl<? super EntityMaid>> control) {
-            this.brains.add(Pair.of(priority, control));
-            return this;
-        }
-
-        public Builder addRideBrain(int priority, BiFunction<BaseTaskJS, EntityMaid, BehaviorControl<? super EntityMaid>> control) {
-            this.rideBrains.add(Pair.of(priority, control));
-            return this;
-        }
-
-        public Builder addEnableConditionDesc(String languageKey, Predicate<EntityMaid> condition) {
-            this.enableConditionDesc.add(Pair.of(languageKey, condition));
-            return this;
-        }
-
-        public Builder addConditionDesc(String languageKey, Predicate<EntityMaid> condition) {
-            this.conditionDesc.add(Pair.of(languageKey, condition));
-            return this;
-        }
-
-        public Builder enable(Predicate<EntityMaid> enable) {
-            this.enable = enable;
-            return this;
-        }
-
-        public Builder enableLookAndRandomWalk(Predicate<EntityMaid> enableLookAndRandomWalk) {
-            this.enableLookAndRandomWalk = enableLookAndRandomWalk;
-            return this;
-        }
-
+        @Info("""
+                Sets the condition to enable panic behavior for the maid. Default is true. <br>
+                设置女仆是否启用惊慌行为的条件。默认为 true。
+                """
+        )
         public Builder enablePanic(Predicate<EntityMaid> enablePanic) {
             this.enablePanic = enablePanic;
             return this;
         }
 
-        public Builder enableEating(Predicate<EntityMaid> enableEating) {
-            this.enableEating = enableEating;
-            return this;
-        }
-
+        @Info("""
+                Sets the condition to enable work point task for the maid. Default is false. <br>
+                设置女仆是否启用工作点任务的条件。默认为 false。
+                """
+        )
         public Builder workPoint(Predicate<EntityMaid> workPointTask) {
             this.workPointTask = workPointTask;
             return this;
         }
 
-        public Builder sound(SoundEvent sound) {
-            this.sound = sound;
-            return this;
-        }
-
+        @Info("""
+                Sets the search radius for the maid's task. Default is the maid's working range. <br>
+                设置女仆任务的搜索半径。默认为女仆的工作范围。
+                """
+        )
         public Builder searchRadius(float searchRadius) {
             this.searchRadius = searchRadius;
             return this;

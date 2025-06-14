@@ -11,6 +11,7 @@ import com.github.tartaricacid.touhoulittlemaid.util.SoundUtil;
 import com.github.tartaricacid.touhoulittlemaid.util.functional.TriConsumer;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
+import dev.latvian.mods.kubejs.typings.Info;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.LivingEntity;
@@ -22,7 +23,6 @@ import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
@@ -114,6 +114,14 @@ public class RangedAttackTaskJS implements IRangedAttackTask {
     }
 
     @Override
+    public boolean enableEating(EntityMaid maid) {
+        if (this.builder.enableEating == null) {
+            return true;
+        }
+        return this.builder.enableEating.test(maid);
+    }
+
+    @Override
     public List<Pair<String, Predicate<EntityMaid>>> getEnableConditionDesc(EntityMaid maid) {
         return this.builder.enableConditionDesc;
     }
@@ -172,24 +180,10 @@ public class RangedAttackTaskJS implements IRangedAttackTask {
         return IRangedAttackTask.super.searchRadius(maid);
     }
 
-    public static class Builder {
-        private final ResourceLocation id;
-        private final ItemStack icon;
-
-        private final List<Pair<Integer, BiFunction<RangedAttackTaskJS, EntityMaid, BehaviorControl<? super EntityMaid>>>> brains = Lists.newArrayList();
-        private final List<Pair<Integer, BiFunction<RangedAttackTaskJS, EntityMaid, BehaviorControl<? super EntityMaid>>>> rideBrains = Lists.newArrayList();
-
-        private final List<Pair<String, Predicate<EntityMaid>>> enableConditionDesc = Lists.newArrayList();
-        private final List<Pair<String, Predicate<EntityMaid>>> conditionDesc = Lists.newArrayList();
-
-        private @Nullable Predicate<EntityMaid> enable = null;
-        private @Nullable Predicate<EntityMaid> enableLookAndRandomWalk = null;
+    public static class Builder extends TaskBuilder<Builder, RangedAttackTaskJS> {
         private @Nullable BiPredicate<EntityMaid, LivingEntity> canAttack = null;
         private @Nullable BiPredicate<EntityMaid, ItemStack> isWeapon = null;
-
         private @Nullable TriConsumer<EntityMaid, LivingEntity, Float> performRangedAttack = null;
-
-        private @Nullable SoundEvent sound;
         private float searchRadius = -1f;
         // 默认投射物射程
         private float projectileRange = 16f;
@@ -199,75 +193,69 @@ public class RangedAttackTaskJS implements IRangedAttackTask {
         private float walkSpeed = 0.5f;
 
         public Builder(ResourceLocation id, ItemStack icon) {
-            this.id = id;
-            this.icon = icon;
+            super(id, icon);
         }
 
-        public Builder addBrain(int priority, BiFunction<RangedAttackTaskJS, EntityMaid, BehaviorControl<? super EntityMaid>> control) {
-            this.brains.add(Pair.of(priority, control));
-            return this;
-        }
-
-        public Builder addRideBrain(int priority, BiFunction<RangedAttackTaskJS, EntityMaid, BehaviorControl<? super EntityMaid>> control) {
-            this.rideBrains.add(Pair.of(priority, control));
-            return this;
-        }
-
-        public Builder addEnableConditionDesc(String languageKey, Predicate<EntityMaid> condition) {
-            this.enableConditionDesc.add(Pair.of(languageKey, condition));
-            return this;
-        }
-
-        public Builder addConditionDesc(String languageKey, Predicate<EntityMaid> condition) {
-            this.conditionDesc.add(Pair.of(languageKey, condition));
-            return this;
-        }
-
-        public Builder enable(Predicate<EntityMaid> enable) {
-            this.enable = enable;
-            return this;
-        }
-
-        public Builder enableLookAndRandomWalk(Predicate<EntityMaid> enableLookAndRandomWalk) {
-            this.enableLookAndRandomWalk = enableLookAndRandomWalk;
-            return this;
-        }
-
-        public Builder sound(SoundEvent sound) {
-            this.sound = sound;
-            return this;
-        }
-
+        @Info(value = """
+                Sets the condition for whether the maid can attack a target. Default is all hostile entities. <br>
+                设置女仆是否可以攻击目标的条件。默认为所有敌对生物。
+                """)
         public Builder canAttack(BiPredicate<EntityMaid, LivingEntity> canAttack) {
             this.canAttack = canAttack;
             return this;
         }
 
+        @Info(value = """
+                Sets the condition for whether the maid considers an item as a weapon. Mandatory. <br>
+                设置女仆是否将当前物品视为武器的条件。必填项。
+                """)
         public Builder isWeapon(BiPredicate<EntityMaid, ItemStack> isWeapon) {
             this.isWeapon = isWeapon;
             return this;
         }
 
+        @Info(value = """
+                Sets the search radius for the maid to find targets. Default is the work range, you can increase this value for long-range attacks. <br>
+                设置女仆寻找目标的搜索半径。默认为工作范围，你可以调大此数值实现超视距打击。
+                """)
         public Builder searchRadius(float radius) {
             this.searchRadius = radius;
             return this;
         }
 
+        @Info(value = """
+                Sets the projectile range for the maid's ranged attack. Generally, this value is less than the search radius,
+                and the maid will actively approach hostile entities until within range. Default is 16 blocks. <br>
+                设置女仆远程攻击的投射物射程。一般这个数值会小于搜索半径，女仆会主动接近敌对生物，直到射程范围内。默认为 16 格。
+                """)
         public Builder projectileRange(float projectileRange) {
             this.projectileRange = projectileRange;
             return this;
         }
 
+        @Info(value = """
+                Sets the charge duration for the maid's ranged attack, in ticks. Generally, this is 20 ticks. <br>
+                设置女仆远程攻击的充能时间，单位为 tick。一般是 20 tick。
+                """)
         public Builder chargeDurationTick(int chargeDurationTick) {
             this.chargeDurationTick = chargeDurationTick;
             return this;
         }
 
+        @Info(value = """
+                Sets the walk speed for the maid when performing a ranged attack. Since ranged attacks require frequent movement,
+                this value can be slightly less than 0.6f. <br>
+                设置女仆远程攻击时的行走速度。因为远程攻击走位比较频繁，所以这个数值可以略小于 0.6f。
+                """)
         public Builder walkSpeed(float walkSpeed) {
             this.walkSpeed = walkSpeed;
             return this;
         }
 
+        @Info(value = """
+                Sets the action to perform when the maid performs a ranged attack. Default is empty. <br>
+                设置女仆执行远程攻击时的行为。默认为空。
+                """)
         public Builder performRangedAttack(TriConsumer<EntityMaid, LivingEntity, Float> performRangedAttack) {
             this.performRangedAttack = performRangedAttack;
             return this;
