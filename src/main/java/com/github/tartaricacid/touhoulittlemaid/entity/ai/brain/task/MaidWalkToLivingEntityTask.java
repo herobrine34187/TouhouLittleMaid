@@ -54,11 +54,14 @@ public class MaidWalkToLivingEntityTask extends MaidCheckRateTask {
                 .findFirst()
                 .ifPresent(e -> {
                     targetEntity = e;
-                    BehaviorUtils.setWalkAndLookTargetMemories(maid, e, this.speedModifier, 0);
+                    BehaviorUtils.setWalkAndLookTargetMemories(maid, e, this.speedModifier, (int) Math.max(0, this.closeEnoughDistance - 1));
                 });
 
         if (targetEntity != null && targetEntity.closerThan(maid, this.closeEnoughDistance)) {
             this.arriveAction.accept(maid, targetEntity);
+            maid.getBrain().eraseMemory(MemoryModuleType.LOOK_TARGET);
+            maid.getBrain().eraseMemory(MemoryModuleType.WALK_TARGET);
+            targetEntity = null;
         }
     }
 

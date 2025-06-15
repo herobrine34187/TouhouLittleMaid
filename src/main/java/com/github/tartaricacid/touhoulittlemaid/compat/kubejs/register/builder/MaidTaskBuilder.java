@@ -1,7 +1,7 @@
 package com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.builder;
 
 import com.github.tartaricacid.touhoulittlemaid.api.task.IMaidTask;
-import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.task.presets.*;
+import com.github.tartaricacid.touhoulittlemaid.compat.kubejs.register.task.*;
 import com.github.tartaricacid.touhoulittlemaid.entity.task.TaskManager;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
