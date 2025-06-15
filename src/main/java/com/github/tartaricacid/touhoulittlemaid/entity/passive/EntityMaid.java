@@ -137,6 +137,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.common.capabilities.Capability;
@@ -339,7 +340,15 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return LivingEntity.createLivingAttributes().add(Attributes.FOLLOW_RANGE, 64).add(Attributes.ATTACK_KNOCKBACK).add(Attributes.ATTACK_DAMAGE).add(Attributes.LUCK);
+        return LivingEntity.createLivingAttributes()
+                // 目前仅用于寻路，女仆最大可寻路 64 格
+                .add(Attributes.FOLLOW_RANGE, 64)
+                .add(Attributes.ATTACK_KNOCKBACK)
+                .add(Attributes.ATTACK_DAMAGE)
+                // 幸运值，目前暂时没用，保留为未来添加更多趣味内容
+                .add(Attributes.LUCK)
+                // 用于女仆近战的范围判断
+                .add(ForgeMod.ENTITY_REACH.get(), 2);
     }
 
     public static boolean canInsertItem(ItemStack stack) {
@@ -853,7 +862,8 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
 
     @Override
     public double getMeleeAttackRangeSqr(LivingEntity entity) {
-        int attackDistance = this.favorabilityManager.getAttackDistanceByPoint(this.getFavorability());
+        int attackPlusDistance = this.favorabilityManager.getAttackDistancePlusByPoint(this.getFavorability());
+        double attackDistance = this.getAttributeValue(ForgeMod.ENTITY_REACH.get()) + attackPlusDistance;
         return attackDistance * attackDistance;
     }
 

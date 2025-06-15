@@ -75,7 +75,7 @@ public class MeleeTaskJS implements IAttackTask {
         BehaviorControl<EntityMaid> supplementedTask = StartAttacking.create(m ->
                 isWeapon(m, m.getMainHandItem()), IAttackTask::findFirstValidAttackTarget);
         BehaviorControl<EntityMaid> findTargetTask = StopAttackingIfTargetInvalid.create(target ->
-                !isWeapon(maid, maid.getMainHandItem()) || maid.distanceTo(target) > maid.getRestrictRadius());
+                !isWeapon(maid, maid.getMainHandItem()) || farAway(target, maid));
         BehaviorControl<Mob> attackTargetTask = MeleeAttack.create(builder.meleeCooldownTick);
         MaidUseShieldTask maidUseShieldTask = new MaidUseShieldTask();
 
@@ -155,6 +155,18 @@ public class MeleeTaskJS implements IAttackTask {
             return false;
         }
         return this.builder.isWeapon.test(maid, stack);
+    }
+
+    private boolean farAway(LivingEntity target, EntityMaid maid) {
+        if (!target.isAlive()) {
+            return true;
+        }
+        boolean enable = maid.isHomeModeEnable();
+        float radius = maid.getRestrictRadius();
+        if (!enable && maid.getOwner() != null) {
+            return maid.getOwner().distanceTo(target) > radius;
+        }
+        return maid.distanceTo(target) > radius;
     }
 
     public static class Builder extends TaskBuilder<Builder, MeleeTaskJS> {
