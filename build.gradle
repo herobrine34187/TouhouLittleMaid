@@ -153,8 +153,8 @@ dependencies {
     }
 
     // 拆分出来的基岩版模型加载库
-    jarJar(implementation(fg.deobf("libs:simplebedrockmodel-1.20.1-release:1.2.1"))) {
-        jarJar.ranged(it, "[1.2.1,)")
+    jarJar(implementation(fg.deobf("maven.modrinth:simplebedrockmodel:1.3.0-forge+mc1.20.1"))) {
+        jarJar.ranged(it, "[1.3.0,)")
     }
 
     // 单元测试
