@@ -214,6 +214,8 @@ dependencies {
     runtimeOnly fg.deobf("maven.modrinth:embeddium:0.3.31+mc1.20.1")
     compileOnly fg.deobf("maven.modrinth:embeddium:0.3.31+mc1.20.1")
 
+    implementation fg.deobf("maven.modrinth:inventory-tweaks-refoxed:1.20.1-1.2.0")
+
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     // runtimeOnly fg.deobf("curse.maven:carry-on-274259:4882500")
