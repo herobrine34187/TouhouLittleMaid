@@ -10,6 +10,7 @@ import com.github.tartaricacid.touhoulittlemaid.client.overlay.MaidTipsOverlay;
 import com.github.tartaricacid.touhoulittlemaid.client.resource.LegacyPackRepositorySource;
 import com.github.tartaricacid.touhoulittlemaid.compat.immersivemelodies.ImmersiveMelodiesCompat;
 import com.github.tartaricacid.touhoulittlemaid.compat.oculus.OculusCompat;
+import com.github.tartaricacid.touhoulittlemaid.compat.ponder.PonderCompat;
 import com.github.tartaricacid.touhoulittlemaid.compat.simplehats.SimpleHatsCompat;
 import com.github.tartaricacid.touhoulittlemaid.compat.sodium.SodiumCompat;
 import net.minecraft.server.packs.PackType;
@@ -37,6 +38,7 @@ public class ClientSetupEvent {
         ImmersiveMelodiesCompat.init();
         OculusCompat.init();
         SodiumCompat.init();
+        event.enqueueWork(PonderCompat::register);
     }
 
     @SubscribeEvent
