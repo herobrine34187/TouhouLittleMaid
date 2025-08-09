@@ -5,6 +5,7 @@ import net.createmod.ponder.api.PonderPalette;
 import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper;
 import net.createmod.ponder.api.scene.SceneBuilder;
 import net.createmod.ponder.api.scene.SceneBuildingUtil;
+import net.createmod.ponder.api.scene.Selection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -21,34 +22,30 @@ public class MaidPonderScenes {
 
     public static void altar(SceneBuilder scene, SceneBuildingUtil util) {
         scene.title("altar", "How to build an altar");
-        scene.scaleSceneView(0.75f);
+        scene.scaleSceneView(0.5f);
+        scene.showBasePlate();
 
-        for (int i = 0; i < 6; i++) {
+        for (int i = 1; i < 7; i++) {
             scene.world().showSection(util.select().layer(i), Direction.DOWN);
+            scene.addKeyframe();
             scene.idle(10);
         }
 
-        BlockPos pos = new BlockPos(5, 3, 1);
+        BlockPos pos = new BlockPos(5, 4, 1);
+        Selection clickPos = util.select().position(pos);
 
-        scene.overlay().showText(50)
-                .text("Use Gohei click here to build the altar")
-                .attachKeyFrame()
+        scene.overlay().showOutlineWithText(clickPos, 50)
+                .colored(PonderPalette.BLUE)
                 .placeNearTarget()
-                .pointAt(util.vector().blockSurface(pos, Direction.NORTH, 0.25f));
-
-        scene.idle(5);
-
-        scene.overlay().showOutline(PonderPalette.BLUE,
-                "clickToBuild",
-                util.select().position(pos),
-                110);
+                .pointAt(util.vector().blockSurface(pos, Direction.NORTH, 0.25f))
+                .text("Use Gohei click here to build the altar");
 
         scene.idle(60);
 
-        scene.overlay().showText(50)
-                .text("Paying attention to the direction of the click")
+        scene.overlay().showOutlineWithText(clickPos, 50)
+                .colored(PonderPalette.BLUE)
                 .placeNearTarget()
-                .attachKeyFrame()
-                .pointAt(util.vector().blockSurface(pos, Direction.NORTH, 0.25f));
+                .pointAt(util.vector().blockSurface(pos, Direction.NORTH, 0.25f))
+                .text("Paying attention to the direction of the click");
     }
 }
