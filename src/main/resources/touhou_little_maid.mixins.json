@@ -11,10 +11,8 @@
     "accessor.ArrowAccessor", "accessor.CropBlockAccessor", "accessor.EntityAccessor", "accessor.FenceGateBlockAccessor"
   ],
   "client": [
-    "client.HumanoidModelMixin",
-    "client.ItemPropertiesMixin",
-    "client.LanguageMixin",
-    "client.LivingEntityRendererMixin"
+    "client.ClientPacketListenerMixin", "client.HumanoidModelMixin", "client.ItemPropertiesMixin",
+    "client.LanguageMixin", "client.LivingEntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

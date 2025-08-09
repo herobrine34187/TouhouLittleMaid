@@ -2,6 +2,8 @@ package com.github.tartaricacid.touhoulittlemaid.entity.item;
 
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.init.InitItems;
+import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
+import com.github.tartaricacid.touhoulittlemaid.network.message.OpenPlayerInventoryMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -16,11 +18,13 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -37,10 +41,7 @@ public class EntityBroom extends AbstractEntityFromItem implements OwnableEntity
     private static final EntityDataAccessor<Optional<UUID>> OWNER_ID = SynchedEntityData.defineId(EntityBroom.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final String OWNER_UUID_TAG = "OwnerUUID";
 
-    private boolean keyForward = false;
-    private boolean keyBack = false;
-    private boolean keyLeft = false;
-    private boolean keyRight = false;
+    private boolean keyJump = false;
 
     public EntityBroom(EntityType<EntityBroom> entityType, Level worldIn) {
         super(entityType, worldIn);
@@ -52,23 +53,8 @@ public class EntityBroom extends AbstractEntityFromItem implements OwnableEntity
     }
 
     @OnlyIn(Dist.CLIENT)
-    private static boolean keyForward() {
-        return Minecraft.getInstance().options.keyUp.isDown();
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private static boolean keyBack() {
-        return Minecraft.getInstance().options.keyDown.isDown();
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private static boolean keyLeft() {
-        return Minecraft.getInstance().options.keyLeft.isDown();
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private static boolean keyRight() {
-        return Minecraft.getInstance().options.keyRight.isDown();
+    private static boolean keyJump() {
+        return Minecraft.getInstance().options.keyJump.isDown();
     }
 
     @Override
@@ -95,21 +81,54 @@ public class EntityBroom extends AbstractEntityFromItem implements OwnableEntity
     public void travel(Vec3 vec3) {
         Entity entity = this.getControllingPassenger();
         if (entity instanceof Player player && this.isVehicle() && this.hasPassenger(e -> e instanceof EntityMaid)) {
+            boolean keyForward = player.zza > 0;
+            boolean keyBack = player.zza < 0;
+            boolean keyLeft = player.xxa > 0;
+            boolean keyRight = player.xxa < 0;
+            boolean keySneak = player.isShiftKeyDown();
+
             if (level.isClientSide) {
-                // 不要问我为什么客户端数据能跑到服务端来
-                // 一定是玄学
-                keyForward = keyForward();
-                keyBack = keyBack();
-                keyLeft = keyLeft();
-                keyRight = keyRight();
+                // 空格键起飞
+                this.keyJump = !keySneak && keyJump();
             }
 
-            // 按键控制扫帚各个方向速度
-            float strafe = keyLeft ? 0.5f : (keyRight ? -0.5f : 0);
-            float vertical = keyForward ? -(player.getXRot() - 10) / 22.5f : 0;
-            float forward = keyForward ? 3 : (keyBack ? -0.5f : 0);
+            Vec3 currentMotion = this.getDeltaMovement();
+            boolean hasInput = keyForward || keyBack || keyLeft || keyRight || this.keyJump || keySneak;
 
-            this.moveRelative(0.02f, new Vec3(strafe, vertical, forward));
+            if (hasInput) {
+                float strafe = keyLeft ? 0.2f : (keyRight ? -0.2f : 0);
+                float vertical = 0;
+
+                // 垂直移动控制
+                if (keyJump) {
+                    vertical = 0.25f;
+                } else if (keySneak) {
+                    vertical = -0.2f;
+                } else if (keyForward) {
+                    // 原有的俯仰控制
+                    vertical = -(player.getXRot() - 10) / 360f;
+                }
+
+                float forward = keyForward ? 0.375f : (keyBack ? -0.2f : 0);
+
+                // 玩家基础速度是 0.1，速度二效果是 0.14，为了增加速度效果带来的增益，故这样计算
+                float speed = Math.max(getRiddenSpeed(player) - 0.1f, 0) * 2.5f + 0.1f;
+                Vec3 targetMotion = new Vec3(strafe, vertical, forward).scale(speed * 20);
+                targetMotion = targetMotion.yRot((float) (-this.getYRot() * Math.PI / 180.0));
+
+                // 插值到目标速度，而不是直接累加
+                Vec3 newMotion = currentMotion.lerp(targetMotion, 0.25f);
+
+                if (hasCollisionAbove()) {
+                    newMotion = new Vec3(-newMotion.x, -0.3, -newMotion.z);
+                }
+
+                this.setDeltaMovement(newMotion);
+            } else {
+                // 没有输入时，快速减速
+                this.setDeltaMovement(currentMotion.scale(0.75));
+            }
+
             this.move(MoverType.SELF, this.getDeltaMovement());
             return;
         }
@@ -119,6 +138,24 @@ public class EntityBroom extends AbstractEntityFromItem implements OwnableEntity
             return;
         }
         super.travel(vec3);
+    }
+
+    private boolean hasCollisionAbove() {
+        if (this.onGround()) {
+            return false;
+        }
+        // 检查扫帚及乘客上方 1.5 格的空间
+        double hOffset = 0.25;
+        double vOffset = 1.75;
+        AABB aabb = this.getBoundingBox();
+        AABB checkBox = new AABB(aabb.minX - hOffset, aabb.minY, aabb.minZ - hOffset,
+                aabb.maxX + hOffset, aabb.maxY + vOffset, aabb.maxZ + hOffset);
+        return level.collidesWithSuffocatingBlock(this, checkBox);
+    }
+
+    @Override
+    protected float getRiddenSpeed(Player player) {
+        return (float) player.getAttributeValue(Attributes.MOVEMENT_SPEED);
     }
 
     @Override
@@ -156,7 +193,7 @@ public class EntityBroom extends AbstractEntityFromItem implements OwnableEntity
 
         // 施加上下晃动
         if (!this.onGround()) {
-            this.addDeltaMovement(new Vec3(0, 0.01 * Math.sin(this.tickCount * Math.PI / 18), 0));
+            this.addDeltaMovement(new Vec3(0, 0.003 * Math.sin(this.tickCount * Math.PI / 18), 0));
         }
 
         // 与旋转有关系的一堆东西，用来控制扫帚朝向
@@ -215,7 +252,7 @@ public class EntityBroom extends AbstractEntityFromItem implements OwnableEntity
         List<Entity> passengers = this.getPassengers();
         boolean hasPlayer = false;
         EntityMaid maidOpen = null;
-        for (int i = 0; i < Math.max(passengers.size(), 2); i++) {
+        for (int i = 0; i < Math.min(passengers.size(), 2); i++) {
             Entity entity = passengers.get(i);
             if (entity.equals(player)) {
                 hasPlayer = true;
@@ -224,8 +261,12 @@ public class EntityBroom extends AbstractEntityFromItem implements OwnableEntity
                 maidOpen = maid;
             }
         }
-        if (hasPlayer && maidOpen != null) {
-            maidOpen.openMaidGui(serverPlayer);
+        if (hasPlayer) {
+            if (maidOpen == null) {
+                NetworkHandler.sendToClientPlayer(new OpenPlayerInventoryMessage(OpenPlayerInventoryMessage.OPEN_PLAYER_INVENTORY), serverPlayer);
+            } else {
+                maidOpen.openMaidGui(serverPlayer);
+            }
         }
     }
 
