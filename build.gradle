@@ -14,6 +14,7 @@ buildscript {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '[6.0.16,6.2)', changing: true
         classpath 'org.parchmentmc:librarian:1.+'
         classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
+        classpath 'gradle.plugin.com.github.johnrengelman:shadow:7.1.2'
     }
 }
 
@@ -23,6 +24,7 @@ apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'java'
 apply plugin: 'idea'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 version = mod_version
 group = 'com.github.tartaricacid'
@@ -83,6 +85,14 @@ mixin {
     config "touhou_little_maid.mixins.json"
 }
 
+configurations {
+    // 自定义一个 minecraftLibrary，方便引入需要 Shadow 的库
+    mcLib
+    minecraftLibrary {
+        extendsFrom mcLib
+    }
+}
+
 repositories {
     // 优先本地 libs 文件夹
     flatDir {
@@ -141,28 +151,15 @@ repositories {
     }
 }
 
-jarJar.enable()
-
 dependencies {
     minecraft "net.minecraftforge:forge:${forge_version}"
 
     // Opus 音频解码库
-    jarJar(minecraftLibrary("org.gagravarr:vorbis-java-core:0.8")) {
-        jarJar.ranged(it, "[0.8,)")
-    }
-    jarJar(minecraftLibrary("io.github.jaredmdobson:concentus:1.0.2")) {
-        jarJar.ranged(it, "[1.0.2,)")
-    }
+    mcLib "org.gagravarr:vorbis-java-core:0.8"
+    mcLib "io.github.jaredmdobson:concentus:1.0.2"
 
     // YAML 库
-    jarJar(minecraftLibrary("org.yaml:snakeyaml:2.4")) {
-        jarJar.ranged(it, "[2.4,)")
-    }
-
-    // 拆分出来的基岩版模型加载库
-    jarJar(implementation(fg.deobf("maven.modrinth:simplebedrockmodel:1.3.0-forge+mc1.20.1"))) {
-        jarJar.ranged(it, "[1.3.0,)")
-    }
+    mcLib "org.yaml:snakeyaml:2.4"
 
     // 单元测试
     testImplementation 'junit:junit:4.13.2'
@@ -247,6 +244,33 @@ dependencies {
     // runtimeOnly fg.deobf("curse.maven:maid-storage-manager-1210244:6315697")
     // runtimeOnly fg.deobf("curse.maven:lavafishing-1035887:5432767")
     // runtimeOnly fg.deobf("curse.maven:catalogue-459701:4766090")
+}
+
+shadowJar {
+    configurations = [project.configurations.mcLib]
+
+    // MP3 音频库 居然会把 junit 打包进去……
+    dependencies {
+        exclude(dependency('junit:junit'))
+    }
+
+    // 包重定向
+    relocate 'io.github.jaredmdobson.concentus', 'com.github.tartaricacid.touhoulittlemaid.libs.concentus'
+    relocate 'org.gagravarr', 'com.github.tartaricacid.touhoulittlemaid.libs.gagravarr'
+    relocate 'org.yaml.snakeyaml', 'com.github.tartaricacid.touhoulittlemaid.libs.snakeyaml'
+
+    // 排除不需要的依赖项和资源
+    exclude 'META-INF/maven/**/*'
+    exclude 'META-INF/versions/**/*'
+    // 这个版权许可都已经手动添加进 licenses 里了
+    exclude 'META-INF/LICENSE'
+
+    mergeServiceFiles()
+    minimize()
+}
+
+reobf {
+    shadowJar {}
 }
 
 tasks.compileJava {
