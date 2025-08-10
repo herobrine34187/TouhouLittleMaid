@@ -4,7 +4,6 @@ import com.github.tartaricacid.touhoulittlemaid.entity.item.EntityBroom;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.mixin.accessor.LivingEntityAccessor;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.AABB;
 
 /**
  * 扫帚控制器的接口，用来管控如何控制扫帚
@@ -13,22 +12,6 @@ import net.minecraft.world.phys.AABB;
  * 首个符合条件的控制器会被调用，执行 travel 和 tickRot 方法。
  */
 public interface IBroomControl {
-    /**
-     * 工具方法，检查扫帚是否有碰撞（双端可用）
-     */
-    static boolean hasCollision(EntityBroom broom) {
-        if (broom.onGround()) {
-            return false;
-        }
-        // 检查扫帚及乘客上方 1.5 格的空间
-        double hOffset = 0.25;
-        double vOffset = 1.75;
-        AABB aabb = broom.getBoundingBox();
-        AABB checkBox = new AABB(aabb.minX - hOffset, aabb.minY, aabb.minZ - hOffset,
-                aabb.maxX + hOffset, aabb.maxY + vOffset, aabb.maxZ + hOffset);
-        return broom.level.collidesWithSuffocatingBlock(broom, checkBox);
-    }
-
     /**
      * 工具方法，检查玩家是否按下了跳跃键（双端可用）
      */

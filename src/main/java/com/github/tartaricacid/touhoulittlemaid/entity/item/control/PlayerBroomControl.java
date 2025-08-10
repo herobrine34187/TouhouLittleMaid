@@ -61,11 +61,6 @@ public class PlayerBroomControl implements IBroomControl {
 
             // 插值到目标速度，而不是直接累加
             Vec3 newMotion = currentMotion.lerp(targetMotion, 0.25f);
-
-            if (IBroomControl.hasCollision(broom)) {
-                newMotion = new Vec3(-newMotion.x, -0.3, -newMotion.z);
-            }
-
             broom.setDeltaMovement(newMotion);
         } else {
             // 没有输入时，快速减速

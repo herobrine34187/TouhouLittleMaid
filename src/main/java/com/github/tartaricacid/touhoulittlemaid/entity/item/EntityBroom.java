@@ -25,6 +25,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
@@ -69,6 +70,17 @@ public class EntityBroom extends AbstractEntityFromItem implements OwnableEntity
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
         this.entityData.get(OWNER_ID).ifPresent(uuid -> compound.putUUID(OWNER_UUID_TAG, uuid));
+    }
+
+    @Override
+    protected AABB makeBoundingBox() {
+        AABB aabb = super.makeBoundingBox();
+        if (this.getPassengers().size() > 1) {
+            // 如果有乘客，扫帚的碰撞盒就变大一点
+            return new AABB(aabb.minX, aabb.minY, aabb.minZ,
+                    aabb.maxX, aabb.maxY + 1, aabb.maxZ);
+        }
+        return aabb;
     }
 
     @Override
