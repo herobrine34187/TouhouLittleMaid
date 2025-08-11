@@ -121,11 +121,6 @@ public class ItemChair extends Item {
         return chair;
     }
 
-    @Override
-    public InteractionResult interactLivingEntity(ItemStack pStack, Player pPlayer, LivingEntity pInteractionTarget, InteractionHand pUsedHand) {
-        return super.interactLivingEntity(pStack, pPlayer, pInteractionTarget, pUsedHand);
-    }
-
     private static void addExtraData(@Nullable Player player, ItemStack stack, EntityChair chair, float rotation) {
         Data data = Data.deserialization(stack.getOrCreateTag());
         chair.setModelId(data.getModelId());
