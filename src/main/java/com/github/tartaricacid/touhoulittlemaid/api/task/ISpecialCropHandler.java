@@ -1,12 +1,16 @@
 package com.github.tartaricacid.touhoulittlemaid.api.task;
 
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
+import com.github.tartaricacid.touhoulittlemaid.mixin.accessor.CropBlockAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemNameBlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LevelEvent;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraftforge.common.IPlantable;
 
 public interface ISpecialCropHandler {
@@ -31,6 +35,22 @@ public interface ISpecialCropHandler {
      *                      否则是类似于右键收获
      */
     default void harvest(EntityMaid maid, BlockPos cropPos, BlockState cropState, boolean isDestroyMode) {
+        if (isDestroyMode) {
+            maid.destroyBlock(cropPos);
+        } else if (cropState.getBlock() instanceof CropBlockAccessor crop) {
+            BlockEntity blockEntity = cropState.hasBlockEntity() ? maid.level.getBlockEntity(cropPos) : null;
+            maid.dropResourcesToMaidInv(cropState, maid.level, cropPos, blockEntity, maid, maid.getMainHandItem());
+            maid.level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, cropPos, Block.getId(cropState));
+            // 直接设置 Age 为 0
+            if (cropState.hasProperty(crop.tlmAgeProperty())) {
+                try {
+                    cropState = cropState.trySetValue(crop.tlmAgeProperty(), 0);
+                } catch (IllegalArgumentException ignore) {
+                }
+            }
+            maid.level.setBlock(cropPos, cropState, Block.UPDATE_ALL);
+            maid.level.gameEvent(maid, GameEvent.BLOCK_CHANGE, cropPos);
+        }
     }
 
     /**
