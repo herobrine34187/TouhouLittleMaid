@@ -28,7 +28,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 
 version = mod_version
 group = 'com.github.tartaricacid'
-archivesBaseName = 'touhoulittlemaid-1.20.1-release'
+archivesBaseName = 'touhoulittlemaid'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
