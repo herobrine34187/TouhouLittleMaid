@@ -3,6 +3,7 @@ package com.github.tartaricacid.touhoulittlemaid.network.message;
 import com.github.tartaricacid.touhoulittlemaid.advancements.maid.TriggerType;
 import com.github.tartaricacid.touhoulittlemaid.config.subconfig.MaidConfig;
 import com.github.tartaricacid.touhoulittlemaid.entity.ai.brain.MaidSchedule;
+import com.github.tartaricacid.touhoulittlemaid.entity.item.EntityBroom;
 import com.github.tartaricacid.touhoulittlemaid.entity.item.EntitySit;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.SchedulePos;
@@ -55,8 +56,7 @@ public class MaidConfigMessage {
                     return;
                 }
                 Entity entity = sender.level.getEntity(message.id);
-                if (entity instanceof EntityMaid && ((EntityMaid) entity).isOwnedBy(sender)) {
-                    EntityMaid maid = (EntityMaid) entity;
+                if (entity instanceof EntityMaid maid && maid.isOwnedBy(sender)) {
                     if (maid.isHomeModeEnable() != message.home) {
                         handleHome(message, sender, maid);
                     }
@@ -65,9 +65,10 @@ public class MaidConfigMessage {
                     }
                     if (maid.isRideable() != message.ride) {
                         maid.setRideable(message.ride);
-                    }
-                    if (maid.getVehicle() != null && !(maid.getVehicle() instanceof EntitySit)) {
-                        maid.stopRiding();
+                        Entity vehicle = maid.getVehicle();
+                        if (!message.ride && vehicle != null && !isStopRideBlocklist(vehicle)) {
+                            maid.stopRiding();
+                        }
                     }
                     if (maid.getSchedule() != message.schedule) {
                         maid.setSchedule(message.schedule);
@@ -83,6 +84,14 @@ public class MaidConfigMessage {
             });
         }
         context.setPacketHandled(true);
+    }
+
+    private static boolean isStopRideBlocklist(Entity vehicle) {
+        // 娱乐方块骑乘不受影响
+        boolean isSit = vehicle instanceof EntitySit;
+        // 飞行中的扫帚不能脱离，有风险
+        boolean isBroom = vehicle instanceof EntityBroom broom && !broom.onGround();
+        return isSit || isBroom;
     }
 
     private static void handleHome(MaidConfigMessage message, ServerPlayer sender, EntityMaid maid) {
