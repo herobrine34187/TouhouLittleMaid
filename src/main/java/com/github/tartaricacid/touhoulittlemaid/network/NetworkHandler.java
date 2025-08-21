@@ -126,6 +126,8 @@ public final class NetworkHandler {
                 Optional.of(NetworkDirection.PLAY_TO_CLIENT));
         CHANNEL.registerMessage(49, DismountMessage.class, DismountMessage::encode, DismountMessage::decode, DismountMessage::handle,
                 Optional.of(NetworkDirection.PLAY_TO_SERVER));
+        CHANNEL.registerMessage(50, MaidAnimationMessage.class, MaidAnimationMessage::encode, MaidAnimationMessage::decode, MaidAnimationMessage::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT));
     }
 
     public static void sendToClientPlayer(Object message, Player player) {

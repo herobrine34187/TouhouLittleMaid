@@ -289,6 +289,12 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
     public int roamingVarsUpdateFlag = 0;
     public Object2FloatOpenHashMap<String> roamingVars = new Object2FloatOpenHashMap<>();
 
+    /**
+     * 用于方便特殊动画播放的变量，目前仅支持捡雪球
+     */
+    public int animationId = 0;
+    public long animationRecordTime = -1L;
+
     private List<SendEffectMessage.EffectData> effects = Lists.newArrayList();
     private IMaidTask task = TaskManager.getIdleTask();
     private IMaidBackpack backpack = BackpackManager.getEmptyBackpack();
