@@ -1498,6 +1498,14 @@ public class EntityMaid extends TamableAnimal implements CrossbowAttackMob, IMai
             // 胶片
             ItemStack filmItem = ItemFilm.maidToFilm(this);
             tombstone.insertItem(filmItem);
+
+            // 事件触发，既可以阻断墓碑生成，也可以修改墓碑内容
+            MaidTombstoneEvent tombstoneEvent = new MaidTombstoneEvent(this, tombstone);
+            if (MinecraftForge.EVENT_BUS.post(tombstoneEvent)) {
+                // 如果事件被取消了，那么就不生成墓碑了
+                return;
+            }
+
             // 全局记录
             MaidWorldData maidWorldData = MaidWorldData.get(level);
             if (maidWorldData != null) {
