@@ -1,6 +1,8 @@
 package com.github.tartaricacid.touhoulittlemaid.entity.ai.brain.task;
 
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
+import com.github.tartaricacid.touhoulittlemaid.network.NetworkHandler;
+import com.github.tartaricacid.touhoulittlemaid.network.message.MaidAnimationMessage;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -21,6 +23,7 @@ public class MaidSnowballTargetTask extends Behavior<EntityMaid> {
     private final int attackCooldown;
     private boolean canThrow = false;
     private int attackTime = -1;
+    private int playPickUpAnimationDelayTime = -1;
 
     public MaidSnowballTargetTask(int attackCooldown) {
         super(ImmutableMap.of(MemoryModuleType.LOOK_TARGET, MemoryStatus.REGISTERED, MemoryModuleType.ATTACK_TARGET, MemoryStatus.VALUE_PRESENT), 1200);
@@ -46,10 +49,12 @@ public class MaidSnowballTargetTask extends Behavior<EntityMaid> {
     protected void start(ServerLevel worldIn, EntityMaid entityIn, long gameTimeIn) {
         if (entityIn.getMainHandItem().isEmpty()) {
             entityIn.setItemInHand(InteractionHand.MAIN_HAND, Items.SNOWBALL.getDefaultInstance());
+            NetworkHandler.sendToTrackingEntity(MaidAnimationMessage.pickUpSnowball(entityIn), entityIn);
             return;
         }
         if (!(entityIn.getMainHandItem().getItem() instanceof SnowballItem) && entityIn.getOffhandItem().isEmpty()) {
             entityIn.setItemInHand(InteractionHand.OFF_HAND, Items.SNOWBALL.getDefaultInstance());
+            NetworkHandler.sendToTrackingEntity(MaidAnimationMessage.pickUpSnowball(entityIn), entityIn);
         }
     }
 
@@ -67,8 +72,28 @@ public class MaidSnowballTargetTask extends Behavior<EntityMaid> {
                 BehaviorUtils.lookAtEntity(owner, target);
                 performRangedAttack(owner, target);
                 this.attackTime = this.attackCooldown + owner.getRandom().nextInt(this.attackCooldown);
+                // 略微早一些播放动画
+                this.playPickUpAnimationDelayTime = 25;
             } else if (--this.attackTime <= 0) {
                 this.canThrow = true;
+            }
+
+            // 拾取雪球的动画需要延迟 30 tick 播放，给丢出动画预留一些时间
+            if (this.playPickUpAnimationDelayTime >= 0) {
+                this.playPickUpAnimationDelayTime--;
+            }
+            if (this.playPickUpAnimationDelayTime == 0) {
+                NetworkHandler.sendToTrackingEntity(MaidAnimationMessage.pickUpSnowball(owner), owner);
+            }
+
+            // 如果女仆处于捡雪球动画中，禁止移动
+            if (owner.animationId == MaidAnimationMessage.PICK_UP_SNOWBALL) {
+                // 捡雪球动画默认 1750 毫秒
+                if (System.currentTimeMillis() - owner.animationRecordTime > 1750) {
+                    owner.animationId = MaidAnimationMessage.NONE;
+                    owner.animationRecordTime = -1L;
+                }
+                owner.getNavigation().stop();
             }
         });
     }
@@ -87,7 +112,6 @@ public class MaidSnowballTargetTask extends Behavior<EntityMaid> {
 
     @Override
     protected void stop(ServerLevel worldIn, EntityMaid entityIn, long gameTimeIn) {
-        this.attackTime = -1;
         this.canThrow = false;
         clearAttackTarget(entityIn);
     }

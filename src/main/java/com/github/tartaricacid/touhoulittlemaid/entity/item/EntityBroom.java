@@ -41,6 +41,8 @@ public class EntityBroom extends AbstractEntityFromItem implements OwnableEntity
     private static final String OWNER_UUID_TAG = "OwnerUUID";
 
     private final List<IBroomControl> broomControls;
+    public boolean inPhysicalCheck = false;
+    private AABB physicalBoundingBox = new AABB(Vec3.ZERO, Vec3.ZERO);
 
     public EntityBroom(EntityType<EntityBroom> entityType, Level worldIn) {
         super(entityType, worldIn);
@@ -77,8 +79,10 @@ public class EntityBroom extends AbstractEntityFromItem implements OwnableEntity
         AABB aabb = super.makeBoundingBox();
         if (this.getPassengers().size() > 1) {
             // 如果有乘客，扫帚的碰撞盒就变大一点
-            return new AABB(aabb.minX, aabb.minY, aabb.minZ,
+            this.physicalBoundingBox = new AABB(aabb.minX, aabb.minY, aabb.minZ,
                     aabb.maxX, aabb.maxY + 1, aabb.maxZ);
+        } else {
+            this.physicalBoundingBox = aabb;
         }
         return aabb;
     }
@@ -290,5 +294,9 @@ public class EntityBroom extends AbstractEntityFromItem implements OwnableEntity
 
     public void setOwnerUUID(@Nullable UUID uuid) {
         this.entityData.set(OWNER_ID, Optional.ofNullable(uuid));
+    }
+
+    public AABB getPhysicalBoundingBox() {
+        return physicalBoundingBox;
     }
 }

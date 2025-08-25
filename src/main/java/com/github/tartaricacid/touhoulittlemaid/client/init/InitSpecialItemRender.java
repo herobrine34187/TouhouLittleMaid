@@ -29,6 +29,11 @@ public final class InitSpecialItemRender {
     private static final ResourceLocation LIFE_POINT = new ResourceLocation(TouhouLittleMaid.MOD_ID, "life_point");
     private static final ResourceLocation POINT_ITEM = new ResourceLocation(TouhouLittleMaid.MOD_ID, "point_item");
 
+    // 祭坛合成占位符的物品模型
+    private static final ResourceLocation SPAWN_BOX = new ResourceLocation(TouhouLittleMaid.MOD_ID, "item/spawn_box");
+    private static final ResourceLocation REBORN_MAID = new ResourceLocation(TouhouLittleMaid.MOD_ID, "item/reborn_maid");
+    private static final ResourceLocation SPAWN_LIGHTNING_BOLT = new ResourceLocation(TouhouLittleMaid.MOD_ID, "item/spawn_lightning_bolt");
+
     @SubscribeEvent
     public static void register(RegisterEvent event) {
         if (event.getRegistryKey().equals(Registries.ITEM)) {
@@ -49,6 +54,11 @@ public final class InitSpecialItemRender {
     @SubscribeEvent
     public static void registerModels(ModelEvent.RegisterAdditional event) {
         REPLACEABLE_MODEL_LIST.forEach((triple) -> event.register(triple.getMiddle()));
+
+        // 特殊需要额外注册的模型
+        event.register(SPAWN_BOX);
+        event.register(REBORN_MAID);
+        event.register(SPAWN_LIGHTNING_BOLT);
     }
 
     public static void addReplaceableModel(Item item, ResourceLocation replacedModel, Supplier<Boolean> isReplace) {
