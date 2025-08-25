@@ -9,7 +9,7 @@ public class TTSGptSovitsRequest {
     @SerializedName("text")
     private String text;
 
-    @SerializedName("text_lang")
+    @SerializedName("text_language")
     private String textLang;
 
     @SerializedName("ref_audio_path")
